@@ -1,5 +1,8 @@
 # Seoul Air Tour Viewer
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://minwoo19930301.github.io/seoul-flight-game/)
+
+
 서울 실제 도로, 한강, 주행 경로, 건물 풋프린트 데이터를 바탕으로 만든 1인칭 서울 상공 비행 뷰어입니다. HUD와 미니맵으로 주요 랜드마크 방향을 보면서 63빌딩, 경복궁, N서울타워, COEX, 롯데월드타워 순서로 천천히 둘러볼 수 있습니다.
 
 ## Links
