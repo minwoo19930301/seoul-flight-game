@@ -42,16 +42,16 @@ let bridgeDefs = [];
 
 const buildingMaterials = [
   [
-    new THREE.MeshStandardMaterial({ color: 0xb4bcc6, roughness: 0.92, metalness: 0.06, vertexColors: true }),
-    new THREE.MeshStandardMaterial({ color: 0x7d8d9f, roughness: 0.72, metalness: 0.2, emissive: 0x13253a, emissiveIntensity: 0.14, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x8d8298, roughness: 0.92, metalness: 0.06, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x6f7fa8, roughness: 0.72, metalness: 0.2, emissive: 0x2a1f3a, emissiveIntensity: 0.16, vertexColors: true }),
   ],
   [
-    new THREE.MeshStandardMaterial({ color: 0xd6e3ee, roughness: 0.7, metalness: 0.16, vertexColors: true }),
-    new THREE.MeshStandardMaterial({ color: 0x8ba4bd, roughness: 0.46, metalness: 0.42, emissive: 0x122844, emissiveIntensity: 0.18, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x7a7390, roughness: 0.7, metalness: 0.16, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x6f7fa8, roughness: 0.46, metalness: 0.42, emissive: 0x33244a, emissiveIntensity: 0.2, vertexColors: true }),
   ],
   [
-    new THREE.MeshStandardMaterial({ color: 0x9aa8b7, roughness: 0.68, metalness: 0.12, vertexColors: true }),
-    new THREE.MeshStandardMaterial({ color: 0x5d7085, roughness: 0.58, metalness: 0.32, emissive: 0x14263e, emissiveIntensity: 0.16, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x8d8298, roughness: 0.68, metalness: 0.12, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x7a7390, roughness: 0.58, metalness: 0.32, emissive: 0x2c2140, emissiveIntensity: 0.18, vertexColors: true }),
   ],
 ];
 
@@ -98,6 +98,7 @@ const runtime = {
   skyGroup: null,
   riverMesh: null,
   riverGlowMesh: null,
+  towerBeacon: null,
   lastTime: performance.now(),
   checkpointGroups: [],
   clouds: [],
@@ -295,17 +296,25 @@ function setupThree() {
   dom.root.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe0eefb);
-  scene.fog = new THREE.Fog(0xe0eefb, 850, 3400);
+  scene.background = new THREE.Color(0xf0a877);
+  scene.fog = new THREE.Fog(0xd9927e, 800, 3000);
 
   const camera = new THREE.PerspectiveCamera(76, window.innerWidth / window.innerHeight, 0.5, 6000);
   camera.position.set(0, 200, 0);
 
-  const hemi = new THREE.HemisphereLight(0xcfe9ff, 0x36503c, 2.3);
+  const hemi = new THREE.HemisphereLight(0x7c6f9e, 0x2c2438, 1.5);
   scene.add(hemi);
 
-  const sun = new THREE.DirectionalLight(0xfff6df, 2.7);
-  sun.position.set(460, 980, -220);
+  // Magic-hour sun: low elevation (~8deg above horizon) at a fixed azimuth.
+  const sunAzimuth = THREE.MathUtils.degToRad(-25);
+  const sunElevation = THREE.MathUtils.degToRad(8);
+  const sunDistance = 1080;
+  const sun = new THREE.DirectionalLight(0xffb066, 2.4);
+  sun.position.set(
+    Math.cos(sunElevation) * Math.sin(sunAzimuth) * sunDistance,
+    Math.sin(sunElevation) * sunDistance,
+    Math.cos(sunElevation) * Math.cos(sunAzimuth) * sunDistance,
+  );
   scene.add(sun);
 
   const cockpitLight = new THREE.PointLight(0x8fe7ff, 0.48, 320);
@@ -338,7 +347,7 @@ function buildWorld() {
   scene.add(river);
   runtime.riverMesh = river;
 
-  const waterGlow = createRiverMesh(riverWidth * 0.56, 2.4, 0x74d8ff, 0.28);
+  const waterGlow = createRiverMesh(riverWidth * 0.56, 2.4, 0xff9e6a, 0.28);
   scene.add(waterGlow);
   runtime.riverGlowMesh = waterGlow;
 
@@ -355,15 +364,20 @@ function buildWorld() {
 function createSky(scene) {
   const skyGroup = new THREE.Group();
 
+  const sunDirection = runtime.sun.position.clone().normalize();
+
   const skyGeometry = new THREE.SphereGeometry(4800, 32, 15);
   const skyMaterial = new THREE.ShaderMaterial({
     side: THREE.BackSide,
     depthWrite: false,
     fog: false,
     uniforms: {
-      zenithColor: { value: new THREE.Color(0x3d7ccc) },
-      midColor: { value: new THREE.Color(0x9acdf8) },
-      horizonColor: { value: new THREE.Color(0xe6f1fa) },
+      zenithColor: { value: new THREE.Color(0x2e3c6e) },
+      upperColor: { value: new THREE.Color(0x5a5f9e) },
+      lowColor: { value: new THREE.Color(0xc97f8e) },
+      horizonColor: { value: new THREE.Color(0xf7b26a) },
+      scatterColor: { value: new THREE.Color(0xffd9a0) },
+      sunDir: { value: sunDirection },
     },
     vertexShader: `
       varying vec3 vWorldPosition;
@@ -376,12 +390,21 @@ function createSky(scene) {
     fragmentShader: `
       varying vec3 vWorldPosition;
       uniform vec3 zenithColor;
-      uniform vec3 midColor;
+      uniform vec3 upperColor;
+      uniform vec3 lowColor;
       uniform vec3 horizonColor;
+      uniform vec3 scatterColor;
+      uniform vec3 sunDir;
       void main() {
-        float h = normalize(vWorldPosition).y;
-        vec3 lowMix = mix(horizonColor, midColor, smoothstep(0.0, 0.28, h));
-        vec3 color = mix(lowMix, zenithColor, smoothstep(0.28, 0.85, h));
+        vec3 dir = normalize(vWorldPosition);
+        float h = dir.y;
+        vec3 lowMix = mix(horizonColor, lowColor, smoothstep(0.0, 0.22, h));
+        vec3 midMix = mix(lowMix, upperColor, smoothstep(0.22, 0.55, h));
+        vec3 color = mix(midMix, zenithColor, smoothstep(0.55, 0.9, h));
+
+        float scatter = pow(max(dot(dir, normalize(sunDir)), 0.0), 3.0) * 0.6;
+        color = mix(color, scatterColor, scatter);
+
         gl_FragColor = vec4(color, 1.0);
       }
     `,
@@ -394,9 +417,10 @@ function createSky(scene) {
   sunCanvas.height = 256;
   const sunCtx = sunCanvas.getContext("2d");
   const sunGradient = sunCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
-  sunGradient.addColorStop(0, "rgba(255, 250, 230, 0.95)");
-  sunGradient.addColorStop(0.4, "rgba(255, 246, 223, 0.5)");
-  sunGradient.addColorStop(1, "rgba(255, 246, 223, 0)");
+  sunGradient.addColorStop(0, "rgba(255, 243, 208, 0.98)");
+  sunGradient.addColorStop(0.32, "rgba(255, 210, 150, 0.68)");
+  sunGradient.addColorStop(0.62, "rgba(255, 158, 94, 0.32)");
+  sunGradient.addColorStop(1, "rgba(255, 158, 94, 0)");
   sunCtx.fillStyle = sunGradient;
   sunCtx.fillRect(0, 0, sunCanvas.width, sunCanvas.height);
 
@@ -409,9 +433,8 @@ function createSky(scene) {
     fog: false,
   });
   const sunSprite = new THREE.Sprite(sunMaterial);
-  sunSprite.scale.set(520, 520, 1);
-  const sunDirection = runtime.sun.position.clone().normalize();
-  sunSprite.position.copy(sunDirection.multiplyScalar(4200));
+  sunSprite.scale.set(640, 640, 1);
+  sunSprite.position.copy(sunDirection).multiplyScalar(4200);
   skyGroup.add(sunSprite);
 
   scene.add(skyGroup);
@@ -463,14 +486,34 @@ function createGroundTexture() {
 
   if (runtime.rasterMapImage) {
     ctx.save();
-    ctx.filter = "contrast(1.06) saturate(0.88) brightness(0.76)";
+    ctx.filter = "contrast(1.1) saturate(0.82) brightness(0.78)";
     ctx.drawImage(runtime.rasterMapImage, 0, 0, canvas.width, canvas.height);
     ctx.restore();
 
+    // Dusk wash: multiply toward deep purple-mauve.
+    ctx.save();
+    ctx.globalCompositeOperation = "multiply";
+    ctx.fillStyle = "rgba(122, 106, 136, 0.55)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+
+    // Warm sun-facing tint patch (sun azimuth ~ -25deg -> biased toward left/upper of texture).
+    ctx.save();
+    ctx.globalCompositeOperation = "soft-light";
+    const sunTint = ctx.createRadialGradient(
+      canvas.width * 0.32, canvas.height * 0.28, 0,
+      canvas.width * 0.32, canvas.height * 0.28, canvas.width * 0.65,
+    );
+    sunTint.addColorStop(0, "rgba(201, 138, 106, 0.55)");
+    sunTint.addColorStop(1, "rgba(201, 138, 106, 0)");
+    ctx.fillStyle = sunTint;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+
     const wash = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    wash.addColorStop(0, "rgba(8, 20, 28, 0.1)");
-    wash.addColorStop(0.5, "rgba(6, 14, 20, 0.18)");
-    wash.addColorStop(1, "rgba(8, 18, 22, 0.24)");
+    wash.addColorStop(0, "rgba(18, 14, 30, 0.1)");
+    wash.addColorStop(0.5, "rgba(14, 10, 24, 0.18)");
+    wash.addColorStop(1, "rgba(16, 12, 26, 0.26)");
     ctx.fillStyle = wash;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   } else {
@@ -544,19 +587,34 @@ function createGroundTexture() {
   ctx.restore();
 
   if (!runtime.rasterMapImage) {
-    ctx.fillStyle = "rgba(186, 238, 255, 0.95)";
+    ctx.fillStyle = "rgba(255, 232, 208, 0.95)";
     ctx.font = '700 64px "Orbitron", sans-serif';
     ctx.fillText("SEOUL AIR TOUR", 86, 110);
   }
 
-  ctx.fillStyle = "rgba(225, 242, 251, 0.62)";
+  ctx.save();
+  ctx.strokeStyle = "rgba(36, 20, 20, 0.55)";
+  ctx.lineWidth = 4;
+  ctx.fillStyle = "rgba(255, 232, 208, 0.92)";
   ctx.font = '700 44px "IBM Plex Sans KR", sans-serif';
   landmarkDefs.forEach((landmark) => {
-    placeLabel(ctx, canvas, landmark.label.toUpperCase(), landmark.x, landmark.z - 84);
+    const position = worldToTexture(landmark.x, landmark.z - 84, canvas);
+    ctx.textAlign = "center";
+    ctx.strokeText(landmark.label.toUpperCase(), position.x, position.y);
+    ctx.fillText(landmark.label.toUpperCase(), position.x, position.y);
   });
+  ctx.restore();
   const riverMid = riverPath[Math.floor(riverPath.length * 0.52)];
   if (riverMid) {
-    placeLabel(ctx, canvas, "HAN RIVER", riverMid.x, riverMid.y, "rgba(220, 249, 255, 0.78)");
+    ctx.save();
+    ctx.strokeStyle = "rgba(36, 20, 20, 0.55)";
+    ctx.lineWidth = 4;
+    const position = worldToTexture(riverMid.x, riverMid.y, canvas);
+    ctx.textAlign = "center";
+    ctx.strokeText("HAN RIVER", position.x, position.y);
+    ctx.fillStyle = "rgba(255, 224, 200, 0.95)";
+    ctx.fillText("HAN RIVER", position.x, position.y);
+    ctx.restore();
   }
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -565,7 +623,7 @@ function createGroundTexture() {
   return texture;
 }
 
-function createRiverMesh(width = riverWidth, y = 1.2, color = 0x2f72ca, opacity = 0.9) {
+function createRiverMesh(width = riverWidth, y = 1.2, color = 0xb35a3a, opacity = 0.9) {
   const curve = new THREE.SplineCurve(riverPath);
   const points = curve.getPoints(140);
   const positions = [];
@@ -615,11 +673,11 @@ function createRiverMesh(width = riverWidth, y = 1.2, color = 0x2f72ca, opacity 
       color,
       transparent: true,
       opacity,
-      roughness: 0.18,
+      roughness: 0.12,
       metalness: 0.12,
-      clearcoat: 0.9,
-      emissive: 0x144e89,
-      emissiveIntensity: width === riverWidth ? 0.38 : 0.56,
+      clearcoat: 1.0,
+      emissive: 0xd4703f,
+      emissiveIntensity: width === riverWidth ? 0.55 : 0.7,
       side: THREE.DoubleSide,
     }),
   );
@@ -678,16 +736,20 @@ function addMountainGradientColors(geometry, height, baseColorHex) {
   const maxY = geometry.boundingBox.max.y;
   const positions = geometry.attributes.position;
   const colors = new Float32Array(positions.count * 3);
-  const baseColor = new THREE.Color(baseColorHex);
-  const rockColor = new THREE.Color(0x7a6f5f);
-  const ridgeColor = new THREE.Color(0x9c927f);
+  const baseColor = new THREE.Color(0x3a3352);
+  const rockColor = new THREE.Color(0x554a68);
+  const ridgeColor = new THREE.Color(0x6e5a78);
+  const rimColor = new THREE.Color(0x8a6a70);
   const tempColor = new THREE.Color();
+  void baseColorHex;
   for (let index = 0; index < positions.count; index += 1) {
     const fraction = maxY > minY ? (positions.getY(index) - minY) / (maxY - minY) : 1;
     if (fraction < 0.6) {
       tempColor.copy(baseColor).lerp(rockColor, THREE.MathUtils.smoothstep(fraction, 0.35, 0.6));
+    } else if (fraction < 0.88) {
+      tempColor.copy(rockColor).lerp(ridgeColor, THREE.MathUtils.smoothstep(fraction, 0.6, 0.88));
     } else {
-      tempColor.copy(rockColor).lerp(ridgeColor, THREE.MathUtils.smoothstep(fraction, 0.6, 0.92));
+      tempColor.copy(ridgeColor).lerp(rimColor, THREE.MathUtils.smoothstep(fraction, 0.88, 1));
     }
     colors[index * 3] = tempColor.r;
     colors[index * 3 + 1] = tempColor.g;
@@ -698,11 +760,11 @@ function addMountainGradientColors(geometry, height, baseColorHex) {
 
 function createBoundarySkyline(scene) {
   const material = new THREE.MeshStandardMaterial({
-    color: 0xaec4da,
+    color: 0x453a5c,
     roughness: 0.78,
     metalness: 0.08,
     transparent: true,
-    opacity: 0.82,
+    opacity: 0.86,
   });
 
   const rng = mulberry32(911);
@@ -822,9 +884,9 @@ function enqueueInstancedBuilding(buckets, candidate) {
 
 function createInstancedBuildingGroups(group, buckets) {
   const baseColors = {
-    residential: new THREE.Color(0xbcc7d3),
-    commercial: new THREE.Color(0xa7bdd0),
-    mixed: new THREE.Color(0xa3b0be),
+    residential: new THREE.Color(0x8d8298),
+    commercial: new THREE.Color(0x6f7fa8),
+    mixed: new THREE.Color(0x7a7390),
   };
 
   const materials = {
@@ -832,24 +894,24 @@ function createInstancedBuildingGroups(group, buckets) {
       color: 0xffffff,
       roughness: 0.84,
       metalness: 0.12,
-      emissive: 0x122133,
-      emissiveIntensity: 0.09,
+      emissive: 0x261c34,
+      emissiveIntensity: 0.1,
       vertexColors: true,
     }),
     commercial: new THREE.MeshStandardMaterial({
       color: 0xffffff,
       roughness: 0.56,
       metalness: 0.34,
-      emissive: 0x152843,
-      emissiveIntensity: 0.16,
+      emissive: 0x2f2248,
+      emissiveIntensity: 0.18,
       vertexColors: true,
     }),
     mixed: new THREE.MeshStandardMaterial({
       color: 0xffffff,
       roughness: 0.7,
       metalness: 0.18,
-      emissive: 0x141f2e,
-      emissiveIntensity: 0.11,
+      emissive: 0x281f3a,
+      emissiveIntensity: 0.12,
       vertexColors: true,
     }),
   };
@@ -933,7 +995,7 @@ function createLandmarks(scene) {
     group.position.set(landmark.x, 0, landmark.z);
     scene.add(group);
 
-    const label = createLabelSprite(landmark.label, "#dcf5ff");
+    const label = createLabelSprite(landmark.label, "#ffe8d0");
     label.position.set(landmark.x, terrainHeight + landmark.height + 32, landmark.z);
     scene.add(label);
   });
@@ -943,6 +1005,8 @@ function createBridges(scene) {
   const deckMaterial = new THREE.MeshStandardMaterial({ color: 0xd1d5d9, roughness: 0.5, metalness: 0.48 });
   const towerMaterial = new THREE.MeshStandardMaterial({ color: 0xf0f2f5, roughness: 0.42, metalness: 0.42 });
   const cableMaterial = new THREE.MeshStandardMaterial({ color: 0xe8ecef, roughness: 0.3, metalness: 0.6 });
+  const lightGeometry = new THREE.SphereGeometry(1.1, 8, 8);
+  const lightMaterial = new THREE.MeshStandardMaterial({ color: 0xffb15e, emissive: 0xffb15e, emissiveIntensity: 1.1, roughness: 0.4 });
 
   bridgeDefs.forEach((bridge) => {
     const group = new THREE.Group();
@@ -950,6 +1014,16 @@ function createBridges(scene) {
     const deck = new THREE.Mesh(new THREE.BoxGeometry(14, 7, bridge.length), deckMaterial);
     deck.position.y = 12;
     group.add(deck);
+
+    const lightCount = 10 + Math.floor(bridge.length / 60) % 5;
+    for (let index = 0; index < lightCount; index += 1) {
+      const fraction = index / (lightCount - 1) - 0.5;
+      [-8, 8].forEach((side) => {
+        const light = new THREE.Mesh(lightGeometry, lightMaterial);
+        light.position.set(side, 16, fraction * bridge.length * 0.94);
+        group.add(light);
+      });
+    }
 
     if (bridge.name === "반포대교") {
       const lowerDeck = new THREE.Mesh(new THREE.BoxGeometry(12, 3.4, bridge.length * 0.94), deckMaterial);
@@ -1063,6 +1137,15 @@ function createCloudPuffTexture() {
   gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const tint = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  tint.addColorStop(0, "rgba(205, 191, 232, 0.55)");
+  tint.addColorStop(1, "rgba(255, 201, 160, 0.55)");
+  ctx.globalCompositeOperation = "source-atop";
+  ctx.fillStyle = tint;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.globalCompositeOperation = "source-over";
+
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
@@ -1071,11 +1154,11 @@ function createCloudPuffTexture() {
 function create63Building(terrainHeight) {
   const group = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({
-    color: 0xd9b877,
-    roughness: 0.2,
+    color: 0xe8b356,
+    roughness: 0.18,
     metalness: 0.85,
-    emissive: 0x3b2410,
-    emissiveIntensity: 0.16,
+    emissive: 0xffb84d,
+    emissiveIntensity: 0.7,
     vertexColors: true,
   });
 
@@ -1088,7 +1171,7 @@ function create63Building(terrainHeight) {
 
   const parapet = new THREE.Mesh(
     new THREE.BoxGeometry(50, 3, 30),
-    new THREE.MeshStandardMaterial({ color: 0x2c2013, roughness: 0.6, metalness: 0.3 }),
+    new THREE.MeshStandardMaterial({ color: 0x3a2410, roughness: 0.6, metalness: 0.3, emissive: 0xffb84d, emissiveIntensity: 0.2 }),
   );
   parapet.position.y = terrainHeight + 251.5;
   group.add(parapet);
@@ -1102,7 +1185,7 @@ function create63Building(terrainHeight) {
 
 function createSeoulTower(terrainHeight) {
   const group = new THREE.Group();
-  const shaftMaterial = new THREE.MeshStandardMaterial({ color: 0xe6edf3, roughness: 0.3, metalness: 0.44 });
+  const shaftMaterial = new THREE.MeshStandardMaterial({ color: 0xe6c3a8, roughness: 0.3, metalness: 0.44, emissive: 0xff8f52, emissiveIntensity: 0.18 });
 
   const shaft = new THREE.Mesh(
     new THREE.CylinderGeometry(5.4, 10, 160, 20),
@@ -1158,6 +1241,14 @@ function createSeoulTower(terrainHeight) {
   antennaUpper.position.y = terrainHeight + 244;
   group.add(antennaUpper);
 
+  const beacon = new THREE.Mesh(
+    new THREE.SphereGeometry(2.4, 12, 12),
+    new THREE.MeshStandardMaterial({ color: 0xff6a4d, emissive: 0xff6a4d, emissiveIntensity: 1, roughness: 0.4 }),
+  );
+  beacon.position.y = terrainHeight + 260;
+  group.add(beacon);
+  runtime.towerBeacon = beacon;
+
   return group;
 }
 
@@ -1167,7 +1258,7 @@ function createGyeongbokgung(terrainHeight) {
   const roofTile = new THREE.MeshStandardMaterial({ color: 0x3a3f46, roughness: 0.68, metalness: 0.1, vertexColors: true });
   const wall = new THREE.MeshStandardMaterial({ color: 0x9b5039, roughness: 0.82, metalness: 0.02 });
   const column = new THREE.MeshStandardMaterial({ color: 0x7a3b2e, roughness: 0.7, metalness: 0.05 });
-  const eaveBand = new THREE.MeshStandardMaterial({ color: 0xcfe6d2, roughness: 0.6, metalness: 0.04 });
+  const eaveBand = new THREE.MeshStandardMaterial({ color: 0xcfe6d2, roughness: 0.6, metalness: 0.04, emissive: 0xffb87a, emissiveIntensity: 0.3 });
 
   const base = new THREE.Mesh(new THREE.BoxGeometry(118, 5, 94), stone);
   base.position.y = terrainHeight + 2.5;
@@ -1243,11 +1334,11 @@ function createCoexTower(terrainHeight) {
   const body = new THREE.Mesh(
     shared.box,
     new THREE.MeshStandardMaterial({
-      color: 0x8cc4eb,
-      roughness: 0.24,
-      metalness: 0.72,
-      emissive: 0x14314d,
-      emissiveIntensity: 0.22,
+      color: 0xd6a888,
+      roughness: 0.22,
+      metalness: 0.74,
+      emissive: 0xd97a4a,
+      emissiveIntensity: 0.3,
     }),
   );
   body.scale.set(42, 212, 42);
@@ -1256,14 +1347,14 @@ function createCoexTower(terrainHeight) {
 
   const cap = new THREE.Mesh(
     new THREE.BoxGeometry(44, 12, 44),
-    new THREE.MeshStandardMaterial({ color: 0xb8d6ea, roughness: 0.3, metalness: 0.62 }),
+    new THREE.MeshStandardMaterial({ color: 0xe6c2a2, roughness: 0.3, metalness: 0.62, emissive: 0xd97a4a, emissiveIntensity: 0.2 }),
   );
   cap.position.y = terrainHeight + 218;
   group.add(cap);
 
   const lowWing = new THREE.Mesh(
     shared.box,
-    new THREE.MeshStandardMaterial({ color: 0x6f8498, roughness: 0.46, metalness: 0.38 }),
+    new THREE.MeshStandardMaterial({ color: 0x8a7466, roughness: 0.46, metalness: 0.4, emissive: 0xb06a3a, emissiveIntensity: 0.15 }),
   );
   lowWing.scale.set(74, 22, 48);
   lowWing.position.set(-48, terrainHeight + 11, 12);
@@ -1275,11 +1366,11 @@ function createCoexTower(terrainHeight) {
 function createLotteTower(terrainHeight) {
   const group = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({
-    color: 0xa9cbe8,
+    color: 0x8aa8c4,
     roughness: 0.18,
     metalness: 0.55,
-    emissive: 0x102236,
-    emissiveIntensity: 0.24,
+    emissive: 0xb06a3a,
+    emissiveIntensity: 0.25,
     vertexColors: true,
   });
 
@@ -1321,10 +1412,10 @@ function createLabelSprite(text, color) {
   canvas.height = 128;
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "rgba(4, 10, 16, 0.62)";
+  ctx.fillStyle = "rgba(36, 26, 26, 0.72)";
   roundRect(ctx, 20, 20, 472, 88, 28);
   ctx.fill();
-  ctx.strokeStyle = "rgba(134, 229, 255, 0.44)";
+  ctx.strokeStyle = "rgba(255, 184, 122, 0.44)";
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -1523,7 +1614,10 @@ function loop(now) {
   updateHud();
   runtime.skyGroup.position.copy(runtime.camera.position);
   runtime.riverGlowMesh.material.opacity = 0.28 + 0.05 * Math.sin(now * 0.0007);
-  runtime.riverMesh.material.emissiveIntensity = 0.38 * (1 + 0.15 * Math.sin(now * 0.0004));
+  runtime.riverMesh.material.emissiveIntensity = 0.55 * (1 + 0.15 * Math.sin(now * 0.0004));
+  if (runtime.towerBeacon) {
+    runtime.towerBeacon.material.emissiveIntensity = 0.6 + 0.5 * Math.max(Math.sin(now * 0.0028), 0);
+  }
   runtime.renderer.render(runtime.scene, runtime.camera);
   requestAnimationFrame(loop);
 }
@@ -2208,6 +2302,10 @@ function hashFrac(i) {
   return value - Math.floor(value);
 }
 
+const duskShadowColor = new THREE.Color(0x241c38);
+const duskLitColor = new THREE.Color(0xffffff);
+const aoTempColor = new THREE.Color();
+
 function addVerticalAoColors(geometry) {
   geometry.computeBoundingBox();
   const minY = geometry.boundingBox.min.y;
@@ -2216,10 +2314,10 @@ function addVerticalAoColors(geometry) {
   const colors = new Float32Array(positions.count * 3);
   for (let index = 0; index < positions.count; index += 1) {
     const fraction = maxY > minY ? (positions.getY(index) - minY) / (maxY - minY) : 1;
-    const shade = THREE.MathUtils.lerp(0.72, 1, fraction);
-    colors[index * 3] = shade;
-    colors[index * 3 + 1] = shade;
-    colors[index * 3 + 2] = shade;
+    aoTempColor.copy(duskShadowColor).lerp(duskLitColor, THREE.MathUtils.lerp(0.55, 1, fraction));
+    colors[index * 3] = aoTempColor.r;
+    colors[index * 3 + 1] = aoTempColor.g;
+    colors[index * 3 + 2] = aoTempColor.b;
   }
   geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 }
@@ -2231,10 +2329,10 @@ function addHeightFractionColors(geometry, height) {
   const colors = new Float32Array(positions.count * 3);
   for (let index = 0; index < positions.count; index += 1) {
     const fraction = height > 0 ? THREE.MathUtils.clamp((positions.getY(index) - minY) / height, 0, 1) : 1;
-    const shade = THREE.MathUtils.lerp(0.78, 1, fraction);
-    colors[index * 3] = shade;
-    colors[index * 3 + 1] = shade;
-    colors[index * 3 + 2] = shade;
+    aoTempColor.copy(duskShadowColor).lerp(duskLitColor, THREE.MathUtils.lerp(0.62, 1, fraction));
+    colors[index * 3] = aoTempColor.r;
+    colors[index * 3 + 1] = aoTempColor.g;
+    colors[index * 3 + 2] = aoTempColor.b;
   }
   geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 }
