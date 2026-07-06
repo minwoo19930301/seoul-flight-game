@@ -42,16 +42,16 @@ let bridgeDefs = [];
 
 const buildingMaterials = [
   [
-    new THREE.MeshStandardMaterial({ color: 0xb4bcc6, roughness: 0.92, metalness: 0.06 }),
-    new THREE.MeshStandardMaterial({ color: 0x7d8d9f, roughness: 0.72, metalness: 0.2, emissive: 0x13253a, emissiveIntensity: 0.14 }),
+    new THREE.MeshStandardMaterial({ color: 0xb4bcc6, roughness: 0.92, metalness: 0.06, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x7d8d9f, roughness: 0.72, metalness: 0.2, emissive: 0x13253a, emissiveIntensity: 0.14, vertexColors: true }),
   ],
   [
-    new THREE.MeshStandardMaterial({ color: 0xd6e3ee, roughness: 0.7, metalness: 0.16 }),
-    new THREE.MeshStandardMaterial({ color: 0x8ba4bd, roughness: 0.46, metalness: 0.42, emissive: 0x122844, emissiveIntensity: 0.18 }),
+    new THREE.MeshStandardMaterial({ color: 0xd6e3ee, roughness: 0.7, metalness: 0.16, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x8ba4bd, roughness: 0.46, metalness: 0.42, emissive: 0x122844, emissiveIntensity: 0.18, vertexColors: true }),
   ],
   [
-    new THREE.MeshStandardMaterial({ color: 0x9aa8b7, roughness: 0.68, metalness: 0.12 }),
-    new THREE.MeshStandardMaterial({ color: 0x5d7085, roughness: 0.58, metalness: 0.32, emissive: 0x14263e, emissiveIntensity: 0.16 }),
+    new THREE.MeshStandardMaterial({ color: 0x9aa8b7, roughness: 0.68, metalness: 0.12, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x5d7085, roughness: 0.58, metalness: 0.32, emissive: 0x14263e, emissiveIntensity: 0.16, vertexColors: true }),
   ],
 ];
 
@@ -61,6 +61,8 @@ const shared = {
   towerRing: new THREE.TorusGeometry(1, 0.14, 12, 48),
   beam: new THREE.CylinderGeometry(1, 1.4, 1, 20, 1, true),
 };
+
+addVerticalAoColors(shared.box);
 
 const state = {
   mode: "intro",
@@ -93,6 +95,9 @@ const runtime = {
   renderer: null,
   sun: null,
   cockpitLight: null,
+  skyGroup: null,
+  riverMesh: null,
+  riverGlowMesh: null,
   lastTime: performance.now(),
   checkpointGroups: [],
   clouds: [],
@@ -276,7 +281,7 @@ function configureSeoulMap(mapData) {
 
 function setupThree() {
   const renderer = new THREE.WebGLRenderer({
-    antialias: false,
+    antialias: (window.devicePixelRatio || 1) <= 1.5,
     alpha: false,
     powerPreference: "default",
     failIfMajorPerformanceCaveat: false,
@@ -290,8 +295,8 @@ function setupThree() {
   dom.root.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x9acdf8);
-  scene.fog = new THREE.Fog(0x98c8eb, 850, 3400);
+  scene.background = new THREE.Color(0xe0eefb);
+  scene.fog = new THREE.Fog(0xe0eefb, 850, 3400);
 
   const camera = new THREE.PerspectiveCamera(76, window.innerWidth / window.innerHeight, 0.5, 6000);
   camera.position.set(0, 200, 0);
@@ -331,16 +336,86 @@ function buildWorld() {
 
   const river = createRiverMesh();
   scene.add(river);
+  runtime.riverMesh = river;
 
   const waterGlow = createRiverMesh(riverWidth * 0.56, 2.4, 0x74d8ff, 0.28);
   scene.add(waterGlow);
+  runtime.riverGlowMesh = waterGlow;
 
+  createSky(scene);
   createMountains(scene);
   createActualBuildings(scene);
   createLandmarks(scene);
   createBridges(scene);
+  createBoundarySkyline(scene);
   createCheckpoints(scene);
   createClouds(scene);
+}
+
+function createSky(scene) {
+  const skyGroup = new THREE.Group();
+
+  const skyGeometry = new THREE.SphereGeometry(4800, 32, 15);
+  const skyMaterial = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    depthWrite: false,
+    fog: false,
+    uniforms: {
+      zenithColor: { value: new THREE.Color(0x3d7ccc) },
+      midColor: { value: new THREE.Color(0x9acdf8) },
+      horizonColor: { value: new THREE.Color(0xe6f1fa) },
+    },
+    vertexShader: `
+      varying vec3 vWorldPosition;
+      void main() {
+        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = worldPosition.xyz;
+        gl_Position = projectionMatrix * viewMatrix * worldPosition;
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vWorldPosition;
+      uniform vec3 zenithColor;
+      uniform vec3 midColor;
+      uniform vec3 horizonColor;
+      void main() {
+        float h = normalize(vWorldPosition).y;
+        vec3 lowMix = mix(horizonColor, midColor, smoothstep(0.0, 0.28, h));
+        vec3 color = mix(lowMix, zenithColor, smoothstep(0.28, 0.85, h));
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `,
+  });
+  const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+  skyGroup.add(sky);
+
+  const sunCanvas = document.createElement("canvas");
+  sunCanvas.width = 256;
+  sunCanvas.height = 256;
+  const sunCtx = sunCanvas.getContext("2d");
+  const sunGradient = sunCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  sunGradient.addColorStop(0, "rgba(255, 250, 230, 0.95)");
+  sunGradient.addColorStop(0.4, "rgba(255, 246, 223, 0.5)");
+  sunGradient.addColorStop(1, "rgba(255, 246, 223, 0)");
+  sunCtx.fillStyle = sunGradient;
+  sunCtx.fillRect(0, 0, sunCanvas.width, sunCanvas.height);
+
+  const sunTexture = new THREE.CanvasTexture(sunCanvas);
+  sunTexture.colorSpace = THREE.SRGBColorSpace;
+  const sunMaterial = new THREE.SpriteMaterial({
+    map: sunTexture,
+    transparent: true,
+    depthWrite: false,
+    fog: false,
+  });
+  const sunSprite = new THREE.Sprite(sunMaterial);
+  sunSprite.scale.set(520, 520, 1);
+  const sunDirection = runtime.sun.position.clone().normalize();
+  sunSprite.position.copy(sunDirection.multiplyScalar(4200));
+  skyGroup.add(sunSprite);
+
+  scene.add(skyGroup);
+  runtime.skyGroup = skyGroup;
 }
 
 function buildMiniMapBase() {
@@ -556,9 +631,11 @@ function createMountains(scene) {
     for (let index = 0; index < 7; index += 1) {
       const radius = hill.radius * (0.32 + rng() * 0.28);
       const height = hill.height * (0.34 + rng() * 0.42);
-      const geometry = new THREE.ConeGeometry(radius, height, 20);
+      const geometry = new THREE.ConeGeometry(radius, height, 18, 6);
+      displaceMountainGeometry(geometry, radius, height, hillIndex * 7 + index);
+      addMountainGradientColors(geometry, height, hill.color);
       const material = new THREE.MeshStandardMaterial({
-        color: hill.color,
+        vertexColors: true,
         roughness: 1,
         metalness: 0,
       });
@@ -574,9 +651,54 @@ function createMountains(scene) {
   });
 }
 
+function displaceMountainGeometry(geometry, radius, height, seed) {
+  geometry.computeBoundingBox();
+  const minY = geometry.boundingBox.min.y;
+  const maxY = geometry.boundingBox.max.y;
+  const positions = geometry.attributes.position;
+  const amplitude = height * 0.08;
+  for (let index = 0; index < positions.count; index += 1) {
+    const x = positions.getX(index);
+    const y = positions.getY(index);
+    const z = positions.getZ(index);
+    const fraction = maxY > minY ? (y - minY) / (maxY - minY) : 1;
+    const noise = hashFrac(x * 0.37 + z * 0.53 + seed * 3.1) - 0.5;
+    const falloff = fraction;
+    const displacement = 1 + (noise * amplitude * falloff) / Math.max(radius, 1);
+    positions.setX(index, x * displacement);
+    positions.setZ(index, z * displacement);
+  }
+  positions.needsUpdate = true;
+  geometry.computeVertexNormals();
+}
+
+function addMountainGradientColors(geometry, height, baseColorHex) {
+  geometry.computeBoundingBox();
+  const minY = geometry.boundingBox.min.y;
+  const maxY = geometry.boundingBox.max.y;
+  const positions = geometry.attributes.position;
+  const colors = new Float32Array(positions.count * 3);
+  const baseColor = new THREE.Color(baseColorHex);
+  const rockColor = new THREE.Color(0x7a6f5f);
+  const ridgeColor = new THREE.Color(0x9c927f);
+  const tempColor = new THREE.Color();
+  for (let index = 0; index < positions.count; index += 1) {
+    const fraction = maxY > minY ? (positions.getY(index) - minY) / (maxY - minY) : 1;
+    if (fraction < 0.6) {
+      tempColor.copy(baseColor).lerp(rockColor, THREE.MathUtils.smoothstep(fraction, 0.35, 0.6));
+    } else {
+      tempColor.copy(rockColor).lerp(ridgeColor, THREE.MathUtils.smoothstep(fraction, 0.6, 0.92));
+    }
+    colors[index * 3] = tempColor.r;
+    colors[index * 3 + 1] = tempColor.g;
+    colors[index * 3 + 2] = tempColor.b;
+  }
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+}
+
 function createBoundarySkyline(scene) {
   const material = new THREE.MeshStandardMaterial({
-    color: 0x45596c,
+    color: 0xaec4da,
     roughness: 0.78,
     metalness: 0.08,
     transparent: true,
@@ -699,27 +821,36 @@ function enqueueInstancedBuilding(buckets, candidate) {
 }
 
 function createInstancedBuildingGroups(group, buckets) {
+  const baseColors = {
+    residential: new THREE.Color(0xbcc7d3),
+    commercial: new THREE.Color(0xa7bdd0),
+    mixed: new THREE.Color(0xa3b0be),
+  };
+
   const materials = {
     residential: new THREE.MeshStandardMaterial({
-      color: 0xbcc7d3,
+      color: 0xffffff,
       roughness: 0.84,
       metalness: 0.12,
       emissive: 0x122133,
       emissiveIntensity: 0.09,
+      vertexColors: true,
     }),
     commercial: new THREE.MeshStandardMaterial({
-      color: 0xa7bdd0,
+      color: 0xffffff,
       roughness: 0.56,
       metalness: 0.34,
       emissive: 0x152843,
       emissiveIntensity: 0.16,
+      vertexColors: true,
     }),
     mixed: new THREE.MeshStandardMaterial({
-      color: 0xa3b0be,
+      color: 0xffffff,
       roughness: 0.7,
       metalness: 0.18,
       emissive: 0x141f2e,
       emissiveIntensity: 0.11,
+      vertexColors: true,
     }),
   };
 
@@ -727,6 +858,7 @@ function createInstancedBuildingGroups(group, buckets) {
   const quaternion = new THREE.Quaternion();
   const position = new THREE.Vector3();
   const scale = new THREE.Vector3();
+  const instanceColor = new THREE.Color();
 
   Object.entries(buckets).forEach(([key, buildings]) => {
     if (!buildings.length) {
@@ -741,8 +873,15 @@ function createInstancedBuildingGroups(group, buckets) {
       scale.set(item.width, item.height, item.depth);
       matrix.compose(position, quaternion, scale);
       mesh.setMatrixAt(index, matrix);
+
+      const jH = (hashFrac(index * 1.7 + 0.13) - 0.5) * 0.024;
+      const jS = (hashFrac(index * 3.1 + 0.41) - 0.5) * 0.1;
+      const jL = (hashFrac(index * 5.3 + 0.77) - 0.5) * 0.14;
+      instanceColor.copy(baseColors[key]).offsetHSL(jH, jS, jL);
+      mesh.setColorAt(index, instanceColor);
     });
 
+    mesh.instanceColor.needsUpdate = true;
     mesh.castShadow = false;
     mesh.receiveShadow = true;
     group.add(mesh);
@@ -770,6 +909,7 @@ function createBuildingMesh(building, terrainHeight) {
   });
   geometry.rotateX(-Math.PI / 2);
   geometry.computeVertexNormals();
+  addHeightFractionColors(geometry, building.height);
 
   const mesh = new THREE.Mesh(geometry, pickBuildingMaterial(building));
   mesh.position.set(building.x, terrainHeight, building.z);
@@ -800,36 +940,78 @@ function createLandmarks(scene) {
 }
 
 function createBridges(scene) {
+  const deckMaterial = new THREE.MeshStandardMaterial({ color: 0xd1d5d9, roughness: 0.5, metalness: 0.48 });
+  const towerMaterial = new THREE.MeshStandardMaterial({ color: 0xf0f2f5, roughness: 0.42, metalness: 0.42 });
+  const cableMaterial = new THREE.MeshStandardMaterial({ color: 0xe8ecef, roughness: 0.3, metalness: 0.6 });
+
   bridgeDefs.forEach((bridge) => {
     const group = new THREE.Group();
 
-    const deck = new THREE.Mesh(
-      new THREE.BoxGeometry(14, 7, bridge.length),
-      new THREE.MeshStandardMaterial({
-        color: 0xd1d5d9,
-        roughness: 0.5,
-        metalness: 0.48,
-      }),
-    );
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(14, 7, bridge.length), deckMaterial);
     deck.position.y = 12;
     group.add(deck);
 
-    const towerMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf0f2f5,
-      roughness: 0.42,
-      metalness: 0.42,
-    });
+    if (bridge.name === "반포대교") {
+      const lowerDeck = new THREE.Mesh(new THREE.BoxGeometry(12, 3.4, bridge.length * 0.94), deckMaterial);
+      lowerDeck.position.y = 3;
+      group.add(lowerDeck);
+    } else if (bridge.name === "올림픽대교") {
+      const legBases = [
+        new THREE.Vector3(14, 6, 0),
+        new THREE.Vector3(-14, 6, 0),
+        new THREE.Vector3(0, 6, 10),
+        new THREE.Vector3(0, 6, -10),
+      ];
+      const pylonHeight = 96;
+      const apex = new THREE.Vector3(0, pylonHeight, 0);
+      legBases.forEach((base) => {
+        const legMesh = createCylinderBetween(base, apex, 3.2, towerMaterial);
+        group.add(legMesh);
+      });
 
-    [-bridge.length * 0.24, bridge.length * 0.24].forEach((offset) => {
-      const tower = new THREE.Mesh(new THREE.BoxGeometry(12, 44, 12), towerMaterial);
-      tower.position.set(0, 32, offset);
-      group.add(tower);
-    });
+      for (let index = 0; index < 8; index += 1) {
+        const side = index < 4 ? -1 : 1;
+        const along = ((index % 4) / 3 - 0.5) * bridge.length * 0.5;
+        const deckPoint = new THREE.Vector3(side * 7, 12, along);
+        const cable = createCylinderBetween(apex, deckPoint, 0.5, cableMaterial);
+        group.add(cable);
+      }
+    } else if (bridge.name === "청담대교" || bridge.name === "마포대교") {
+      const pylonHeight = 70;
+      [-bridge.length * 0.22, bridge.length * 0.22].forEach((offset) => {
+        const pylonTop = new THREE.Vector3(0, pylonHeight, offset);
+        const pylon = createCylinderBetween(new THREE.Vector3(0, 6, offset), pylonTop, 3.4, towerMaterial);
+        group.add(pylon);
+
+        for (let cableIndex = 0; cableIndex < 6; cableIndex += 1) {
+          const fraction = (cableIndex / 5 - 0.5) * bridge.length * 0.42;
+          const deckPoint = new THREE.Vector3(0, 12, offset + fraction);
+          const cable = createCylinderBetween(pylonTop, deckPoint, 0.5, cableMaterial);
+          group.add(cable);
+        }
+      });
+    } else {
+      [-bridge.length * 0.24, bridge.length * 0.24].forEach((offset) => {
+        const tower = new THREE.Mesh(new THREE.BoxGeometry(12, 44, 12), towerMaterial);
+        tower.position.set(0, 32, offset);
+        group.add(tower);
+      });
+    }
 
     group.position.set(bridge.x, 0, bridge.z);
     group.rotation.y = bridge.rotation;
     scene.add(group);
   });
+}
+
+function createCylinderBetween(start, end, radius, material) {
+  const direction = new THREE.Vector3().subVectors(end, start);
+  const length = direction.length();
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, length, 8), material);
+  mesh.position.copy(start).addScaledVector(direction, 0.5);
+  const axis = new THREE.Vector3(0, 1, 0);
+  mesh.quaternion.setFromUnitVectors(axis, direction.clone().normalize());
+  return mesh;
 }
 
 function createCheckpoints(scene) {
@@ -839,25 +1021,24 @@ function createCheckpoints(scene) {
 
 function createClouds(scene) {
   const rng = mulberry32(4096);
-  const cloudMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    roughness: 0.88,
-    metalness: 0,
-    transparent: true,
-    opacity: 0.85,
-  });
+  const cloudTexture = createCloudPuffTexture();
 
   for (let index = 0; index < 26; index += 1) {
     const cloud = new THREE.Group();
-    const puffCount = 3 + Math.floor(rng() * 4);
+    const puffCount = 4 + Math.floor(rng() * 3);
 
     for (let puff = 0; puff < puffCount; puff += 1) {
-      const geometry = new THREE.SphereGeometry(1, 14, 14);
-      const mesh = new THREE.Mesh(geometry, cloudMaterial);
-      const scale = 26 + rng() * 48;
-      mesh.scale.set(scale * 1.4, scale, scale);
-      mesh.position.set((rng() - 0.5) * 72, rng() * 14, (rng() - 0.5) * 42);
-      cloud.add(mesh);
+      const material = new THREE.SpriteMaterial({
+        map: cloudTexture,
+        transparent: true,
+        depthWrite: false,
+        opacity: 0.55 + rng() * 0.25,
+      });
+      const sprite = new THREE.Sprite(material);
+      const scale = 60 + rng() * 80;
+      sprite.scale.set(scale, scale * (0.62 + rng() * 0.14), 1);
+      sprite.position.set((rng() - 0.5) * 90, (rng() - 0.5) * 20, (rng() - 0.5) * 30);
+      cloud.add(sprite);
     }
 
     cloud.position.set(
@@ -871,23 +1052,49 @@ function createClouds(scene) {
   }
 }
 
+function createCloudPuffTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+  gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.6)");
+  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 function create63Building(terrainHeight) {
   const group = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({
-    color: 0xc5a56f,
-    roughness: 0.28,
-    metalness: 0.62,
+    color: 0xd9b877,
+    roughness: 0.2,
+    metalness: 0.85,
     emissive: 0x3b2410,
-    emissiveIntensity: 0.2,
+    emissiveIntensity: 0.16,
+    vertexColors: true,
   });
 
-  const body = new THREE.Mesh(shared.box, material);
+  const bodyGeometry = shared.box.clone();
+  addVerticalAoColors(bodyGeometry);
+  const body = new THREE.Mesh(bodyGeometry, material);
   body.scale.set(54, 250, 34);
   body.position.y = terrainHeight + 125;
   group.add(body);
 
-  const crown = new THREE.Mesh(new THREE.BoxGeometry(46, 20, 28), material);
-  crown.position.y = terrainHeight + 260;
+  const parapet = new THREE.Mesh(
+    new THREE.BoxGeometry(50, 3, 30),
+    new THREE.MeshStandardMaterial({ color: 0x2c2013, roughness: 0.6, metalness: 0.3 }),
+  );
+  parapet.position.y = terrainHeight + 251.5;
+  group.add(parapet);
+
+  const crown = new THREE.Mesh(new THREE.BoxGeometry(38, 18, 22), material);
+  crown.position.y = terrainHeight + 262;
   group.add(crown);
 
   return group;
@@ -895,34 +1102,61 @@ function create63Building(terrainHeight) {
 
 function createSeoulTower(terrainHeight) {
   const group = new THREE.Group();
+  const shaftMaterial = new THREE.MeshStandardMaterial({ color: 0xe6edf3, roughness: 0.3, metalness: 0.44 });
 
   const shaft = new THREE.Mesh(
-    new THREE.CylinderGeometry(8, 11, 160, 20),
-    new THREE.MeshStandardMaterial({ color: 0xe6edf3, roughness: 0.3, metalness: 0.44 }),
+    new THREE.CylinderGeometry(5.4, 10, 160, 20),
+    shaftMaterial,
   );
   shaft.position.y = terrainHeight + 80;
   group.add(shaft);
 
-  const deck = new THREE.Mesh(
-    new THREE.CylinderGeometry(28, 36, 24, 24),
+  const legMaterial = new THREE.MeshStandardMaterial({ color: 0xc7d0d8, roughness: 0.5, metalness: 0.36 });
+  for (let index = 0; index < 4; index += 1) {
+    const angle = (index / 4) * Math.PI * 2;
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 2, 42, 8), legMaterial);
+    leg.position.set(Math.cos(angle) * 10, terrainHeight + 21, Math.sin(angle) * 10);
+    leg.rotation.z = Math.cos(angle) * 0.26;
+    leg.rotation.x = Math.sin(angle) * -0.26;
+    group.add(leg);
+  }
+
+  const deckLower = new THREE.Mesh(
+    new THREE.CylinderGeometry(30, 27, 11, 24),
     new THREE.MeshStandardMaterial({ color: 0xe0edf8, roughness: 0.28, metalness: 0.52 }),
   );
-  deck.position.y = terrainHeight + 150;
-  group.add(deck);
+  deckLower.position.y = terrainHeight + 144;
+  group.add(deckLower);
+
+  const deckBand = new THREE.Mesh(
+    new THREE.CylinderGeometry(27.4, 30, 6, 24),
+    new THREE.MeshStandardMaterial({ color: 0x2a3440, roughness: 0.5, metalness: 0.3 }),
+  );
+  deckBand.position.y = terrainHeight + 152.5;
+  group.add(deckBand);
+
+  const deckUpper = new THREE.Mesh(
+    new THREE.CylinderGeometry(24, 30, 12, 24),
+    new THREE.MeshStandardMaterial({ color: 0xe0edf8, roughness: 0.28, metalness: 0.52 }),
+  );
+  deckUpper.position.y = terrainHeight + 161.5;
+  group.add(deckUpper);
 
   const head = new THREE.Mesh(
-    new THREE.CylinderGeometry(18, 26, 18, 24),
+    new THREE.CylinderGeometry(15, 22, 18, 24),
     new THREE.MeshStandardMaterial({ color: 0x98d6ff, roughness: 0.22, metalness: 0.52, emissive: 0x1a3044, emissiveIntensity: 0.32 }),
   );
-  head.position.y = terrainHeight + 174;
+  head.position.y = terrainHeight + 176;
   group.add(head);
 
-  const antenna = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.8, 2.4, 74, 10),
-    new THREE.MeshStandardMaterial({ color: 0xffdf92, roughness: 0.34, metalness: 0.48 }),
-  );
-  antenna.position.y = terrainHeight + 220;
-  group.add(antenna);
+  const antennaMaterial = new THREE.MeshStandardMaterial({ color: 0xffdf92, roughness: 0.34, metalness: 0.48 });
+  const antennaLower = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 2.4, 44, 10), antennaMaterial);
+  antennaLower.position.y = terrainHeight + 207;
+  group.add(antennaLower);
+
+  const antennaUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.8, 30, 8), antennaMaterial);
+  antennaUpper.position.y = terrainHeight + 244;
+  group.add(antennaUpper);
 
   return group;
 }
@@ -930,8 +1164,10 @@ function createSeoulTower(terrainHeight) {
 function createGyeongbokgung(terrainHeight) {
   const group = new THREE.Group();
   const stone = new THREE.MeshStandardMaterial({ color: 0xbfa98a, roughness: 0.9, metalness: 0.02 });
-  const roof = new THREE.MeshStandardMaterial({ color: 0x38584c, roughness: 0.72, metalness: 0.08 });
+  const roofTile = new THREE.MeshStandardMaterial({ color: 0x3a3f46, roughness: 0.68, metalness: 0.1, vertexColors: true });
   const wall = new THREE.MeshStandardMaterial({ color: 0x9b5039, roughness: 0.82, metalness: 0.02 });
+  const column = new THREE.MeshStandardMaterial({ color: 0x7a3b2e, roughness: 0.7, metalness: 0.05 });
+  const eaveBand = new THREE.MeshStandardMaterial({ color: 0xcfe6d2, roughness: 0.6, metalness: 0.04 });
 
   const base = new THREE.Mesh(new THREE.BoxGeometry(118, 5, 94), stone);
   base.position.y = terrainHeight + 2.5;
@@ -948,11 +1184,54 @@ function createGyeongbokgung(terrainHeight) {
     hall.position.set(building.x, terrainHeight + building.sy * 0.5 + 5, building.z);
     group.add(hall);
 
-    const roofMesh = new THREE.Mesh(new THREE.ConeGeometry(building.sx * 0.72, 10, 4), roof);
-    roofMesh.position.set(building.x, terrainHeight + building.sy + 10, building.z);
-    roofMesh.rotation.y = Math.PI * 0.25;
-    roofMesh.scale.z = building.sz / building.sx;
+    const eave = new THREE.Mesh(new THREE.BoxGeometry(building.sx + 4, 1.6, building.sz + 4), eaveBand);
+    eave.position.set(building.x, terrainHeight + building.sy + 5.8, building.z);
+    group.add(eave);
+
+    const cornerOffsetX = building.sx * 0.42;
+    const cornerOffsetZ = building.sz * 0.42;
+    [-1, 1].forEach((signX) => {
+      [-1, 1].forEach((signZ) => {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, building.sy, 8), column);
+        post.position.set(building.x + signX * cornerOffsetX, terrainHeight + building.sy * 0.5 + 5, building.z + signZ * cornerOffsetZ);
+        group.add(post);
+      });
+    });
+
+    const roofBaseRadius = Math.hypot(building.sx, building.sz) * 0.5;
+    const roofHeight = building.sy * 0.62;
+    const roofProfile = [
+      new THREE.Vector2(roofBaseRadius * 1.1, 0),
+      new THREE.Vector2(roofBaseRadius * 1.16, roofHeight * 0.18),
+      new THREE.Vector2(roofBaseRadius * 1.02, roofHeight * 0.4),
+      new THREE.Vector2(roofBaseRadius * 0.7, roofHeight * 0.68),
+      new THREE.Vector2(roofBaseRadius * 0.32, roofHeight * 0.9),
+      new THREE.Vector2(0.4, roofHeight),
+    ];
+    const roofGeometry = new THREE.LatheGeometry(roofProfile, 4);
+    addHeightFractionColors(roofGeometry, roofHeight);
+    const roofMesh = new THREE.Mesh(roofGeometry, roofTile);
+    roofMesh.position.set(building.x, terrainHeight + building.sy + 7, building.z);
+    roofMesh.rotation.y = Math.PI / 4;
+    roofMesh.scale.set(1, 1, building.sz / building.sx);
     group.add(roofMesh);
+  });
+
+  const roofStripMaterial = new THREE.MeshStandardMaterial({ color: 0x3a3f46, roughness: 0.7, metalness: 0.08 });
+  const perimeter = [
+    { sx: 132, sz: 4, x: 0, z: 50 },
+    { sx: 132, sz: 4, x: 0, z: -50 },
+    { sx: 4, sz: 104, x: -66, z: 0 },
+    { sx: 4, sz: 104, x: 66, z: 0 },
+  ];
+  perimeter.forEach((segment) => {
+    const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(segment.sx, 9, segment.sz), stone);
+    wallMesh.position.set(segment.x, terrainHeight + 4.5 + 5, segment.z);
+    group.add(wallMesh);
+
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(segment.sx + 1.5, 1.6, segment.sz + 1.5), roofStripMaterial);
+    strip.position.set(segment.x, terrainHeight + 9.8 + 5, segment.z);
+    group.add(strip);
   });
 
   return group;
@@ -996,33 +1275,41 @@ function createCoexTower(terrainHeight) {
 function createLotteTower(terrainHeight) {
   const group = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({
-    color: 0xb8d3eb,
-    roughness: 0.22,
-    metalness: 0.78,
+    color: 0xa9cbe8,
+    roughness: 0.18,
+    metalness: 0.55,
     emissive: 0x102236,
-    emissiveIntensity: 0.28,
+    emissiveIntensity: 0.24,
+    vertexColors: true,
   });
 
-  const lower = new THREE.Mesh(shared.box, material);
-  lower.scale.set(64, 240, 64);
-  lower.position.y = terrainHeight + 120;
-  group.add(lower);
-
-  const mid = new THREE.Mesh(shared.box, material);
-  mid.scale.set(48, 180, 48);
-  mid.position.y = terrainHeight + 330;
-  group.add(mid);
-
-  const upper = new THREE.Mesh(shared.box, material);
-  upper.scale.set(34, 110, 34);
-  upper.position.y = terrainHeight + 475;
-  group.add(upper);
+  const towerHeight = 496;
+  const profile = [
+    new THREE.Vector2(34, 0),
+    new THREE.Vector2(33.4, towerHeight * 0.06),
+    new THREE.Vector2(31.8, towerHeight * 0.14),
+    new THREE.Vector2(29.4, towerHeight * 0.24),
+    new THREE.Vector2(26.6, towerHeight * 0.34),
+    new THREE.Vector2(23.6, towerHeight * 0.44),
+    new THREE.Vector2(20.6, towerHeight * 0.54),
+    new THREE.Vector2(17.8, towerHeight * 0.64),
+    new THREE.Vector2(15.2, towerHeight * 0.74),
+    new THREE.Vector2(12.9, towerHeight * 0.83),
+    new THREE.Vector2(11, towerHeight * 0.91),
+    new THREE.Vector2(9.6, towerHeight * 0.96),
+    new THREE.Vector2(9, towerHeight),
+  ];
+  const bodyGeometry = new THREE.LatheGeometry(profile, 24);
+  addHeightFractionColors(bodyGeometry, towerHeight);
+  const body = new THREE.Mesh(bodyGeometry, material);
+  body.position.y = terrainHeight;
+  group.add(body);
 
   const spire = new THREE.Mesh(
-    new THREE.CylinderGeometry(3.2, 5.2, 70, 12),
+    new THREE.CylinderGeometry(2.2, 9, 70, 12),
     new THREE.MeshStandardMaterial({ color: 0xe7f2fb, roughness: 0.26, metalness: 0.84 }),
   );
-  spire.position.y = terrainHeight + 566;
+  spire.position.y = terrainHeight + towerHeight + 35;
   group.add(spire);
 
   return group;
@@ -1234,6 +1521,9 @@ function loop(now) {
   }
 
   updateHud();
+  runtime.skyGroup.position.copy(runtime.camera.position);
+  runtime.riverGlowMesh.material.opacity = 0.28 + 0.05 * Math.sin(now * 0.0007);
+  runtime.riverMesh.material.emissiveIntensity = 0.38 * (1 + 0.15 * Math.sin(now * 0.0004));
   runtime.renderer.render(runtime.scene, runtime.camera);
   requestAnimationFrame(loop);
 }
@@ -1911,4 +2201,40 @@ function mulberry32(seed) {
     value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
     return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+function hashFrac(i) {
+  const value = Math.sin(i * 12.9898) * 43758.5453;
+  return value - Math.floor(value);
+}
+
+function addVerticalAoColors(geometry) {
+  geometry.computeBoundingBox();
+  const minY = geometry.boundingBox.min.y;
+  const maxY = geometry.boundingBox.max.y;
+  const positions = geometry.attributes.position;
+  const colors = new Float32Array(positions.count * 3);
+  for (let index = 0; index < positions.count; index += 1) {
+    const fraction = maxY > minY ? (positions.getY(index) - minY) / (maxY - minY) : 1;
+    const shade = THREE.MathUtils.lerp(0.72, 1, fraction);
+    colors[index * 3] = shade;
+    colors[index * 3 + 1] = shade;
+    colors[index * 3 + 2] = shade;
+  }
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+}
+
+function addHeightFractionColors(geometry, height) {
+  geometry.computeBoundingBox();
+  const minY = geometry.boundingBox.min.y;
+  const positions = geometry.attributes.position;
+  const colors = new Float32Array(positions.count * 3);
+  for (let index = 0; index < positions.count; index += 1) {
+    const fraction = height > 0 ? THREE.MathUtils.clamp((positions.getY(index) - minY) / height, 0, 1) : 1;
+    const shade = THREE.MathUtils.lerp(0.78, 1, fraction);
+    colors[index * 3] = shade;
+    colors[index * 3 + 1] = shade;
+    colors[index * 3 + 2] = shade;
+  }
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 }
