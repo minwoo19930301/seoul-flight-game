@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Orbitron:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./seoul-flight.css?v=3" />
+    <link rel="stylesheet" href="./seoul-flight.css?v=4" />
   </head>
   <body>
     <main id="app">
@@ -51,6 +51,10 @@
 
       <section class="panel mission-panel">
         <div class="mission-row">
+          <span class="label">VISITED</span>
+          <strong id="progress-value">0 / 5</strong>
+        </div>
+        <div class="mission-row">
           <span class="label">FOCUS</span>
           <strong id="target-name">63빌딩</strong>
         </div>
@@ -61,6 +65,10 @@
         <div class="mission-row">
           <span class="label">BEARING</span>
           <strong id="bearing-value">0°</strong>
+        </div>
+        <div class="mission-row">
+          <span class="label">목표 고도</span>
+          <strong id="target-altitude">220m</strong>
         </div>
         <p id="status-text">서울 상공 뷰를 준비 중입니다.</p>
         <canvas id="mini-map" width="240" height="176" aria-label="서울 경로 미니맵"></canvas>
@@ -97,10 +105,13 @@
       <section class="panel controls-panel">
         <div class="control-line">화면 클릭 후 마우스로 시점/방향 조종</div>
         <div class="control-line">W/S 느리게 상승/하강</div>
-        <div class="control-line">A/D 좌우 기울기, Q/E 러더</div>
+        <div class="control-line">A/D 좌우 선회, Q/E 러더</div>
         <div class="control-line">Shift 가속, Space 수평 복귀</div>
         <div class="control-line">R 처음 위치로</div>
+        <div class="control-line">P / Esc 일시정지 · P / Enter 이어서</div>
       </section>
+
+      <button id="pause-btn" type="button" disabled>일시정지</button>
 
       <div id="map-credit">Map data</div>
 
@@ -125,19 +136,20 @@
         <div class="overlay-notes">
           <div>시작 후 화면을 클릭하면 마우스 보는 방향으로 비행합니다.</div>
           <div>지면과 건물은 보기용이며 충돌 판정 없이 통과합니다.</div>
-          <div>랜드마크 방향 안내는 HUD 텍스트로 제공됩니다.</div>
+          <div>미니맵의 번호 순서대로 비행하고, HUD의 목표 고도에 맞추세요.</div>
         </div>
-        <button id="start-btn" type="button">둘러보기 시작</button>
+        <button id="start-btn" type="button" disabled>서울 공역 준비 중…</button>
       </section>
 
-      <section id="message-panel" class="overlay-card hidden">
+      <section id="message-panel" class="overlay-card hidden" aria-live="polite">
         <div class="overlay-eyebrow" id="message-tag">STATUS</div>
         <h2 id="message-title">안내</h2>
         <p id="message-body"></p>
+        <button id="resume-btn" type="button" hidden>이어서 비행</button>
         <button id="restart-btn" type="button">처음 위치로</button>
       </section>
     </main>
 
-    <script type="module" src="./seoul-flight.mjs?v=7"></script>
+    <script type="module" src="./seoul-flight.mjs?v=8"></script>
   </body>
 </html>

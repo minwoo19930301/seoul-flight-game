@@ -1,4 +1,5 @@
 import * as THREE from "./vendor/three.module.js";
+import { controlByCode, FlightInputs, updateAttitude, yawToTarget } from "./flight-model.mjs";
 
 const dom = {
   root: document.getElementById("game-root"),
@@ -18,6 +19,10 @@ const dom = {
   messageTitle: document.getElementById("message-title"),
   messageBody: document.getElementById("message-body"),
   restartBtn: document.getElementById("restart-btn"),
+  pauseBtn: document.getElementById("pause-btn"),
+  resumeBtn: document.getElementById("resume-btn"),
+  progressValue: document.getElementById("progress-value"),
+  targetAltitude: document.getElementById("target-altitude"),
   horizonInner: document.getElementById("horizon-inner"),
   mapCredit: document.getElementById("map-credit"),
   miniMap: document.getElementById("mini-map"),
@@ -62,6 +67,10 @@ const shared = {
   beam: new THREE.CylinderGeometry(1, 1.4, 1, 20, 1, true),
 };
 
+const duskShadowColor = new THREE.Color(0x241c38);
+const duskLitColor = new THREE.Color(0xffffff);
+const aoTempColor = new THREE.Color();
+
 addVerticalAoColors(shared.box);
 
 const state = {
@@ -74,20 +83,11 @@ const state = {
   roll: 0,
   speed: 0,
   elapsedMs: 0,
-  startedAt: 0,
   checkpointIndex: 0,
 };
 
-const input = {
-  pitchUp: false,
-  pitchDown: false,
-  bankLeft: false,
-  bankRight: false,
-  yawLeft: false,
-  yawRight: false,
-  boost: false,
-  level: false,
-};
+const inputController = new FlightInputs();
+const input = inputController.state;
 
 const runtime = {
   scene: null,
@@ -111,6 +111,7 @@ const runtime = {
   pointerLocked: false,
   lookRollVelocity: 0,
   currentStatus: "서울 상공 뷰를 준비 중입니다.",
+  frameId: null,
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -133,15 +134,20 @@ async function init() {
   bindEvents();
   resetFlight();
   dom.mapCredit.textContent = mapData.attribution;
+  dom.startBtn.disabled = false;
+  dom.startBtn.textContent = "둘러보기 시작";
   if (urlParams.get("autostart") === "1") {
     startGame();
   }
   updateHud();
-  requestAnimationFrame(loop);
+  runtime.frameId = requestAnimationFrame(loop);
 }
 
 function showFatalError(error) {
   console.error(error);
+  state.mode = "error";
+  clearInputs();
+  cancelAnimationFrame(runtime.frameId);
   const message = error instanceof Error ? error.message : String(error);
   runtime.currentStatus = `초기화 오류: ${message}`;
   dom.startPanel.classList.add("hidden");
@@ -149,6 +155,10 @@ function showFatalError(error) {
   dom.messageTitle.textContent = "초기화 오류";
   dom.messageBody.textContent = message;
   dom.messagePanel.classList.remove("hidden");
+  dom.pauseBtn.disabled = true;
+  dom.resumeBtn.hidden = true;
+  dom.restartBtn.textContent = "다시 불러오기";
+  dom.restartBtn.onclick = () => window.location.reload();
   updateHud();
 }
 
@@ -190,6 +200,10 @@ function configureSeoulMap(mapData) {
   });
 
   runtime.projectedMap = {
+    rasterBounds: {
+      northWest: project(mapData.bbox.minLon, mapData.bbox.maxLat),
+      southEast: project(mapData.bbox.maxLon, mapData.bbox.minLat),
+    },
     attribution: mapData.attribution,
     waterPolygons: mapData.waterPolygons.map((points) => projectLine(points, project)),
     waterLines: mapData.waterLines.map((points) => projectLine(points, project)),
@@ -449,7 +463,7 @@ function buildMiniMapBase() {
   const map = runtime.projectedMap;
 
   if (runtime.rasterMapImage) {
-    ctx.drawImage(runtime.rasterMapImage, 0, 0, base.width, base.height);
+    drawRasterMap(ctx, base);
     ctx.fillStyle = "rgba(7, 14, 24, 0.16)";
     ctx.fillRect(0, 0, base.width, base.height);
   } else {
@@ -487,7 +501,7 @@ function createGroundTexture() {
   if (runtime.rasterMapImage) {
     ctx.save();
     ctx.filter = "contrast(1.1) saturate(0.82) brightness(0.78)";
-    ctx.drawImage(runtime.rasterMapImage, 0, 0, canvas.width, canvas.height);
+    drawRasterMap(ctx, canvas);
     ctx.restore();
 
     // Dusk wash: multiply toward deep purple-mauve.
@@ -1444,6 +1458,14 @@ function bindEvents() {
   window.addEventListener("keyup", handleKeyUp);
   document.addEventListener("pointerlockchange", handlePointerLockChange);
   document.addEventListener("mousemove", handleMouseMove);
+  window.addEventListener("blur", pauseFlight);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseFlight();
+  });
+  runtime.renderer.domElement.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    showFatalError(new Error("3D 화면 연결이 끊겼습니다. 다시 불러오면 비행을 시작할 수 있습니다."));
+  });
 
   dom.startBtn.addEventListener("click", () => {
     startGame();
@@ -1451,7 +1473,13 @@ function bindEvents() {
   });
 
   dom.restartBtn.addEventListener("click", () => {
+    if (state.mode === "error") return;
     resetFlight();
+    startGame();
+    requestFlightPointerLock();
+  });
+  dom.pauseBtn.addEventListener("click", pauseFlight);
+  dom.resumeBtn.addEventListener("click", () => {
     startGame();
     requestFlightPointerLock();
   });
@@ -1465,31 +1493,42 @@ function bindEvents() {
   dom.touchButtons.forEach((button) => {
     const control = button.dataset.control;
     const activate = (event) => {
+      if (state.mode !== "running") return;
       event.preventDefault();
-      input[control] = true;
+      button.setPointerCapture(event.pointerId);
+      inputController.set(control, `pointer:${event.pointerId}`, true);
       button.classList.add("active");
     };
     const deactivate = (event) => {
       event.preventDefault();
-      input[control] = false;
-      button.classList.remove("active");
+      inputController.set(control, `pointer:${event.pointerId}`, false);
+      button.classList.toggle("active", input[control]);
     };
 
     button.addEventListener("pointerdown", activate);
     button.addEventListener("pointerup", deactivate);
-    button.addEventListener("pointerleave", deactivate);
     button.addEventListener("pointercancel", deactivate);
+    button.addEventListener("lostpointercapture", deactivate);
   });
 }
 
 function requestFlightPointerLock() {
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
   if (runtime.renderer?.domElement && document.pointerLockElement !== runtime.renderer.domElement) {
-    runtime.renderer.domElement.requestPointerLock?.();
+    try {
+      runtime.renderer.domElement.requestPointerLock?.()?.catch(() => {
+        runtime.currentStatus = "마우스 조종을 사용할 수 없습니다. W/S, A/D, Q/E로 조종하세요.";
+      });
+    } catch {
+      runtime.currentStatus = "키보드 W/S, A/D, Q/E로 조종하세요.";
+    }
   }
 }
 
 function handlePointerLockChange() {
+  const wasLocked = runtime.pointerLocked;
   runtime.pointerLocked = document.pointerLockElement === runtime.renderer?.domElement;
+  if (wasLocked && !runtime.pointerLocked) pauseFlight();
 }
 
 function handleMouseMove(event) {
@@ -1510,11 +1549,23 @@ function onResize() {
 }
 
 function handleKeyDown(event) {
+  if (state.mode === "error") return;
+  if (event.target instanceof Element) {
+    if (event.target.closest("input, select, textarea, [contenteditable]")) return;
+    if (event.target.closest("button") && ["Enter", "Space"].includes(event.code)) return;
+  }
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
     event.preventDefault();
   }
 
   if (event.repeat) {
+    return;
+  }
+
+  if (event.code === "KeyP" || event.code === "Escape") {
+    event.preventDefault();
+    if (state.mode === "paused") startGame();
+    else pauseFlight();
     return;
   }
 
@@ -1527,11 +1578,11 @@ function handleKeyDown(event) {
     return;
   }
 
-  if (event.code === "Enter" && state.mode === "intro") {
+  if (event.code === "Enter" && (state.mode === "intro" || state.mode === "paused")) {
     startGame();
   }
 
-  setInputByCode(event.code, true);
+  if (state.mode === "running") setInputByCode(event.code, true);
 }
 
 function handleKeyUp(event) {
@@ -1539,23 +1590,7 @@ function handleKeyUp(event) {
 }
 
 function setInputByCode(code, active) {
-  if (code === "KeyW" || code === "ArrowUp") {
-    input.pitchUp = active;
-  } else if (code === "KeyS" || code === "ArrowDown") {
-    input.pitchDown = active;
-  } else if (code === "KeyA" || code === "ArrowLeft") {
-    input.bankLeft = active;
-  } else if (code === "KeyD" || code === "ArrowRight") {
-    input.bankRight = active;
-  } else if (code === "KeyQ") {
-    input.yawLeft = active;
-  } else if (code === "KeyE") {
-    input.yawRight = active;
-  } else if (code === "ShiftLeft" || code === "ShiftRight") {
-    input.boost = active;
-  } else if (code === "Space") {
-    input.level = active;
-  }
+  inputController.set(controlByCode[code], `key:${code}`, active);
 }
 
 function resetFlight() {
@@ -1563,51 +1598,71 @@ function resetFlight() {
   document.exitPointerLock?.();
   runtime.pointerLocked = false;
   const firstCheckpoint = checkpointDefs[0];
-  const startX = firstCheckpoint.x - 360;
+  const startX = Math.max(-world.width * 0.5 + world.boundaryPadding + 20, firstCheckpoint.x - 360);
   const startZ = firstCheckpoint.z + 36;
   state.mode = "intro";
   state.position.set(startX, 236, startZ);
-  state.yaw = Math.atan2(firstCheckpoint.x - startX, -(firstCheckpoint.z - startZ));
-  state.pitch = -0.18;
+  state.yaw = yawToTarget(state.position, firstCheckpoint);
+  state.pitch = 0;
   state.roll = 0;
   state.speed = 68;
   state.elapsedMs = 0;
-  state.startedAt = 0;
   state.checkpointIndex = 0;
+  runtime.lookRollVelocity = 0;
 
   runtime.currentStatus = "서울 상공 뷰 준비 완료. 시작하면 바로 이동합니다.";
   dom.startPanel.classList.remove("hidden");
   dom.messagePanel.classList.add("hidden");
+  dom.pauseBtn.disabled = true;
   updateCheckpointVisuals();
   updateCamera(0);
   updateHud();
 }
 
 function startGame() {
-  if (state.mode === "running") {
+  if (state.mode !== "intro" && state.mode !== "paused") {
     return;
   }
 
   state.mode = "running";
-  state.startedAt = performance.now() - state.elapsedMs;
+  runtime.lastTime = performance.now();
   dom.startPanel.classList.add("hidden");
   dom.messagePanel.classList.add("hidden");
-  runtime.currentStatus = checkpointDefs[state.checkpointIndex].note;
+  dom.pauseBtn.disabled = false;
+  runtime.currentStatus = checkpointDefs[state.checkpointIndex]?.note || "서울 상공을 둘러보세요.";
+  // Keep global keyboard controls available after activating a focused button.
+  runtime.renderer.domElement.tabIndex = 0;
+  runtime.renderer.domElement.focus({ preventScroll: true });
+}
+
+function pauseFlight() {
+  clearInputs();
+  if (state.mode !== "running") return;
+  state.mode = "paused";
+  document.exitPointerLock?.();
+  dom.pauseBtn.disabled = true;
+  runtime.currentStatus = "일시정지 · 이어서 비행하면 같은 위치에서 계속합니다.";
+  dom.messageTag.textContent = "PAUSED";
+  dom.messageTitle.textContent = "비행을 잠시 멈췄습니다.";
+  dom.messageBody.textContent = "위치와 둘러본 랜드마크를 보관했습니다. 이어서 비행하거나 처음부터 다시 시작하세요.";
+  dom.resumeBtn.hidden = false;
+  dom.restartBtn.textContent = "처음부터 다시";
+  dom.messagePanel.classList.remove("hidden");
 }
 
 function loop(now) {
-  const delta = Math.min((now - runtime.lastTime) / 1000, 0.05);
+  const delta = Math.max(0, Math.min((now - runtime.lastTime) / 1000, 0.05));
   runtime.lastTime = now;
 
   if (state.mode === "running") {
-    state.elapsedMs = now - state.startedAt;
+    state.elapsedMs += delta * 1000;
     updateFlight(delta);
     updateClouds(delta);
     if (state.mode === "running") {
       updateCheckpoints(now);
     }
-  } else {
-    updateIdleCamera(delta, now);
+  } else if (state.mode === "intro") {
+    updateCamera(delta);
     updateClouds(delta);
   }
 
@@ -1619,40 +1674,14 @@ function loop(now) {
     runtime.towerBeacon.material.emissiveIntensity = 0.6 + 0.5 * Math.max(Math.sin(now * 0.0028), 0);
   }
   runtime.renderer.render(runtime.scene, runtime.camera);
-  requestAnimationFrame(loop);
+  if (state.mode !== "error") runtime.frameId = requestAnimationFrame(loop);
 }
 
 function updateFlight(delta) {
-  const pitchInput = Number(input.pitchUp) - Number(input.pitchDown);
-  const bankInput = Number(input.bankRight) - Number(input.bankLeft);
-  const yawInput = Number(input.yawRight) - Number(input.yawLeft);
-
   const targetSpeed = input.boost ? 116 : 74;
   state.speed = THREE.MathUtils.damp(state.speed, targetSpeed, 2.1, delta);
-
-  const pitchSpeed = input.level ? 0.16 : 0.82;
-  const pitchDamp = input.level ? 3.2 : 1.3;
-  state.pitch += pitchInput * pitchSpeed * delta;
-  state.yaw += yawInput * 0.86 * delta;
-
-  if (input.level) {
-    state.pitch = THREE.MathUtils.damp(state.pitch, -0.08, 3.4, delta);
-  }
-
-  if (!runtime.pointerLocked && !pitchInput && !input.level) {
-    state.pitch = THREE.MathUtils.damp(state.pitch, -0.02, pitchDamp, delta);
-  }
-
-  const targetRoll = THREE.MathUtils.clamp(
-    runtime.lookRollVelocity * 1.8 + bankInput * 0.34 + yawInput * 0.18,
-    -0.72,
-    0.72,
-  );
-  state.roll = THREE.MathUtils.damp(state.roll, targetRoll, input.level ? 4.2 : 3.2, delta);
+  updateAttitude(state, input, delta, runtime.lookRollVelocity, runtime.pointerLocked);
   runtime.lookRollVelocity = THREE.MathUtils.damp(runtime.lookRollVelocity, 0, 4.8, delta);
-
-  state.pitch = THREE.MathUtils.clamp(state.pitch, -0.48, 0.58);
-  state.roll = THREE.MathUtils.clamp(state.roll, -1.15, 1.15);
 
   const euler = new THREE.Euler(state.pitch, state.yaw, state.roll, "YXZ");
   state.forward.set(0, 0, -1).applyEuler(euler).normalize();
@@ -1670,17 +1699,10 @@ function updateFlight(delta) {
 
   if (state.position.y > world.ceiling) {
     state.position.y = world.ceiling;
-    state.pitch = Math.min(state.pitch, 0.04);
+    state.pitch = Math.min(state.pitch, 0);
   }
 
   enforceBoundary(delta);
-  updateCamera(delta);
-}
-
-function updateIdleCamera(delta, now) {
-  state.yaw += delta * 0.16;
-  state.roll = Math.sin(now * 0.0004) * 0.08;
-  state.pitch = -0.2 + Math.sin(now * 0.0003) * 0.04;
   updateCamera(delta);
 }
 
@@ -1782,16 +1804,18 @@ function updateCheckpointVisuals() {
 
 function updateHud() {
   const headingDegrees = normalizeDegrees(THREE.MathUtils.radToDeg(getHeadingRadians()));
-  const current = checkpointDefs[Math.min(state.checkpointIndex, checkpointDefs.length - 1)];
+  const current = checkpointDefs[state.checkpointIndex];
   const distance = current ? horizontalDistance(state.position.x, state.position.z, current.x, current.z) : 0;
   const relativeBearing = current ? getRelativeBearing(current) : 0;
 
-  dom.speedValue.textContent = String(Math.round(state.speed)).padStart(3, "0");
+  dom.speedValue.textContent = String(Math.round(state.speed * 3.6)).padStart(3, "0");
   dom.altitudeValue.textContent = String(Math.max(0, Math.round(state.position.y))).padStart(3, "0");
-  dom.headingValue.textContent = String(Math.round(headingDegrees)).padStart(3, "0");
+  dom.headingValue.textContent = String(Math.round(headingDegrees) % 360).padStart(3, "0");
   dom.headingCardinal.textContent = getCardinal(headingDegrees);
   dom.timerValue.textContent = formatTime(state.elapsedMs);
-  dom.targetName.textContent = current ? current.name : "서울 상공";
+  dom.targetName.textContent = current ? current.name : "둘러보기 완료";
+  dom.progressValue.textContent = `${Math.min(state.checkpointIndex, checkpointDefs.length)} / ${checkpointDefs.length}`;
+  dom.targetAltitude.textContent = current ? `${current.y}m` : "—";
   dom.distanceValue.textContent = `${Math.round(distance)}m`;
   dom.bearingValue.textContent = `${Math.round(relativeBearing)}°`;
   dom.statusText.textContent = runtime.currentStatus;
@@ -1800,8 +1824,18 @@ function updateHud() {
 }
 
 function finishRun() {
-  state.checkpointIndex = checkpointDefs.length - 1;
+  state.mode = "complete";
+  clearInputs();
+  document.exitPointerLock?.();
+  dom.pauseBtn.disabled = true;
   runtime.currentStatus = "주요 랜드마크 안내를 모두 지났습니다.";
+  dom.messageTag.textContent = "TOUR COMPLETE";
+  dom.messageTitle.textContent = "서울의 다섯 랜드마크를 모두 둘러봤습니다.";
+  dom.messageBody.textContent = `둘러본 곳 ${checkpointDefs.length}곳 · 비행 시간 ${formatTime(state.elapsedMs)}`;
+  dom.resumeBtn.hidden = true;
+  dom.restartBtn.textContent = "다시 둘러보기";
+  dom.messagePanel.classList.remove("hidden");
+  dom.restartBtn.focus({ preventScroll: true });
 }
 
 function enforceBoundary(delta) {
@@ -1817,7 +1851,7 @@ function enforceBoundary(delta) {
   state.position.x = THREE.MathUtils.clamp(state.position.x, -limitX, limitX);
   state.position.z = THREE.MathUtils.clamp(state.position.z, -limitZ, limitZ);
 
-  const desired = Math.atan2(-state.position.x, state.position.z);
+  const desired = yawToTarget(state.position, { x: 0, z: 0 });
   const deltaAngle = shortestAngle(state.yaw, desired);
   state.yaw += deltaAngle * Math.min(1, delta * 1.8);
   runtime.currentStatus = "서울 지도 경계 접근. 지도 안쪽으로 복귀 중.";
@@ -1939,6 +1973,17 @@ function worldToTexture(x, z, canvas) {
   };
 }
 
+function drawRasterMap(ctx, canvas) {
+  const bounds = runtime.projectedMap.rasterBounds;
+  const start = worldToTexture(bounds.northWest.x, bounds.northWest.z, canvas);
+  const end = worldToTexture(bounds.southEast.x, bounds.southEast.z, canvas);
+  // The raster covers the geographic bbox, not the padded simulation world.
+  // Use the same projection as buildings, roads and landmark positions.
+  ctx.fillStyle = "#303442";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(runtime.rasterMapImage, start.x, start.y, end.x - start.x, end.y - start.y);
+}
+
 function placeLabel(ctx, canvas, text, x, z, color = "rgba(225, 242, 251, 0.62)") {
   const position = worldToTexture(x, z, canvas);
   ctx.fillStyle = color;
@@ -2034,10 +2079,34 @@ function drawMiniMap() {
   ctx.drawImage(runtime.miniMapBase, 0, 0);
 
   const player = worldToTexture(state.position.x, state.position.z, dom.miniMap);
+  const current = checkpointDefs[state.checkpointIndex];
+  if (current) {
+    const target = worldToTexture(current.x, current.z, dom.miniMap);
+    ctx.save();
+    ctx.strokeStyle = "#ffe4a3";
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y);
+    ctx.lineTo(target.x, target.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+  checkpointDefs.forEach((checkpoint, index) => {
+    const point = worldToTexture(checkpoint.x, checkpoint.z, dom.miniMap);
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = index < state.checkpointIndex ? "#88f2a1" : index === state.checkpointIndex ? "#ffe4a3" : "#b6eaff";
+    ctx.fill();
+    ctx.fillStyle = "#07131d";
+    ctx.font = "bold 10px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(String(index + 1), point.x, point.y);
+  });
   const heading = getHeadingRadians();
   ctx.save();
   ctx.translate(player.x, player.y);
-  ctx.rotate(heading + Math.PI * 0.5);
+  ctx.rotate(heading);
   ctx.fillStyle = "#ff8d64";
   ctx.beginPath();
   ctx.moveTo(0, -8);
@@ -2267,7 +2336,7 @@ function getHeadingRadians() {
   if (state.forward.lengthSq() > 0.0001) {
     return Math.atan2(state.forward.x, -state.forward.z);
   }
-  return state.yaw;
+  return -state.yaw;
 }
 
 function shortestAngle(from, to) {
@@ -2279,9 +2348,8 @@ function shortestAngle(from, to) {
 }
 
 function clearInputs() {
-  Object.keys(input).forEach((key) => {
-    input[key] = false;
-  });
+  inputController.clear();
+  runtime.lookRollVelocity = 0;
   dom.touchButtons.forEach((button) => {
     button.classList.remove("active");
   });
@@ -2301,10 +2369,6 @@ function hashFrac(i) {
   const value = Math.sin(i * 12.9898) * 43758.5453;
   return value - Math.floor(value);
 }
-
-const duskShadowColor = new THREE.Color(0x241c38);
-const duskLitColor = new THREE.Color(0xffffff);
-const aoTempColor = new THREE.Color();
 
 function addVerticalAoColors(geometry) {
   geometry.computeBoundingBox();
