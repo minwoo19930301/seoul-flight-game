@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "threeRevision": "179",
+  "polygonCount": 206,
+  "trianglesBeforeTerrainSubdivision": 5490,
+  "degenerateTriangles": 0,
+  "areaM2": 18586190.702815454,
+  "maxTriangulationRelativeAreaError": 3.971818020702549e-11,
+  "mainHanIslandProbesExcluded": 8,
+  "legacyMainRiverVerticesInBbox": 29,
+  "legacyMainRiverVerticesCoveredByNewWater": 29,
+  "localPathsOrContributorIdentityPatterns": 0,
+  "scope": "Independent Node polygon/ring/triangulation and byte checks only; no browser, DOM, GPU or map-view QA"
+}

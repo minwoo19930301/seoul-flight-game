@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "checks": [
+    "204 GLB binary/JSON chunks, aligned buffer views, interleaved accessors, index ranges, finite attributes",
+    "Exact Float32 POSITION bounds; tile-local/world bounds and origin contract",
+    "Every nondegenerate triangle winding agrees with flat unit normal; flat roof Y",
+    "Every expected source ID exactly once; exactly four requested landmark exclusions",
+    "Real DEM hash and projection dimensions match; no missing/failed footprint",
+    "All roofs preserved source polygon area during generation, including 26299 concave footprints"
+  ],
+  "totals": {
+    "tiles": 204,
+    "vertices": 2235303,
+    "triangles": 1188054,
+    "roofTriangles": 280248,
+    "wallTriangles": 907806,
+    "primitives": 820,
+    "bytes": 79603340
+  },
+  "minimumNormalDot": 0.9999999570399862,
+  "degenerateTriangles": 0,
+  "result": "PASS",
+  "sourceSceneSha256": "22a13bad3e379a2293fc437e555991ef53c18a507c5ce547ce159c6e2036f210",
+  "sourceTerrainSha256": "3025792e6215f23fecb95ef300e8dba96e9f0e7fbff1dcb20ecce5546afb082b",
+  "warningCount": 7,
+  "warningPolicy": "Inherited-height/coarse-DEM intersections are disclosed, not arbitrary height corrections."
+}

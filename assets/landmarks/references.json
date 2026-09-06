@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "researchedAt": "2026-09-06",
+  "scope": "Five existing flight-route landmarks. Independently recreated reference models, not official models, surveys or photogrammetry.",
+  "assetContract": {
+    "unit": "metre",
+    "gltfAxes": { "x": "local width", "y": "up", "z": "local depth" },
+    "origin": "horizontal centre of tower/main hall footprint at local finished ground y=0; no terrain elevation baked into asset",
+    "transform": "Apply physical metre scale uniformly. Root handles x-east/z-south georeferencing and asset yaw. Blender native Z-up exports through standard glTF Y-up conversion.",
+    "photos": "Reference links only; no permission to redistribute photographs as textures is asserted.",
+    "accuracy": "Published heights retain their stated datum; footprint-derived dimensions and all facade subdivisions are estimates. Model bounds must include roof and antenna where specified."
+  },
+  "sourceMap": {
+    "path": "work/repos/seoul-flight-game/assets/seoul-scene-data.json",
+    "attribution": "OpenStreetMap contributors; retained repository snapshot, acquisition date and individual height provenance unknown",
+    "bbox": { "minLat": 37.5, "maxLat": 37.59, "minLon": 126.92, "maxLon": 127.11 },
+    "referenceLat": 37.545,
+    "legacyWorld": { "width": 3200, "depth": 2300, "ceiling": 720 },
+    "legacyWorldUnitsPerPhysicalMetreAtReferenceLat": 0.17173664117562842,
+    "legacyVerticalExaggerationAgainstFootprints": 5.822869209240785,
+    "replacementDecision": "Use physical local metres for all x/y/z. Mercator displacement in metres multiplied by cos(referenceLat); fit world bounds to bbox plus margin. Do not retain old 3200x2300 miniature dimensions.",
+    "warnings": [
+      "Legacy normalizeBuildingHeight clamps stored heights to 8..320 units. Generator used height, levels, or kind/area fallback and discarded which branch was used; numerical height alone cannot be labeled surveyed.",
+      "COEX checkpoint is exhibition-centre centre, not Trade Tower; palace checkpoint is near Heumgyeonggak, not Geunjeongjeon.",
+      "Inherited N Seoul coordinate has not been independently surveyed or corrected."
+    ]
+  },
+  "sources": {
+    "lotteArchitect": { "publisher": "Kohn Pedersen Fox, project architect", "url": "https://www.kpf.com/project/lotte-world-tower", "supports": ["555 m height", "123 stories", "tapered convex glass mass", "vertical seam", "split crown ears and sky bridge"], "confidence": "high" },
+    "lottePhoto": { "publisher": "KPF project gallery", "url": "https://e1.nmcdn.io/assets/kpf2024/wp-content/uploads/2015/10/1769_1_000_N278_large-2160x1440.webp", "supports": ["exterior photo reference"], "confidence": "high", "usage": "Reference only; no texture license asserted" },
+    "sixtythreeCity": { "publisher": "Seoul Museum of History", "url": "https://museum.seoul.go.kr/archive/archiveNew/NR_archiveView.do?ctgryId=CTGRY489&fileId=H-TRNS-102535-491&fileSn=300&type=A&upperNodeId=CTGRY491", "supports": ["249.58 m building height", "264.58 m above sea level", "historical exterior photograph"], "confidence": "high" },
+    "sixtythreeOwnerPhoto": { "publisher": "Hanwha, owner group", "url": "https://www.hanwha.com/newsroom/media-library/media-assets/hanwha-lifes-headquarters-in-seoul-korea.do", "supports": ["63 Building identity", "owner exterior photo reference"], "confidence": "high", "usage": "Reference only; no texture license asserted" },
+    "sixtythreeOwnerGold": { "publisher": "Hanwha", "url": "https://www.hanwha.com/newsroom/news/feature-stories/galleria-duty-free-63-a-journey-to-modern-luxury-to-seouls-golden-landmark.do", "supports": ["gold exterior identity"], "confidence": "high" },
+    "nseoulOperator": { "publisher": "CJ Foodville / N Seoul Tower operator", "url": "https://www.nseoultower.co.kr/global/intro2.asp", "supports": ["236.7 m tower", "135.7 m tower body plus 101 m steel tower", "operator ground altitude 270 m", "operator tip altitude 506.7 m", "observation-floor areas 450, 460, 466, 271 square metres"], "confidence": "high_for_tower_height_conflicting_for_ground_altitude" },
+    "nseoulCity": { "publisher": "Seoul Metropolitan Government, Future Heritage", "url": "https://futureheritage.seoul.go.kr/futureHeritageMeet/futureHeritage/view.do?fetchStart=1&htNo=3084&searchTitle=%EB%82%A8%EC%82%B0&srchType=title", "supports": ["236.7 m tower", "135.7+101 m split", "city ground altitude 243 m", "city tip altitude 479.7 m"], "confidence": "high_for_tower_height_conflicting_for_ground_altitude" },
+    "nseoulGallery": { "publisher": "N Seoul Tower operator", "url": "https://www.nseoultower.co.kr/global/intro.asp", "supports": ["tower identity", "link to operator photo gallery", "lighting changes dynamically"], "confidence": "high" },
+    "tradeOwner": { "publisher": "WTC Seoul, property operator", "url": "https://wtcseoul.com/office/office01.php", "supports": ["Trade Tower is distinct from COEX exhibition centre", "54 above-ground floors according to operator", "1988 completion", "exterior photographs"], "confidence": "high" },
+    "tradePhoto": { "publisher": "WTC Seoul", "url": "https://wtcseoul.com/images/sub/trade_img1.jpg", "supports": ["exterior massing and facade reference"], "confidence": "high", "usage": "Reference only; no texture license asserted" },
+    "tradeHeight": { "publisher": "Council on Vertical Urbanism / CTBUH, original building database", "url": "https://www.skyscrapercenter.com/building/trade-tower/1141", "supports": ["architectural height 228 m", "to-tip height 256.5 m", "helipad 228 m", "database counts 55 floors, unlike operator 54"], "confidence": "high_for_published_database_not_a_new_survey" },
+    "palaceHeritage": { "publisher": "Korea Heritage Service, National Heritage Portal", "url": "https://www.heritage.go.kr/heri/cul/culSelectDetail.do?ccbaAsno=0002230000000&ccbaCpno=1111102230000&ccbaCtcd=11&ccbaKdcd=11&ccbaLcto=11&culPageNo=1&header=region&pageNo=1_1_3_1&s_ctcd=11&sngl=Y", "supports": ["Geunjeongjeon identity and official exterior photographs/drawings index"], "access": "Search-index content obtained; live page open returned internal error", "confidence": "high_for_identity_no_verified_height" },
+    "palaceOperator": { "publisher": "Korea Heritage Service, Royal Palaces and Tombs Center", "url": "https://royal.khs.go.kr/ROYAL/contents/R404000000.do?schGroupCode=gbg", "supports": ["Geunjeongjeon five bays by five bays"], "confidence": "high" },
+    "palaceArchitecture": { "publisher": "Korea Heritage Service, Royal Palaces and Tombs Center", "url": "https://royal.khs.go.kr/ROYAL/contents/R311050000.do", "supports": ["Geunjeongjeon exterior reference and palace-building hierarchy"], "confidence": "high" },
+    "palaceCityRegister": { "publisher": "Seoul public building register", "url": "https://openab.seoul.go.kr/build/detail.do?mgmBldrgstPk=10021100184283", "supports": ["Geunjeongjeon registered building area 636 square metres", "timber structure and tile roof"], "confidence": "high_for_registry_not_roof_bounds" }
+  },
+  "landmarks": [
+    {
+      "id": "sixtythree", "nameKo": "63빌딩", "assetId": "sixtythree",
+      "coordinate": { "lon": 126.9402516, "lat": 37.5198496, "basis": "existing repository landmark, agrees with named OSM footprint centre within 1 m", "confidence": "medium_unsurveyed" },
+      "osmWayId": 64989671,
+      "dimensionsM": { "width": 64.5, "depth": 43.3, "height": 249.58 },
+      "dimensionEvidence": { "widthDepth": "Estimated minimum-area oriented box of retained OSM footprint; podium/projections can differ from upper shaft", "height": "Published Seoul Museum of History building height; technical antennas excluded from this model target", "estimatedPlanUncertaintyPercent": 15 },
+      "yawDegFromEast": 38.2202,
+      "yawMeaning": "Plan local width axis counterclockwise from geographic east; equivalent 180-degree rotation is same footprint",
+      "groundAltitudeM": { "value": 15, "status": "derived_from_published_264.58_minus_249.58_not_surveyed" },
+      "appearance": ["Golden/bronze reflective curtain wall, not yellow self-emissive plastic", "Thin regular floor bands and darker window mullions", "Main slab silhouette with softened or curved transitions; inspect owner photograph before finalizing", "Avoid invented 18 m box crown in legacy mesh"],
+      "modelingEstimates": { "floorBands": 60, "mullionPitchM": 1.7, "mullionThicknessM": 0.14, "materialBaseColor": "#B79758", "materialRoughness": 0.25, "materialMetalness": 0.45 },
+      "sources": ["sixtythreeCity", "sixtythreeOwnerPhoto", "sixtythreeOwnerGold"],
+      "legacyMismatch": "Legacy declared collision height 254; visible mesh reaches 271. Main 54x34 box lacks facade rhythm."
+    },
+    {
+      "id": "gyeongbokgung", "nameKo": "경복궁 근정전", "assetId": "gyeongbokgung",
+      "coordinate": { "lon": 126.9769911, "lat": 37.5785475, "basis": "Estimated oriented-box centre of named Geunjeongjeon OSM footprint", "confidence": "medium_unsurveyed" },
+      "legacyCoordinate": { "lon": 126.9766818, "lat": 37.579754 },
+      "osmWayId": 170199428,
+      "dimensionsM": { "width": 32.04, "depth": 23.57, "height": 26 },
+      "dimensionEvidence": { "widthDepth": "Estimated OSM footprint oriented bounds; not official surveyed roof dimensions", "height": "Modeling estimate including approximately 3.5 m raised stone terrace; no primary height measurement verified", "estimatedHeightUncertaintyM": 4, "estimatedPlanUncertaintyPercent": 15 },
+      "yawDegFromEast": -2.3602,
+      "groundAltitudeM": { "value": null, "status": "use_terrain_estimate_not_verified" },
+      "appearance": ["Five-bay front and five-bay side rhythm", "Two-tier hipped-and-gabled tiled roof with long horizontal ridges and gently lifted eaves; not a four-sided conical/pagoda roof", "Red-brown timber columns, muted green/red dancheong brackets, charcoal roof tiles", "Pale stone two-level terrace, south-facing central steps and low balustrade"],
+      "modelingEstimates": { "terraceWidthM": 47, "terraceDepthM": 38, "terraceHeightM": 3.5, "roofRidgeHeightAboveTerraceM": 22.5, "columnDiameterM": 0.75, "hallWidthM": 30, "hallDepthM": 21 },
+      "scopeWarning": "Asset is Geunjeongjeon main hall and terrace only, not a reconstructed full palace compound. Keep nearby real footprint halls instead of four invented large halls. Terrace extends beyond dimensionsM plan fields; collision must use exported complete bounds.",
+      "sources": ["palaceHeritage", "palaceOperator", "palaceArchitecture", "palaceCityRegister"],
+      "legacyMismatch": "Old point lies near Heumgyeonggak approximately 136 m north-northwest. Legacy principal hall footprint is 64x40 and roof peak about 36.16 units, despite declared height26."
+    },
+    {
+      "id": "nseoul", "nameKo": "N서울타워", "assetId": "nseoul",
+      "coordinate": { "lon": 126.9882805, "lat": 37.55127, "basis": "existing repository landmark; no independent coordinate verification", "confidence": "medium_unsurveyed" },
+      "dimensionsM": { "width": 28, "depth": 28, "height": 236.7 },
+      "dimensionEvidence": { "widthDepth": "Estimated observation-head outer envelope; 466 square metre public floor implies circular floor diameter24.36 m, not an exact exterior diameter", "height": "Operator and city agree 135.7 m body +101 m steel tower", "estimatedPlanUncertaintyPercent": 20 },
+      "groundAltitudeM": { "value": 270, "status": "operator_published_selected_terrain_estimate_with_city_conflict", "alternativeCityValue": 243, "note": "Operator gives tip506.7 m; city gives479.7 m. Do not present either terrain datum as independently verified. Do not bake mountain into GLB." },
+      "appearance": ["Slender light-gray concrete shaft", "Broad multi-level observation head around upper part of 135.7 m body; dark blue-gray glazed bands and light fascia", "A further101 m slender antenna/steel transmission structure above the body, with maintenance platforms/radial details", "Do not make 60 m diameter observation head or move whole observation head above160 m as legacy model does"],
+      "modelingEstimates": { "shaftBaseDiameterM": 14, "shaftTopDiameterM": 7, "headBottomHeightM": 106, "headTopHeightM": 135.7, "headDiameterM": 28, "mastHeightM": 101, "mastBaseDiameterM": 4.6, "mastTipDiameterM": 0.9 },
+      "sources": ["nseoulOperator", "nseoulCity", "nseoulGallery"],
+      "legacyMismatch": "Legacy declared tower246, visible mesh reaches262.4, head diameter60, procedural hill76. Those are not the published tower/site dimensions."
+    },
+    {
+      "id": "coex", "nameKo": "무역센터 트레이드타워", "assetId": "coex",
+      "coordinate": { "lon": 127.0610204, "lat": 37.5103271, "basis": "Estimated oriented-box centre of named Trade Tower OSM footprint; not COEX exhibition-centre midpoint", "confidence": "medium_unsurveyed" },
+      "legacyCoordinate": { "lon": 127.0591105, "lat": 37.5118733 },
+      "osmWayId": 74056379,
+      "dimensionsM": { "width": 61.48, "depth": 42.06, "height": 256.5 },
+      "architecturalHeightM": 228,
+      "dimensionEvidence": { "widthDepth": "Estimated oriented bounds of retained irregular OSM tower footprint, not official construction drawings", "height": "Published CTBUH/CVU to-tip256.5 m; main architectural roof/helipad228 m", "estimatedPlanUncertaintyPercent": 15 },
+      "yawDegFromEast": 22.9297,
+      "groundAltitudeM": { "value": null, "status": "use_terrain_estimate_not_verified" },
+      "appearance": ["Stepped/setback upper profile formed by adjacent interlocking vertical masses, not single flat-topped square box", "Cool silver/blue-gray curtain-wall glazing with strong dark horizontal bands", "Roof/helipad at228 m; very slim technical mast to256.5 m may be separate low-polygon part", "COEX exhibition hall is a separate large low-rise footprint and must not become another228 m tower"],
+      "modelingEstimates": { "floorBands": 54, "mullionPitchM": 1.8, "materialBaseColor": "#879AAB", "materialRoughness": 0.3, "mastHeightM": 28.5 },
+      "sources": ["tradeOwner", "tradePhoto", "tradeHeight"],
+      "legacyMismatch": "Old point is about241 m northwest of actual named tower. Legacy declared214, box/cap reaches224, colored copper. Owner54 floors and CTBUH55 floors differ; use owner54 for visual rhythm without claiming exact window count."
+    },
+    {
+      "id": "lotte", "nameKo": "롯데월드타워", "assetId": "lotte",
+      "coordinate": { "lon": 127.102679, "lat": 37.5125537, "basis": "existing landmark agrees within approximately3 m with local OSM tower-shaped footprint", "confidence": "medium_unsurveyed" },
+      "osmWayId": 914963586,
+      "dimensionsM": { "width": 71.5, "depth": 71.5, "height": 555 },
+      "dimensionEvidence": { "widthDepth": "Estimated rounded-square base plan from retained OSM footprint; footprint record itself is unnamed and its18.3 m height is unsuitable", "height": "KPF project architect publishes555 m", "estimatedPlanUncertaintyPercent": 12 },
+      "yawDegFromEast": 22.5573,
+      "groundAltitudeM": { "value": null, "status": "use_terrain_estimate_not_verified" },
+      "appearance": ["Rounded-square/convex four-sided base transitioning into a smooth narrowing glass tower", "Continuous silver vertical fins and thin horizontal floor bands", "Pronounced vertical seam/opening oriented approximately toward historic Seoul", "Split open crown with two pointed ears and connecting skybridge; do not add separate conical needle on top"],
+      "modelingEstimates": { "profileHeightFractions": [0, 0.2, 0.4, 0.6, 0.8, 0.92, 1], "profileWidthFractions": [1, 0.93, 0.79, 0.63, 0.47, 0.35, 0.2], "crownStartHeightM": 500, "crownGapM": 6, "floorBandCount": 123, "verticalFinCount": 48, "materialBaseColor": "#9AACBB", "materialRoughness": 0.22 },
+      "sources": ["lotteArchitect", "lottePhoto"],
+      "legacyMismatch": "Legacy profile496+conical spire70 reaches566, despite declared548; circular lathe lacks four-sided convex mass and open crown."
+    }
+  ]
+}

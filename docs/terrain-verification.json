@@ -1,0 +1,20 @@
+{
+  "sampleCount": 66049,
+  "noDataCount": 0,
+  "minimumM": -17.599,
+  "maximumM": 340.618,
+  "tileCount": 9,
+  "sources": [
+    "srtm/N37E126.tif",
+    "srtm/N37E127.tif",
+    "gmted/30N120E_20101117_gmted_mea075.tif"
+  ],
+  "sampledGroundM": {
+    "sixtythree": 31.573771159789928,
+    "gyeongbokgung": 42.30241758917196,
+    "nseoul": 258.67197140480357,
+    "coex": 28.883487744811568,
+    "lotte": 22.734875445376368
+  },
+  "northWestEqualsFirstSample": true
+}

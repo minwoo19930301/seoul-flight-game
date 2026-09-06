@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "assetCount": 5,
+  "triangles": 48116,
+  "drawCalls": 24,
+  "bytes": 2544416,
+  "maxBytes": 1069956,
+  "dimensionsToleranceM": 0.0001,
+  "checks": [
+    "GLB headers and actual binary POSITION bounds",
+    "Y-up floor-centre origin and identity hierarchy",
+    "finite positions/normals and valid index ranges",
+    "unit normals agree with triangle winding",
+    "zero degenerate triangles",
+    "self-contained no-image procedural PBR",
+    "no cameras/lights exported"
+  ],
+  "assets": [
+    {
+      "id": "sixtythree",
+      "dimensions": [
+        64.5,
+        249.5800018,
+        43.2999992
+      ],
+      "triangles": 4128,
+      "bytes": 225364,
+      "drawCalls": 3,
+      "sha256": "e981170c677a4f514a421a6d00a2e56ae753519f6fea8d51b49a19ab7a32276a"
+    },
+    {
+      "id": "lotte",
+      "dimensions": [
+        71.5,
+        555.0,
+        71.5
+      ],
+      "triangles": 12888,
+      "bytes": 672044,
+      "drawCalls": 3,
+      "sha256": "f5be224ff863346194f079eebdcbd370b93385aa92764fdccb0547584b9adcda"
+    },
+    {
+      "id": "nseoul",
+      "dimensions": [
+        28.0,
+        236.6999969,
+        28.0
+      ],
+      "triangles": 4572,
+      "bytes": 230492,
+      "drawCalls": 5,
+      "sha256": "fc3cfafa7c007247d1b158e85c29ad5b429c6f4b3c971276fb09fef014ea73eb"
+    },
+    {
+      "id": "coex",
+      "dimensions": [
+        61.4799995,
+        256.5,
+        42.0600014
+      ],
+      "triangles": 6352,
+      "bytes": 346560,
+      "drawCalls": 3,
+      "sha256": "f29108b8030d1f52ff356d653b5afb6be6012062e00e93fe158632a3b966d29c"
+    },
+    {
+      "id": "gyeongbokgung",
+      "dimensions": [
+        47.0,
+        26.0,
+        38.0
+      ],
+      "triangles": 20176,
+      "bytes": 1069956,
+      "drawCalls": 10,
+      "sha256": "3e2a1a730e5286d2dedb47336cb17fb5e6ec6a0bac2f6c8ca2ee8d61a2c27aa8"
+    }
+  ]
+}

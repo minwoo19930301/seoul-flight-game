@@ -1,0 +1,6035 @@
+{
+  "schemaVersion": 1,
+  "output": "water.geojson",
+  "crs": "OGC:CRS84 / WGS84 longitude,latitude (GeoJSON order)",
+  "bbox": [
+    126.92,
+    37.5,
+    127.11,
+    37.59
+  ],
+  "acquiredAt": "2026-09-06T14:45:19.205871+00:00",
+  "sourceSnapshot": "2026-09-06T14:44:00Z",
+  "endpoint": "https://overpass-api.de/api/interpreter",
+  "serviceAttempts": 1,
+  "sourceQuery": "[out:json][timeout:75];\n(\n  way[\"natural\"=\"water\"](37.5,126.92,37.59,127.11);\n  relation[\"natural\"=\"water\"](37.5,126.92,37.59,127.11);\n  way[\"waterway\"=\"riverbank\"](37.5,126.92,37.59,127.11);\n  relation[\"waterway\"=\"riverbank\"](37.5,126.92,37.59,127.11);\n);\nout meta geom;\n",
+  "sourceQuerySha256": "9c5438d6ddcf449be69e9d4c2cda3de0781caf138574e88c83e47ccbc313b545",
+  "rawResponseSha256": "e8b0576a5a8629625028f4769583582fd55957fdfea6e7763ffddb8b6c0895ae",
+  "rawResponseBytes": 965889,
+  "rawElementCount": 231,
+  "outputSha256": "41b2ce4b21c7f4905f599405244160859c56da072a7007707bcc092b8764fabb",
+  "outputBytes": 155660,
+  "sourceFeaturesSha256": "dbed5a0597be94fe2aae84d98bcfdb1938fc03222e1072b973ad27e24528152a",
+  "sourceFeaturesBytes": 237047,
+  "software": {
+    "shapely": "2.1.2",
+    "geos": "3.13.1"
+  },
+  "license": {
+    "name": "Open Database License (ODbL) 1.0",
+    "attribution": "© OpenStreetMap contributors",
+    "url": "https://www.openstreetmap.org/copyright",
+    "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/"
+  },
+  "assemblyRules": [
+    "Exact-coordinate endpoint stitching of complete Overpass member geometries; no invented closure.",
+    "Member role outer forms shells; inner rings assigned to the smallest containing outer ring. Member order/direction does not determine role.",
+    "Source topology must pass GEOS validity before clipping. No buffer(0), make_valid, simplification, estimated river width or geometric repair is applied.",
+    "True polygon intersection with the requested bbox retains holes and can split disconnected parts. Outer rings CCW, inner rings CW.",
+    "Selected-relation outer way duplicates are suppressed. Named/unnamed water features remain separate in water-source-features.geojson for provenance.",
+    "water.geojson is a true topological union of accepted source features: overlapping coplanar surfaces are eliminated while main-Han island holes remain dry. No buffer or simplification.",
+    "OSM contributor usernames, user IDs, changesets and unrelated tags are not included in public outputs."
+  ],
+  "validation": {
+    "allIncludedSourceAndClippedGeometriesValid": true,
+    "invalidSourceFeaturesExcluded": 3,
+    "allRingsClosed": true,
+    "correctOuterInnerWinding": true,
+    "holeRepresentativePointsExcluded": true,
+    "allCoordinatesFiniteAndWithinBbox": true,
+    "sourceGeometryRepairs": 0
+  },
+  "summary": {
+    "featureCount": 228,
+    "geometryTypes": {
+      "Polygon": 226,
+      "MultiPolygon": 2
+    },
+    "polygonCount": 230,
+    "holeCount": 40,
+    "areaSumM2": 18586859.338896535,
+    "areaUnionM2": 18586190.70281264,
+    "overlapAreaM2": 668.6360838934779,
+    "mainHanFeatureCount": 2,
+    "mainHanAreaM2": 16955988.04269214,
+    "mainHanHoles": 8,
+    "coordinates": 6159,
+    "outputFeatureCount": 1,
+    "outputPolygonCount": 206,
+    "outputHoleCount": 41,
+    "outputCoordinates": 6069,
+    "mainHanIslandProbeCount": 8,
+    "mainHanIslandProbesDryAfterUnion": true
+  },
+  "sources": [
+    {
+      "id": "way/101293867",
+      "version": 5,
+      "timestamp": "2021-07-21T06:16:23Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/101293867",
+      "name": "아사달 연못",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            101293867
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1382.3678057355671
+    },
+    {
+      "id": "way/154112475",
+      "version": 5,
+      "timestamp": "2022-08-31T14:12:33Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/154112475",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            154112475
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 4553.543496344543
+    },
+    {
+      "id": "way/154806809",
+      "version": 3,
+      "timestamp": "2017-10-01T08:33:56Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/154806809",
+      "name": "서울숲호수",
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            154806809
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 7410.127707035866
+    },
+    {
+      "id": "way/222074695",
+      "version": 26,
+      "timestamp": "2022-01-02T19:53:28Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/222074695",
+      "name": "성내천",
+      "waterType": "stream",
+      "assembledRings": [
+        {
+          "outerWays": [
+            222074695
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 27365.75772784753
+    },
+    {
+      "id": "way/224704568",
+      "version": 2,
+      "timestamp": "2017-05-24T07:55:18Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/224704568",
+      "name": "하늘못",
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            224704568
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1670.473336442459
+    },
+    {
+      "id": "way/229995724",
+      "version": 12,
+      "timestamp": "2025-11-18T01:42:23Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/229995724",
+      "name": "전쟁기념관 호수",
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            229995724
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 6322.5827018596465
+    },
+    {
+      "id": "way/241751836",
+      "version": 3,
+      "timestamp": "2025-09-08T00:20:20Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/241751836",
+      "name": null,
+      "waterType": "basin",
+      "assembledRings": [
+        {
+          "outerWays": [
+            241751836
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1709.4989834868134
+    },
+    {
+      "id": "way/248405787",
+      "version": 10,
+      "timestamp": "2022-08-31T14:12:33Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/248405787",
+      "name": "반포천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            248405787
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 2,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 28581.1279196633
+    },
+    {
+      "id": "way/278615339",
+      "version": 1,
+      "timestamp": "2014-05-01T17:23:31Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/278615339",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            278615339
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1237.0529340150474
+    },
+    {
+      "id": "way/304260845",
+      "version": 3,
+      "timestamp": "2022-04-09T06:32:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/304260845",
+      "name": null,
+      "waterType": "now empty",
+      "assembledRings": [
+        {
+          "outerWays": [
+            304260845
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 286.20476064459933
+    },
+    {
+      "id": "way/369953105",
+      "version": 2,
+      "timestamp": "2019-03-22T14:45:52Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/369953105",
+      "name": "관어지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            369953105
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 114.68932395784837
+    },
+    {
+      "id": "way/370027259",
+      "version": 3,
+      "timestamp": "2015-10-28T12:38:44Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/370027259",
+      "name": null,
+      "waterType": "fountain",
+      "assembledRings": [
+        {
+          "outerWays": [
+            370027259
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 94.6492948166009
+    },
+    {
+      "id": "way/377289796",
+      "version": 1,
+      "timestamp": "2015-10-28T12:38:38Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/377289796",
+      "name": null,
+      "waterType": "fountain",
+      "assembledRings": [
+        {
+          "outerWays": [
+            377289796
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 199.0557588116436
+    },
+    {
+      "id": "way/378466667",
+      "version": 3,
+      "timestamp": "2021-07-24T04:29:50Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/378466667",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            378466667
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 335.3212447024286
+    },
+    {
+      "id": "way/382079354",
+      "version": 1,
+      "timestamp": "2015-11-22T21:12:31Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/382079354",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            382079354
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 437.94315492523003
+    },
+    {
+      "id": "way/382079358",
+      "version": 3,
+      "timestamp": "2019-03-29T14:20:12Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/382079358",
+      "name": "나들못",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            382079358
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 2430.751102158837
+    },
+    {
+      "id": "way/382946998",
+      "version": 5,
+      "timestamp": "2020-02-17T06:05:41Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/382946998",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            382946998
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 329.19772057675493
+    },
+    {
+      "id": "way/383097706",
+      "version": 1,
+      "timestamp": "2015-11-27T17:08:43Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/383097706",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            383097706
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 70.72549705540854
+    },
+    {
+      "id": "way/469161237",
+      "version": 1,
+      "timestamp": "2017-01-26T19:56:10Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/469161237",
+      "name": "실로암",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            469161237
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 238.51817631178662
+    },
+    {
+      "id": "way/469936980",
+      "version": 1,
+      "timestamp": "2017-01-29T13:04:37Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/469936980",
+      "name": "주연",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            469936980
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 71.22040146007546
+    },
+    {
+      "id": "way/472433059",
+      "version": 1,
+      "timestamp": "2017-02-06T01:18:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/472433059",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            472433059
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 338.0520759892657
+    },
+    {
+      "id": "way/472445697",
+      "version": 2,
+      "timestamp": "2020-11-25T06:40:21Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/472445697",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            472445697
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 161.62737313229854
+    },
+    {
+      "id": "way/472445703",
+      "version": 1,
+      "timestamp": "2017-02-06T04:05:27Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/472445703",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            472445703
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 597.9446603580664
+    },
+    {
+      "id": "way/474025687",
+      "version": 1,
+      "timestamp": "2017-02-11T17:40:14Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/474025687",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            474025687
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 108.66276269967835
+    },
+    {
+      "id": "way/476442536",
+      "version": 4,
+      "timestamp": "2024-07-21T14:27:34Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/476442536",
+      "name": "습지조화원",
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            476442536
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 5828.6911611988435
+    },
+    {
+      "id": "way/566335760",
+      "version": 5,
+      "timestamp": "2021-01-20T13:11:32Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/566335760",
+      "name": null,
+      "waterType": "stream",
+      "assembledRings": [
+        {
+          "outerWays": [
+            566335760
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1449.3491852370755
+    },
+    {
+      "id": "way/614403295",
+      "version": 1,
+      "timestamp": "2018-08-06T08:08:22Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/614403295",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            614403295
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 220.05039137490525
+    },
+    {
+      "id": "way/614403297",
+      "version": 3,
+      "timestamp": "2020-08-27T05:08:35Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/614403297",
+      "name": "애련지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            614403297
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 785.2413012556184
+    },
+    {
+      "id": "way/616037081",
+      "version": 3,
+      "timestamp": "2025-05-12T15:26:37Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/616037081",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            616037081
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 3200.5513994321873
+    },
+    {
+      "id": "way/618128760",
+      "version": 1,
+      "timestamp": "2018-08-20T03:22:59Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/618128760",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            618128760
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 198.83287650167512
+    },
+    {
+      "id": "way/629022593",
+      "version": 3,
+      "timestamp": "2022-12-24T14:43:18Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/629022593",
+      "name": "환경연못",
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            629022593
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 4180.15607286228
+    },
+    {
+      "id": "way/629126159",
+      "version": 2,
+      "timestamp": "2025-09-20T15:16:58Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/629126159",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            629126159
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 4723.6151989789805
+    },
+    {
+      "id": "way/633779315",
+      "version": 2,
+      "timestamp": "2018-11-23T17:35:52Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/633779315",
+      "name": "아이파크 내 인공 폭포",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            633779315
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 876.1203642568931
+    },
+    {
+      "id": "way/668917855",
+      "version": 2,
+      "timestamp": "2024-07-21T14:27:34Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/668917855",
+      "name": null,
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            668917855
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 5551.400368885356
+    },
+    {
+      "id": "way/675327350",
+      "version": 1,
+      "timestamp": "2019-03-08T01:18:45Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/675327350",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            675327350
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 352.19375260272716
+    },
+    {
+      "id": "way/687940675",
+      "version": 2,
+      "timestamp": "2022-02-16T10:37:09Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/687940675",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            687940675
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 198.69491717296447
+    },
+    {
+      "id": "way/687940677",
+      "version": 1,
+      "timestamp": "2019-05-05T12:53:19Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/687940677",
+      "name": "115동 앞 인공 연못",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            687940677
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 229.21836348614946
+    },
+    {
+      "id": "way/687940678",
+      "version": 2,
+      "timestamp": "2022-02-16T10:37:09Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/687940678",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            687940678
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 527.255969839385
+    },
+    {
+      "id": "way/687940679",
+      "version": 2,
+      "timestamp": "2022-02-16T10:37:09Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/687940679",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            687940679
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 140.78875407619051
+    },
+    {
+      "id": "way/687940680",
+      "version": 2,
+      "timestamp": "2022-02-16T10:37:09Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/687940680",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            687940680
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 242.41521491867258
+    },
+    {
+      "id": "way/744071475",
+      "version": 2,
+      "timestamp": "2024-08-28T18:44:24Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/744071475",
+      "name": "청룡연못",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            744071475
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 553.7886217394141
+    },
+    {
+      "id": "way/759409653",
+      "version": 1,
+      "timestamp": "2019-12-29T17:45:39Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/759409653",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            759409653
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 206.9902887966045
+    },
+    {
+      "id": "way/760129914",
+      "version": 4,
+      "timestamp": "2024-06-09T18:15:36Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/760129914",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            760129914
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 178.0101339451859
+    },
+    {
+      "id": "way/767779592",
+      "version": 3,
+      "timestamp": "2020-08-24T07:31:45Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/767779592",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            767779592
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 68.46551797198728
+    },
+    {
+      "id": "way/767874478",
+      "version": 1,
+      "timestamp": "2020-01-29T13:55:20Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/767874478",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            767874478
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 258.8959521247528
+    },
+    {
+      "id": "way/768444114",
+      "version": 1,
+      "timestamp": "2020-01-31T07:29:25Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/768444114",
+      "name": null,
+      "waterType": "stream",
+      "assembledRings": [
+        {
+          "outerWays": [
+            768444114
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 74.32804703821994
+    },
+    {
+      "id": "way/768444115",
+      "version": 1,
+      "timestamp": "2020-01-31T07:29:25Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/768444115",
+      "name": null,
+      "waterType": "stream",
+      "assembledRings": [
+        {
+          "outerWays": [
+            768444115
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 60.110496729684456
+    },
+    {
+      "id": "way/771233468",
+      "version": 2,
+      "timestamp": "2024-01-13T12:56:55Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/771233468",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            771233468
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 105.01974873892907
+    },
+    {
+      "id": "way/771233469",
+      "version": 2,
+      "timestamp": "2024-01-13T12:56:55Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/771233469",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            771233469
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 107.28347553386692
+    },
+    {
+      "id": "way/775090209",
+      "version": 1,
+      "timestamp": "2020-02-20T18:40:11Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/775090209",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            775090209
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 99.83299851043223
+    },
+    {
+      "id": "way/777660089",
+      "version": 3,
+      "timestamp": "2020-09-03T03:35:10Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/777660089",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            777660089
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 304.38387211154554
+    },
+    {
+      "id": "way/777660090",
+      "version": 3,
+      "timestamp": "2020-09-03T03:35:10Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/777660090",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            777660090
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 320.22343023296935
+    },
+    {
+      "id": "way/786079697",
+      "version": 6,
+      "timestamp": "2021-05-17T03:51:02Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/786079697",
+      "name": null,
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            786079697
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 120.21096072502753
+    },
+    {
+      "id": "way/788178726",
+      "version": 4,
+      "timestamp": "2020-12-30T00:55:26Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/788178726",
+      "name": "관람지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            788178726
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 583.4823547855718
+    },
+    {
+      "id": "way/802936071",
+      "version": 4,
+      "timestamp": "2020-06-16T05:39:00Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/802936071",
+      "name": "고려대학교 육생비오톱",
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            802936071
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.4108993878536
+    },
+    {
+      "id": "way/807013767",
+      "version": 10,
+      "timestamp": "2023-07-13T07:33:02Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/807013767",
+      "name": "성인 물놀이장",
+      "waterType": "pool",
+      "assembledRings": [
+        {
+          "outerWays": [
+            807013767
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 2823.887431464305
+    },
+    {
+      "id": "way/867117240",
+      "version": 1,
+      "timestamp": "2020-11-04T21:33:15Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/867117240",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            867117240
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 403.10161374052166
+    },
+    {
+      "id": "way/880952758",
+      "version": 1,
+      "timestamp": "2020-12-04T10:18:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880952758",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880952758
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 4194.100485530058
+    },
+    {
+      "id": "way/880952759",
+      "version": 1,
+      "timestamp": "2020-12-04T10:18:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880952759",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880952759
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 6368.324211891153
+    },
+    {
+      "id": "way/880952760",
+      "version": 1,
+      "timestamp": "2020-12-04T10:18:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880952760",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880952760
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 7427.134730066442
+    },
+    {
+      "id": "way/880952761",
+      "version": 1,
+      "timestamp": "2020-12-04T10:18:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880952761",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880952761
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 11781.459265439675
+    },
+    {
+      "id": "way/880952762",
+      "version": 1,
+      "timestamp": "2020-12-04T10:18:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880952762",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880952762
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 10815.174953246453
+    },
+    {
+      "id": "way/880952763",
+      "version": 1,
+      "timestamp": "2020-12-04T10:18:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880952763",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880952763
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 2194.927190449846
+    },
+    {
+      "id": "way/880989967",
+      "version": 1,
+      "timestamp": "2020-12-04T12:26:34Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880989967",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880989967
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1580.2361060538137
+    },
+    {
+      "id": "way/880989968",
+      "version": 1,
+      "timestamp": "2020-12-04T12:26:34Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880989968",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880989968
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 3032.234282290501
+    },
+    {
+      "id": "way/880989969",
+      "version": 1,
+      "timestamp": "2020-12-04T12:26:34Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880989969",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880989969
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 988.2172811269238
+    },
+    {
+      "id": "way/880989973",
+      "version": 3,
+      "timestamp": "2022-08-31T19:16:20Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/880989973",
+      "name": "홍제천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            880989973
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 11099.37603183875
+    },
+    {
+      "id": "way/886450540",
+      "version": 1,
+      "timestamp": "2020-12-19T13:43:31Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/886450540",
+      "name": null,
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            886450540
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 144.32710937378528
+    },
+    {
+      "id": "way/924019558",
+      "version": 1,
+      "timestamp": "2021-03-31T04:03:30Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/924019558",
+      "name": "거울연못",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            924019558
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 415.8523346970571
+    },
+    {
+      "id": "way/925869097",
+      "version": 2,
+      "timestamp": "2026-06-26T00:02:35Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/925869097",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            925869097
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1282.7538370645664
+    },
+    {
+      "id": "way/928880877",
+      "version": 1,
+      "timestamp": "2021-04-10T14:34:34Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/928880877",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            928880877
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 110.15167036834619
+    },
+    {
+      "id": "way/929793590",
+      "version": 15,
+      "timestamp": "2026-02-02T19:16:14Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/929793590",
+      "name": null,
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            929793590
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 3610.1999084641807
+    },
+    {
+      "id": "way/971270508",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270508",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270508
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1596.9963800812222
+    },
+    {
+      "id": "way/971270594",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270594",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270594
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 424.8754329204953
+    },
+    {
+      "id": "way/971270595",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270595",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270595
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 424.85279856771234
+    },
+    {
+      "id": "way/971270642",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270642",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270642
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3633939827223
+    },
+    {
+      "id": "way/971270643",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270643",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270643
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3013785370671
+    },
+    {
+      "id": "way/971270644",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270644",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270644
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2193396475884
+    },
+    {
+      "id": "way/971270645",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270645",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270645
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3551263871332
+    },
+    {
+      "id": "way/971270646",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270646",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270646
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.707002381503
+    },
+    {
+      "id": "way/971270647",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270647",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270647
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.168412447134
+    },
+    {
+      "id": "way/971270648",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270648",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270648
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2215840349173
+    },
+    {
+      "id": "way/971270649",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270649",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270649
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3047512594668
+    },
+    {
+      "id": "way/971270667",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270667",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270667
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2269257953894
+    },
+    {
+      "id": "way/971270668",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270668",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270668
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1738264693445
+    },
+    {
+      "id": "way/971270669",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270669",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270669
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3709802598717
+    },
+    {
+      "id": "way/971270670",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270670",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270670
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2252680050084
+    },
+    {
+      "id": "way/971270671",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270671",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270671
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.4224851873365
+    },
+    {
+      "id": "way/971270672",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270672",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270672
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1715823870211
+    },
+    {
+      "id": "way/971270673",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270673",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270673
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3687367966177
+    },
+    {
+      "id": "way/971270674",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270674",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270674
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2230250966203
+    },
+    {
+      "id": "way/971270681",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270681",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270681
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.37670632474106
+    },
+    {
+      "id": "way/971270684",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270684",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270684
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.52024400553734
+    },
+    {
+      "id": "way/971270686",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270686",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270686
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.341221202351
+    },
+    {
+      "id": "way/971270688",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270688",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270688
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.54901537970176
+    },
+    {
+      "id": "way/971270690",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270690",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270690
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.31404019614536
+    },
+    {
+      "id": "way/971270691",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270691",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270691
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.3137752740127
+    },
+    {
+      "id": "way/971270699",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270699",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270699
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3152318616349
+    },
+    {
+      "id": "way/971270700",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270700",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270700
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.4298696171089
+    },
+    {
+      "id": "way/971270701",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270701",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270701
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3766476772364
+    },
+    {
+      "id": "way/971270702",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270702",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270702
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2309338316212
+    },
+    {
+      "id": "way/971270703",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270703",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270703
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2303470640355
+    },
+    {
+      "id": "way/971270704",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270704",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270704
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3750041846229
+    },
+    {
+      "id": "way/971270705",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270705",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270705
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1766475695545
+    },
+    {
+      "id": "way/971270706",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270706",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270706
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.4264960577938
+    },
+    {
+      "id": "way/971270722",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270722",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270722
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1849049989868
+    },
+    {
+      "id": "way/971270723",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270723",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270723
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.6609141197688
+    },
+    {
+      "id": "way/971270724",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270724",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270724
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3189888815259
+    },
+    {
+      "id": "way/971270725",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270725",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270725
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3710815430782
+    },
+    {
+      "id": "way/971270726",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270726",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270726
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2352327850269
+    },
+    {
+      "id": "way/971270727",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270727",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270727
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3173452947042
+    },
+    {
+      "id": "way/971270728",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270728",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270728
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1815329173406
+    },
+    {
+      "id": "way/971270729",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270729",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270729
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3688378060729
+    },
+    {
+      "id": "way/971270731",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270731",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270731
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.3419380544868
+    },
+    {
+      "id": "way/971270732",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270732",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270732
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.3416737134377
+    },
+    {
+      "id": "way/971270735",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270735",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270735
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.3136974577374
+    },
+    {
+      "id": "way/971270736",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270736",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270736
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.3134318837818
+    },
+    {
+      "id": "way/971270739",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270739",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270739
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.54586273626006
+    },
+    {
+      "id": "way/971270740",
+      "version": 1,
+      "timestamp": "2021-08-08T05:07:51Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/971270740",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            971270740
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.3406135985058
+    },
+    {
+      "id": "way/1004876845",
+      "version": 1,
+      "timestamp": "2021-11-21T09:59:39Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1004876845",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1004876845
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 2729.602174224452
+    },
+    {
+      "id": "way/1004876846",
+      "version": 1,
+      "timestamp": "2021-11-21T09:59:39Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1004876846",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1004876846
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 573.4805698680744
+    },
+    {
+      "id": "way/1004877289",
+      "version": 3,
+      "timestamp": "2025-08-05T08:40:57Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1004877289",
+      "name": null,
+      "waterType": "basin",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1004877289
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 17942.55938478962
+    },
+    {
+      "id": "way/1049307437",
+      "version": 1,
+      "timestamp": "2022-04-05T12:34:26Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1049307437",
+      "name": null,
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1049307437
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 749.9796477819731
+    },
+    {
+      "id": "way/1049307438",
+      "version": 1,
+      "timestamp": "2022-04-05T12:34:26Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1049307438",
+      "name": null,
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1049307438
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1178.4710105437666
+    },
+    {
+      "id": "way/1049307439",
+      "version": 1,
+      "timestamp": "2022-04-05T12:34:26Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1049307439",
+      "name": null,
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1049307439
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 956.5806155907392
+    },
+    {
+      "id": "way/1052189091",
+      "version": 2,
+      "timestamp": "2026-04-19T07:05:09Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1052189091",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1052189091
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 35.87875476112628
+    },
+    {
+      "id": "way/1061424900",
+      "version": 1,
+      "timestamp": "2022-05-18T14:26:43Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1061424900",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1061424900
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 103.14859287988556
+    },
+    {
+      "id": "way/1075472445",
+      "version": 1,
+      "timestamp": "2022-07-03T08:02:53Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1075472445",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1075472445
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 686.7837448608519
+    },
+    {
+      "id": "way/1075472446",
+      "version": 1,
+      "timestamp": "2022-07-03T08:02:53Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1075472446",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1075472446
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 686.7476651296049
+    },
+    {
+      "id": "way/1075472447",
+      "version": 1,
+      "timestamp": "2022-07-03T08:02:53Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1075472447",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1075472447
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 926.5749611397496
+    },
+    {
+      "id": "way/1075472448",
+      "version": 1,
+      "timestamp": "2022-07-03T08:02:53Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1075472448",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1075472448
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 926.6783404245764
+    },
+    {
+      "id": "way/1085031602",
+      "version": 4,
+      "timestamp": "2026-05-16T16:31:31Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1085031602",
+      "name": null,
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1085031602
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 418.89269965810763
+    },
+    {
+      "id": "way/1101935754",
+      "version": 8,
+      "timestamp": "2023-07-13T07:33:02Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1101935754",
+      "name": "어린이 물놀이장",
+      "waterType": "pool",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1101935754
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 439.68295653472484
+    },
+    {
+      "id": "way/1101935755",
+      "version": 7,
+      "timestamp": "2023-07-13T07:33:02Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1101935755",
+      "name": "유아 물놀이장",
+      "waterType": "pool",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1101935755
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 164.87755241815984
+    },
+    {
+      "id": "way/1103358306",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358306",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358306
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1905202257494
+    },
+    {
+      "id": "way/1103358307",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358307",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358307
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.666534044517
+    },
+    {
+      "id": "way/1103358308",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358308",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358308
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3246053686539
+    },
+    {
+      "id": "way/1103358309",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358309",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358309
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.376698534537
+    },
+    {
+      "id": "way/1103358310",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358310",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358310
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2408483449464
+    },
+    {
+      "id": "way/1103358311",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358311",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358311
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3229618776095
+    },
+    {
+      "id": "way/1103358312",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358312",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358312
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1871480987303
+    },
+    {
+      "id": "way/1103358313",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358313",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358313
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3744548688608
+    },
+    {
+      "id": "way/1103358314",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358314",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358314
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1953608374456
+    },
+    {
+      "id": "way/1103358315",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358315",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358315
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.6713786021508
+    },
+    {
+      "id": "way/1103358316",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358316",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358316
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3294469867834
+    },
+    {
+      "id": "way/1103358317",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358317",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358317
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.381540620258
+    },
+    {
+      "id": "way/1103358318",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358318",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358318
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.245689458673
+    },
+    {
+      "id": "way/1103358319",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358319",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358319
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3278036384158
+    },
+    {
+      "id": "way/1103358320",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358320",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358320
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1919886059203
+    },
+    {
+      "id": "way/1103358321",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358321",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358321
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3792968901062
+    },
+    {
+      "id": "way/1103358322",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358322",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358322
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2009043560124
+    },
+    {
+      "id": "way/1103358323",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358323",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358323
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.6769265528562
+    },
+    {
+      "id": "way/1103358324",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358324",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358324
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3349916670779
+    },
+    {
+      "id": "way/1103358325",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358325",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358325
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3870858275106
+    },
+    {
+      "id": "way/1103358326",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358326",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358326
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2512332756403
+    },
+    {
+      "id": "way/1103358327",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358327",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358327
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3333481219328
+    },
+    {
+      "id": "way/1103358328",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358328",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358328
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.1975318092943
+    },
+    {
+      "id": "way/1103358329",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358329",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358329
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3848419459023
+    },
+    {
+      "id": "way/1103358330",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358330",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358330
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2057458405194
+    },
+    {
+      "id": "way/1103358331",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358331",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358331
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.6817722081676
+    },
+    {
+      "id": "way/1103358332",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358332",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358332
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.339834321988
+    },
+    {
+      "id": "way/1103358333",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358333",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358333
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3919289203409
+    },
+    {
+      "id": "way/1103358334",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358334",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358334
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2560751854948
+    },
+    {
+      "id": "way/1103358335",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358335",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358335
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3381908620895
+    },
+    {
+      "id": "way/1103358336",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358336",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358336
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2023732171242
+    },
+    {
+      "id": "way/1103358337",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358337",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358337
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.389685016
+    },
+    {
+      "id": "way/1103358338",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358338",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358338
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2160360026767
+    },
+    {
+      "id": "way/1103358339",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358339",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358339
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.692070813556
+    },
+    {
+      "id": "way/1103358340",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358340",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358340
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3501266443038
+    },
+    {
+      "id": "way/1103358341",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358341",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358341
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.4022222929816
+    },
+    {
+      "id": "way/1103358342",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358342",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358342
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2663660661533
+    },
+    {
+      "id": "way/1103358343",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358343",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358343
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3484832487898
+    },
+    {
+      "id": "way/1103358344",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358344",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358344
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2126632381537
+    },
+    {
+      "id": "way/1103358345",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358345",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358345
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3999781691604
+    },
+    {
+      "id": "way/1103358346",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358346",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358346
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2113082990494
+    },
+    {
+      "id": "way/1103358347",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358347",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358347
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.6873391294788
+    },
+    {
+      "id": "way/1103358348",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358348",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358348
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3453979989417
+    },
+    {
+      "id": "way/1103358349",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358349",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358349
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3974931782521
+    },
+    {
+      "id": "way/1103358350",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358350",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358350
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2616379528064
+    },
+    {
+      "id": "way/1103358351",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358351",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358351
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3437543475253
+    },
+    {
+      "id": "way/1103358352",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358352",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358352
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.2079354962852
+    },
+    {
+      "id": "way/1103358353",
+      "version": 1,
+      "timestamp": "2022-10-13T04:49:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1103358353",
+      "name": null,
+      "waterType": "wastewater",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1103358353
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 579.3952490997481
+    },
+    {
+      "id": "way/1136701068",
+      "version": 2,
+      "timestamp": "2023-04-25T17:07:28Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1136701068",
+      "name": "모란못",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1136701068
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 384.61231287354985
+    },
+    {
+      "id": "way/1145100655",
+      "version": 1,
+      "timestamp": "2023-02-14T11:14:48Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1145100655",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1145100655
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 491.45287678174117
+    },
+    {
+      "id": "way/1188453560",
+      "version": 1,
+      "timestamp": "2023-07-09T14:05:38Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1188453560",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1188453560
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 90.20368850792434
+    },
+    {
+      "id": "way/1198247701",
+      "version": 2,
+      "timestamp": "2023-08-16T14:31:59Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1198247701",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1198247701
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 59.23468318067018
+    },
+    {
+      "id": "way/1201838939",
+      "version": 2,
+      "timestamp": "2023-08-25T04:35:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1201838939",
+      "name": "인공 폭포",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1201838939
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 8.573483797108556
+    },
+    {
+      "id": "way/1214934083",
+      "version": 1,
+      "timestamp": "2023-10-12T00:47:03Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1214934083",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1214934083
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 87.27244214813287
+    },
+    {
+      "id": "way/1216011534",
+      "version": 4,
+      "timestamp": "2026-08-29T05:00:04Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1216011534",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1216011534
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 787.5787924759472
+    },
+    {
+      "id": "way/1219647653",
+      "version": 1,
+      "timestamp": "2023-10-31T00:02:42Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1219647653",
+      "name": null,
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1219647653
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 367.6086658274642
+    },
+    {
+      "id": "way/1229003429",
+      "version": 1,
+      "timestamp": "2023-12-06T07:45:10Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1229003429",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1229003429
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 24.843256299039325
+    },
+    {
+      "id": "way/1274767482",
+      "version": 1,
+      "timestamp": "2024-04-22T04:14:09Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1274767482",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1274767482
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1229.7510845492016
+    },
+    {
+      "id": "way/1282769570",
+      "version": 1,
+      "timestamp": "2024-05-14T09:54:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1282769570",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1282769570
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 30.73882160498509
+    },
+    {
+      "id": "way/1381050975",
+      "version": 1,
+      "timestamp": "2025-04-25T07:17:46Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1381050975",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1381050975
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 746.2098906642738
+    },
+    {
+      "id": "way/1381050976",
+      "version": 1,
+      "timestamp": "2025-04-25T07:17:46Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1381050976",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1381050976
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 847.1211582753007
+    },
+    {
+      "id": "way/1381050977",
+      "version": 1,
+      "timestamp": "2025-04-25T07:17:46Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1381050977",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1381050977
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 382.18434988036955
+    },
+    {
+      "id": "way/1382504475",
+      "version": 2,
+      "timestamp": "2025-09-24T07:23:52Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1382504475",
+      "name": null,
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1382504475
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 27.300906850641283
+    },
+    {
+      "id": "way/1386090557",
+      "version": 1,
+      "timestamp": "2025-05-13T10:35:20Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1386090557",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1386090557
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 1731.357370355494
+    },
+    {
+      "id": "way/1417443454",
+      "version": 1,
+      "timestamp": "2025-07-26T01:37:56Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1417443454",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1417443454
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 459.06473663139724
+    },
+    {
+      "id": "way/1417443459",
+      "version": 1,
+      "timestamp": "2025-07-26T01:37:56Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1417443459",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1417443459
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 267.77200705229654
+    },
+    {
+      "id": "way/1417443462",
+      "version": 1,
+      "timestamp": "2025-07-26T01:37:56Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1417443462",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1417443462
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 113.97530393319475
+    },
+    {
+      "id": "way/1433303442",
+      "version": 1,
+      "timestamp": "2025-09-26T10:17:48Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1433303442",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1433303442
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 139.6265656793921
+    },
+    {
+      "id": "way/1531943867",
+      "version": 2,
+      "timestamp": "2026-06-24T14:01:33Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1531943867",
+      "name": "안산방죽",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1531943867
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 225.37681841624598
+    },
+    {
+      "id": "way/1550773961",
+      "version": 1,
+      "timestamp": "2026-08-19T10:20:16Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1550773961",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1550773961
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 76.97636687322556
+    },
+    {
+      "id": "way/1550801807",
+      "version": 1,
+      "timestamp": "2026-08-19T12:25:26Z",
+      "sourceUrl": "https://www.openstreetmap.org/way/1550801807",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1550801807
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 75.49261452737615
+    },
+    {
+      "id": "relation/152336",
+      "version": 55,
+      "timestamp": "2026-05-07T07:24:49Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/152336",
+      "name": "한강",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            414371705,
+            967550720,
+            469332612,
+            1339883002,
+            1339883014,
+            475427619,
+            988796925,
+            988796922,
+            988798158,
+            988798159,
+            848294491
+          ],
+          "innerWays": [
+            [
+              1509405458
+            ],
+            [
+              848712047
+            ],
+            [
+              773000522
+            ],
+            [
+              773000521
+            ],
+            [
+              773000520
+            ],
+            [
+              305692221
+            ],
+            [
+              599447343
+            ],
+            [
+              270302161
+            ],
+            [
+              270302160
+            ],
+            [
+              270316591
+            ],
+            [
+              270343281
+            ],
+            [
+              34798165
+            ],
+            [
+              414371702
+            ],
+            [
+              414371703,
+              824132488
+            ],
+            [
+              236577863
+            ],
+            [
+              25979109
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 16,
+      "postClipHoleCount": 8,
+      "clippedAreaM2": 14538556.424844543
+    },
+    {
+      "id": "relation/2073960",
+      "version": 6,
+      "timestamp": "2019-04-16T14:14:28Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/2073960",
+      "name": "현충지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            154034004
+          ],
+          "innerWays": [
+            [
+              154034001
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 2982.43447898967
+    },
+    {
+      "id": "relation/3769500",
+      "version": 28,
+      "timestamp": "2024-12-23T04:54:30Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/3769500",
+      "name": "한강",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            284168601,
+            961505275,
+            961505274
+          ],
+          "innerWays": [
+            [
+              847942411
+            ],
+            [
+              892370155
+            ],
+            [
+              847926758
+            ],
+            [
+              847926759
+            ],
+            [
+              847926760
+            ],
+            [
+              847868373
+            ],
+            [
+              22785745
+            ],
+            [
+              377820041
+            ],
+            [
+              377820038
+            ],
+            [
+              377820039
+            ],
+            [
+              377820040
+            ],
+            [
+              892370160
+            ],
+            [
+              892370161
+            ],
+            [
+              892370162
+            ],
+            [
+              892370163
+            ],
+            [
+              1083163432
+            ],
+            [
+              1083163430
+            ],
+            [
+              1083163431
+            ],
+            [
+              1083166105
+            ],
+            [
+              1083166106
+            ],
+            [
+              1083166099
+            ],
+            [
+              1083166098
+            ],
+            [
+              1083166101
+            ],
+            [
+              1083166100
+            ],
+            [
+              1083166104
+            ],
+            [
+              1083166103
+            ],
+            [
+              1083166102
+            ],
+            [
+              892370159
+            ],
+            [
+              892370158
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 29,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 2417431.6178475986
+    },
+    {
+      "id": "relation/4005465",
+      "version": 6,
+      "timestamp": "2022-07-23T17:47:07Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/4005465",
+      "name": "경회지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            170199414
+          ],
+          "innerWays": [
+            [
+              301276782
+            ],
+            [
+              301276784
+            ],
+            [
+              381956887
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 3,
+      "postClipHoleCount": 3,
+      "clippedAreaM2": 12030.856691652949
+    },
+    {
+      "id": "relation/5497986",
+      "version": 5,
+      "timestamp": "2023-01-20T14:02:29Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/5497986",
+      "name": "청학지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            369965851,
+            369971714
+          ],
+          "innerWays": [
+            [
+              369965840
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 1057.5321324936745
+    },
+    {
+      "id": "relation/5621288",
+      "version": 1,
+      "timestamp": "2015-10-28T12:38:42Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/5621288",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            377289795
+          ],
+          "innerWays": [
+            [
+              377289794
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 846.5927460670919
+    },
+    {
+      "id": "relation/5672591",
+      "version": 4,
+      "timestamp": "2019-08-02T06:28:31Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/5672591",
+      "name": "춘당지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            170403789
+          ],
+          "innerWays": [
+            [
+              377289793
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 6516.507726214922
+    },
+    {
+      "id": "relation/5685380",
+      "version": 2,
+      "timestamp": "2019-03-30T15:58:36Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/5685380",
+      "name": "거울못",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            170403822
+          ],
+          "innerWays": [
+            [
+              382079364
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 7555.382532057058
+    },
+    {
+      "id": "relation/5688759",
+      "version": 1,
+      "timestamp": "2015-11-24T11:23:41Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/5688759",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            382428469
+          ],
+          "innerWays": [
+            [
+              382428454
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 298.6340148245399
+    },
+    {
+      "id": "relation/5688760",
+      "version": 1,
+      "timestamp": "2015-11-24T11:23:41Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/5688760",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            382428472
+          ],
+          "innerWays": [
+            [
+              382428455
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 339.10558059474863
+    },
+    {
+      "id": "relation/6168459",
+      "version": 1,
+      "timestamp": "2016-04-25T08:48:49Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/6168459",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            278615337
+          ],
+          "innerWays": [
+            [
+              278615338
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 1276.5026526888435
+    },
+    {
+      "id": "relation/7885627",
+      "version": 4,
+      "timestamp": "2025-03-23T01:29:08Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/7885627",
+      "name": "일감호",
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            301502691
+          ],
+          "innerWays": [
+            [
+              301502692
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 47878.841819932946
+    },
+    {
+      "id": "relation/9035438",
+      "version": 19,
+      "timestamp": "2026-02-02T23:06:34Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/9035438",
+      "name": "탄천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1473690969,
+            617324812
+          ],
+          "innerWays": [
+            [
+              916906503
+            ],
+            [
+              1247688103
+            ],
+            [
+              1247688104
+            ],
+            [
+              1473690986
+            ],
+            [
+              232374971
+            ],
+            [
+              437912704
+            ],
+            [
+              437912705
+            ],
+            [
+              1247688102
+            ],
+            [
+              1247688106
+            ],
+            [
+              1247688105
+            ],
+            [
+              1473690985
+            ],
+            [
+              1473690984
+            ],
+            [
+              1473690983
+            ],
+            [
+              1473690982
+            ],
+            [
+              1473690981
+            ],
+            [
+              1473690980
+            ],
+            [
+              1473690978
+            ],
+            [
+              1473690979
+            ],
+            [
+              1473690977
+            ],
+            [
+              1473690976
+            ],
+            [
+              1473690975
+            ],
+            [
+              1473690974
+            ],
+            [
+              1473690973
+            ],
+            [
+              1473690972
+            ],
+            [
+              1473690971
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 25,
+      "postClipHoleCount": 8,
+      "clippedAreaM2": 234262.5102189159
+    },
+    {
+      "id": "relation/9856886",
+      "version": 4,
+      "timestamp": "2023-10-12T19:26:24Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/9856886",
+      "name": "석촌호수",
+      "waterType": "lake",
+      "assembledRings": [
+        {
+          "outerWays": [
+            636500726
+          ],
+          "innerWays": [
+            [
+              59170771
+            ],
+            [
+              714737957
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 2,
+      "postClipHoleCount": 2,
+      "clippedAreaM2": 150194.12244561926
+    },
+    {
+      "id": "relation/10718843",
+      "version": 24,
+      "timestamp": "2023-08-22T01:46:04Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/10718843",
+      "name": "청계천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            369701032
+          ],
+          "innerWays": []
+        },
+        {
+          "outerWays": [
+            773601064
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 2,
+      "postClipPolygonCount": 2,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 45700.71662768636
+    },
+    {
+      "id": "relation/10776428",
+      "version": 3,
+      "timestamp": "2021-03-25T17:14:36Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/10776428",
+      "name": null,
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            777882489
+          ],
+          "innerWays": [
+            [
+              777660080
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 1774.2893474271293
+    },
+    {
+      "id": "relation/11136026",
+      "version": 3,
+      "timestamp": "2020-11-27T03:50:38Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/11136026",
+      "name": null,
+      "waterType": "unspecified",
+      "assembledRings": [
+        {
+          "outerWays": [
+            154112546
+          ],
+          "innerWays": [
+            [
+              807588585
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 206.26593785108116
+    },
+    {
+      "id": "relation/13407146",
+      "version": 2,
+      "timestamp": "2026-09-06T10:19:41Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/13407146",
+      "name": "향원지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            842192002
+          ],
+          "innerWays": [
+            [
+              930204059
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 4868.353710799031
+    },
+    {
+      "id": "relation/14670863",
+      "version": 8,
+      "timestamp": "2023-07-13T07:33:02Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/14670863",
+      "name": "유수 물놀이장",
+      "waterType": "pool",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1101935756
+          ],
+          "innerWays": [
+            [
+              1101935757
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 1012.377229911094
+    },
+    {
+      "id": "relation/15457595",
+      "version": 1,
+      "timestamp": "2023-02-10T06:19:24Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/15457595",
+      "name": "부용지",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            613392477
+          ],
+          "innerWays": [
+            [
+              613392478
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 1,
+      "postClipHoleCount": 1,
+      "clippedAreaM2": 1009.5190854042393
+    },
+    {
+      "id": "relation/16259781",
+      "version": 1,
+      "timestamp": "2023-08-30T16:06:28Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/16259781",
+      "name": "중랑천",
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            729244032
+          ],
+          "innerWays": [
+            [
+              1203542697
+            ],
+            [
+              1203542698
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 2,
+      "postClipHoleCount": 2,
+      "clippedAreaM2": 805474.5977022022
+    },
+    {
+      "id": "relation/18367965",
+      "version": 1,
+      "timestamp": "2024-12-03T17:05:37Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/18367965",
+      "name": null,
+      "waterType": "river",
+      "assembledRings": [
+        {
+          "outerWays": [
+            1339883005,
+            1339883006,
+            1339883007,
+            1339883008,
+            581269069,
+            1339883004
+          ],
+          "innerWays": []
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 0,
+      "postClipHoleCount": 0,
+      "clippedAreaM2": 27904.60357089693
+    },
+    {
+      "id": "relation/19286397",
+      "version": 1,
+      "timestamp": "2025-06-25T08:09:15Z",
+      "sourceUrl": "https://www.openstreetmap.org/relation/19286397",
+      "name": "여의도공원 지당",
+      "waterType": "pond",
+      "assembledRings": [
+        {
+          "outerWays": [
+            686292189
+          ],
+          "innerWays": [
+            [
+              686292186
+            ],
+            [
+              686292187
+            ],
+            [
+              686292188
+            ]
+          ]
+        }
+      ],
+      "preClipValid": true,
+      "postClipValid": true,
+      "preClipPolygonCount": 1,
+      "postClipPolygonCount": 1,
+      "preClipHoleCount": 3,
+      "postClipHoleCount": 3,
+      "clippedAreaM2": 2173.639156394936
+    }
+  ],
+  "exclusions": [],
+  "failures": [
+    {
+      "id": "relation/9721964",
+      "reason": "Self-intersection[127.0345963 37.573105]",
+      "name": "정릉천"
+    },
+    {
+      "id": "relation/9721965",
+      "reason": "Self-intersection[127.0345963 37.573105]",
+      "name": "청계천"
+    },
+    {
+      "id": "relation/20188785",
+      "reason": "Self-intersection[126.9301325 37.5464241]",
+      "name": null
+    }
+  ],
+  "holeChecks": [
+    {
+      "source": "relation/152336",
+      "insideHole": [
+        126.99452987493412,
+        37.51071815
+      ],
+      "holeAreaM2": 853.4161873934578,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/152336",
+      "insideHole": [
+        126.93114510278758,
+        37.537912750000004
+      ],
+      "holeAreaM2": 142990.60488816202,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/152336",
+      "insideHole": [
+        126.92564868522908,
+        37.539931
+      ],
+      "holeAreaM2": 121999.61924463297,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/152336",
+      "insideHole": [
+        126.95856684341001,
+        37.517559750000004
+      ],
+      "holeAreaM2": 118820.61303143398,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/152336",
+      "insideHole": [
+        126.99490791862863,
+        37.5117282
+      ],
+      "holeAreaM2": 4888.568680154869,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/152336",
+      "insideHole": [
+        126.99479759917236,
+        37.51253005
+      ],
+      "holeAreaM2": 1329.595005829886,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/152336",
+      "insideHole": [
+        126.99594347924108,
+        37.51247465
+      ],
+      "holeAreaM2": 3360.014405994453,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/152336",
+      "insideHole": [
+        126.99024721215176,
+        37.508160950000004
+      ],
+      "holeAreaM2": 38934.95335550644,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/2073960",
+      "insideHole": [
+        126.9769292748741,
+        37.50183065
+      ],
+      "holeAreaM2": 68.83258011365717,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/4005465",
+      "insideHole": [
+        126.9753116,
+        37.579612
+      ],
+      "holeAreaM2": 93.22908756590854,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/4005465",
+      "insideHole": [
+        126.9753215,
+        37.579844
+      ],
+      "holeAreaM2": 103.6827180897586,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/4005465",
+      "insideHole": [
+        126.97597318036077,
+        37.57978795
+      ],
+      "holeAreaM2": 1797.1975658146853,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/5497986",
+      "insideHole": [
+        126.99386954494767,
+        37.5595215
+      ],
+      "holeAreaM2": 58.92621518610082,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/5621288",
+      "insideHole": [
+        126.97652598128309,
+        37.565724349999996
+      ],
+      "holeAreaM2": 71.4041237857857,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/5672591",
+      "insideHole": [
+        126.99489579082295,
+        37.581862150000006
+      ],
+      "holeAreaM2": 469.5425620940521,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/5685380",
+      "insideHole": [
+        126.9797467086014,
+        37.5223728
+      ],
+      "holeAreaM2": 790.1095604864624,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/5688759",
+      "insideHole": [
+        126.99423680411505,
+        37.572286000000005
+      ],
+      "holeAreaM2": 60.541230847406496,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/5688760",
+      "insideHole": [
+        126.99451787865155,
+        37.572810849999996
+      ],
+      "holeAreaM2": 76.61000259589609,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/6168459",
+      "insideHole": [
+        126.99846352071997,
+        37.502516799999995
+      ],
+      "holeAreaM2": 88.47872549649205,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/7885627",
+      "insideHole": [
+        127.07653625,
+        37.54002295
+      ],
+      "holeAreaM2": 703.5724297624906,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9035438",
+      "insideHole": [
+        127.07252785008711,
+        37.5020562
+      ],
+      "holeAreaM2": 20.21625767164267,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9035438",
+      "insideHole": [
+        127.0722583626935,
+        37.502179
+      ],
+      "holeAreaM2": 151.335385036487,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9035438",
+      "insideHole": [
+        127.07221831607143,
+        37.50213955
+      ],
+      "holeAreaM2": 27.583008624708963,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9035438",
+      "insideHole": [
+        127.07176500497755,
+        37.50272505
+      ],
+      "holeAreaM2": 73.92194649016017,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9035438",
+      "insideHole": [
+        127.071360565964,
+        37.502673650000006
+      ],
+      "holeAreaM2": 443.69621023584887,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9035438",
+      "insideHole": [
+        127.07404130449589,
+        37.5021538
+      ],
+      "holeAreaM2": 13919.43403354822,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9035438",
+      "insideHole": [
+        127.08149729665337,
+        37.5006282
+      ],
+      "holeAreaM2": 382.1851819975024,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9035438",
+      "insideHole": [
+        127.08227450524727,
+        37.5004364
+      ],
+      "holeAreaM2": 90.84327237413277,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9856886",
+      "insideHole": [
+        127.10071680515279,
+        37.5089225
+      ],
+      "holeAreaM2": 16736.28659272368,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/9856886",
+      "insideHole": [
+        127.09996249601612,
+        37.50889585
+      ],
+      "holeAreaM2": 1584.634949803698,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/10776428",
+      "insideHole": [
+        126.9577208584603,
+        37.57342735
+      ],
+      "holeAreaM2": 428.59084842747717,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/11136026",
+      "insideHole": [
+        126.97510788794702,
+        37.5031849
+      ],
+      "holeAreaM2": 80.60283192668878,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/13407146",
+      "insideHole": [
+        126.97705370404464,
+        37.582373450000006
+      ],
+      "holeAreaM2": 617.084528310497,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/14670863",
+      "insideHole": [
+        127.0670035876133,
+        37.53001605
+      ],
+      "holeAreaM2": 1350.737577074239,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/15457595",
+      "insideHole": [
+        126.99288772512358,
+        37.58168335
+      ],
+      "holeAreaM2": 96.06508524734237,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/16259781",
+      "insideHole": [
+        127.07266386731821,
+        37.5864057
+      ],
+      "holeAreaM2": 570.6420423355939,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/16259781",
+      "insideHole": [
+        127.07305503028772,
+        37.586173849999994
+      ],
+      "holeAreaM2": 341.6082062506308,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/19286397",
+      "insideHole": [
+        126.92570861212978,
+        37.52804055
+      ],
+      "holeAreaM2": 104.76813362709339,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/19286397",
+      "insideHole": [
+        126.92571435674182,
+        37.5282254
+      ],
+      "holeAreaM2": 66.56407021445092,
+      "waterCoversHolePoint": false
+    },
+    {
+      "source": "relation/19286397",
+      "insideHole": [
+        126.92592060129729,
+        37.528129500000006
+      ],
+      "holeAreaM2": 35.819374973307205,
+      "waterCoversHolePoint": false
+    }
+  ],
+  "limits": [
+    "Current OSM community mapping, not hydrographic survey, live waterline, flood model, measured elevation or guaranteed complete feature inventory.",
+    "GeoJSON carries plan shape only. Terrain/water elevations, triangle-cell clipping and visual layering belong to runtime integration.",
+    "The raw Overpass response is retained privately for reproducibility and contains public OSM edit metadata. Publish only this minimized provenance and GeoJSON.",
+    "Clipped boundary vertices are calculated intersections; underlying banks and islands remain the unsimplified source geometry."
+  ]
+}

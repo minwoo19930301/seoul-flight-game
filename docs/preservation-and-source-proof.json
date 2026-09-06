@@ -1,0 +1,127 @@
+{
+  "passed": true,
+  "sourceMaster": "seoul-landmarks.blend",
+  "reopenedThroughActualMcp": true,
+  "regeneratedDuringRoundTrip": false,
+  "exportedFromSavedMasterCount": 5,
+  "fullFileIdentityCount": 5,
+  "binaryIdentityCount": 5,
+  "jsonIdentityCount": 5,
+  "sourceProof": [
+    {
+      "id": "sixtythree",
+      "fullFileByteIdentical": true,
+      "binaryByteIdentical": true,
+      "jsonIdentical": true,
+      "bytes": 225364,
+      "sha256": "e981170c677a4f514a421a6d00a2e56ae753519f6fea8d51b49a19ab7a32276a"
+    },
+    {
+      "id": "lotte",
+      "fullFileByteIdentical": true,
+      "binaryByteIdentical": true,
+      "jsonIdentical": true,
+      "bytes": 672044,
+      "sha256": "f5be224ff863346194f079eebdcbd370b93385aa92764fdccb0547584b9adcda"
+    },
+    {
+      "id": "nseoul",
+      "fullFileByteIdentical": true,
+      "binaryByteIdentical": true,
+      "jsonIdentical": true,
+      "bytes": 230492,
+      "sha256": "fc3cfafa7c007247d1b158e85c29ad5b429c6f4b3c971276fb09fef014ea73eb"
+    },
+    {
+      "id": "coex",
+      "fullFileByteIdentical": true,
+      "binaryByteIdentical": true,
+      "jsonIdentical": true,
+      "bytes": 346560,
+      "sha256": "f29108b8030d1f52ff356d653b5afb6be6012062e00e93fe158632a3b966d29c"
+    },
+    {
+      "id": "gyeongbokgung",
+      "fullFileByteIdentical": true,
+      "binaryByteIdentical": true,
+      "jsonIdentical": true,
+      "bytes": 1069956,
+      "sha256": "3e2a1a730e5286d2dedb47336cb17fb5e6ec6a0bac2f6c8ca2ee8d61a2c27aa8"
+    }
+  ],
+  "interiorMastersPreserved": [
+    {
+      "role": "original-interior-master",
+      "unchanged": true,
+      "sha256": "dc646f4d7fa73ce159dd090243ea8aa5e1639d90813917be5266ce5f75b9d5c9"
+    },
+    {
+      "role": "sanitized-interior-master",
+      "unchanged": true,
+      "sha256": "03dac07c9a72d9b439abfeab9c48c87fcbafab23ecfb889750c21402cda450f5"
+    }
+  ],
+  "publicPayloadPatternScan": [
+    {
+      "file": "seoul-landmarks.blend",
+      "bytes": 3007515,
+      "sha256": "29440ec1ab7e01bba2b4f250b30b01f8c5dd5b9abe3a952007a9510b83e9ecf2",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "manifest.json",
+      "bytes": 33015,
+      "sha256": "48703216dd403713733cb3e8edb00bd7474bb704e7c703b2cc1fab67cd633c6b",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "references.json",
+      "bytes": 15994,
+      "sha256": "cad7d3e096af3d55bbba316285043c1e020ba98223044892f5bdfa777d2bde4b",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "validation.json",
+      "bytes": 1864,
+      "sha256": "a6dc09b1fabce91b2beabe42be05b6e9124d6a43251b32ad8dfe808356b513dd",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "khronos-validation.json",
+      "bytes": 5343,
+      "sha256": "2f5c3b4b4f076dc3efb47583dc0957c07d833b792cdcf5b67b92683567884ed0",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "sixtythree.glb",
+      "bytes": 225364,
+      "sha256": "e981170c677a4f514a421a6d00a2e56ae753519f6fea8d51b49a19ab7a32276a",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "lotte.glb",
+      "bytes": 672044,
+      "sha256": "f5be224ff863346194f079eebdcbd370b93385aa92764fdccb0547584b9adcda",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "nseoul.glb",
+      "bytes": 230492,
+      "sha256": "fc3cfafa7c007247d1b158e85c29ad5b429c6f4b3c971276fb09fef014ea73eb",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "coex.glb",
+      "bytes": 346560,
+      "sha256": "f29108b8030d1f52ff356d653b5afb6be6012062e00e93fe158632a3b966d29c",
+      "localPathOrCredentialPatternMatches": 0
+    },
+    {
+      "file": "gyeongbokgung.glb",
+      "bytes": 1069956,
+      "sha256": "3e2a1a730e5286d2dedb47336cb17fb5e6ec6a0bac2f6c8ca2ee8d61a2c27aa8",
+      "localPathOrCredentialPatternMatches": 0
+    }
+  ],
+  "safetyLimit": "Pattern scan of full uncompressed Blender file and release payload, not a proof that arbitrary binary files can contain no secrets. No linked textures, external assets, keys, credentials or user documents were used."
+}

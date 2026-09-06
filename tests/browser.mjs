@@ -31,7 +31,7 @@ async function openPage(options = {}, failMap = false) {
   await page.route("**/seoul-flight.mjs*", async (route) => {
     const response = await route.fetch();
     const source = await response.text();
-    await route.fulfill({ response, body: `${source}\nwindow.__flightTest = { state, runtime, input, checkpointDefs, updateFlight, updateCheckpoints, updateHud, resetFlight, startGame, pauseFlight, enforceBoundary };` });
+    await route.fulfill({ response, body: `${source}\nwindow.__flightTest = { state, runtime, input, world, checkpointDefs, updateFlight, updateCheckpoints, updateHud, resetFlight, startGame, pauseFlight, enforceBoundary };` });
   });
   if (failMap) await page.route("**/seoul-scene-data.json", (route) => route.fulfill({ status: 503, body: "unavailable" }));
   await page.goto(`${origin}/index-seoul-flight.html`, { waitUntil: "domcontentloaded" });
@@ -46,7 +46,7 @@ try {
   assert.ok(await page.evaluate(() => __flightTest.runtime.renderer.info.render.calls > 0), "actual WebGL scene renders");
   await page.keyboard.press("Enter");
   await page.waitForFunction(() => __flightTest.state.mode === "running");
-  assert.ok(await page.evaluate(() => Math.abs(__flightTest.state.position.x) < 1460), "spawn is inside the flight boundary");
+  assert.ok(await page.evaluate(() => Math.abs(__flightTest.state.position.x) < __flightTest.world.width/2-__flightTest.world.boundaryPadding), "spawn is inside the physical-metre flight boundary");
   const initialYaw = await page.evaluate(() => __flightTest.state.yaw);
   await page.keyboard.down("KeyD");
   await page.waitForFunction((yaw) => __flightTest.state.yaw < yaw - 0.05, initialYaw);
@@ -67,13 +67,14 @@ try {
 
   const returned = await page.evaluate(() => {
     const t = __flightTest;
-    t.state.position.set(1461, 236, 0);
+    const limitX=t.world.width/2-t.world.boundaryPadding;
+    t.state.position.set(limitX+1, 500, 0);
     t.state.yaw = -Math.PI / 2;
     t.enforceBoundary(1);
     t.updateFlight(1 / 60);
-    return { x: t.state.position.x, forwardX: t.state.forward.x };
+    return { x: t.state.position.x, forwardX: t.state.forward.x, limitX };
   });
-  assert.ok(returned.x < 1460 && returned.forwardX < 0, "east boundary turns west into the map");
+  assert.ok(returned.x < returned.limitX && returned.forwardX < 0, "east boundary turns west into the map");
   await page.evaluate(() => { __flightTest.resetFlight(); __flightTest.startGame(); });
   await page.screenshot({ path: resolve(evidence, "flight-desktop.png") });
 
