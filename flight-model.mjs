@@ -8,6 +8,10 @@ export function compassHeading(yaw) {
   return ((-yaw * 180 / Math.PI) % 360 + 360) % 360;
 }
 
+export function formatMetres(value) {
+  return Number.isFinite(value) ? `${Math.round(value)}m` : "—";
+}
+
 function damp(current, target, rate, delta) {
   return target + (current - target) * Math.exp(-rate * delta);
 }

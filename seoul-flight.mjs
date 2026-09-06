@@ -1,5 +1,5 @@
 import * as THREE from "./vendor/three.module.js";
-import { controlByCode, FlightInputs, updateAttitude, yawToTarget } from "./flight-model.mjs";
+import { controlByCode, FlightInputs, formatMetres, updateAttitude, yawToTarget } from "./flight-model.mjs";
 import { localMetreProjection } from "./geographic-model.mjs";
 import { sampleLocalElevation } from "./terrain-model.mjs";
 import { GLTFLoader } from "./vendor/loaders/GLTFLoader.js";
@@ -1055,7 +1055,7 @@ function updateHud() {
   dom.timerValue.textContent = formatTime(state.elapsedMs);
   dom.targetName.textContent = current ? current.name : "둘러보기 완료";
   dom.progressValue.textContent = `${Math.min(state.checkpointIndex, checkpointDefs.length)} / ${checkpointDefs.length}`;
-  dom.targetAltitude.textContent = current ? `${current.y}m` : "—";
+  dom.targetAltitude.textContent = current ? formatMetres(current.y) : "—";
   dom.distanceValue.textContent = `${Math.round(distance)}m`;
   dom.bearingValue.textContent = `${Math.round(relativeBearing)}°`;
   dom.statusText.textContent = runtime.currentStatus;

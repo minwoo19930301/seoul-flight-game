@@ -41,9 +41,12 @@ N서울타워의 지반 고도는 운영사270m와 서울시243m 자료가 충�
 ## 검증과 재현
 
 - `npm test`: 좌표·조작·타일 취소/재시도·실제 지형/수면 접합·원본 GLB 로더/치수/고도 CPU 검사
+- 추가 CPU 검사는 실제 지리 설정·비행·경계·체크포인트 함수에20/60/120Hz 연속 키보드 입력을 넣어5곳 도달을 확인합니다. 시험용 조종만 사용하며 초기화 이후 위치/방향을 순간 변경하지 않습니다. 카메라는 Three.js CPU 객체이며 DOM·이벤트·GPU 렌더링은 이 검사에서 제외합니다. 앱에 자동조종 기능을 추가하지 않았습니다.
 - `npm run test:assets`: 전체204타일 바이너리·인덱스·법선·소스ID·좌표·SHA 검사
 - `node scripts/generate-city-glbs.mjs`: 저장된 OSM 및 DEM과 공통 지면 보간으로 타일 재생성
 - `node scripts/validate-city-glbs.mjs --reproduce`: 재생성 후 모든 타일 SHA가 동일한지 검증
 - [Blender 원본](../assets/reference-source/landmarks/seoul-landmarks.blend):5개 모델 collection. 저장본 재개방 후 재수출5/5 전체파일 동일, Khronos 오류/경고0
 
 이 기록은 새 브라우저·WebGL·수동 비행·모바일 실기기 테스트가 아닙니다. 원본 지형 제공·법적 출처의 상세 한계는 각 JSON에 보존합니다. OSM은 © OpenStreetMap contributors/[ODbL](https://www.openstreetmap.org/copyright), SRTM/GMTED는 USGS/Mapzen 출처를 유지합니다.
+
+현재 건물 스트리밍 반경3.5/4.5km와 안개 시작6km가 달라 이동 중 구역 출현/제거가 보일 수 있습니다. 실제 시각적 강도·로딩 성능과 페이드 방식은 브라우저 검증이 필요한 잔여 항목입니다. 미니맵은 CSS 고정 높이를 제거해 지리 종횡비를 유지하며, 목표 고도는 정수 미터로 표시해 DEM 소수점의 허위 정밀도를 노출하지 않습니다.

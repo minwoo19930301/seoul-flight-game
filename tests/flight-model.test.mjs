@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { compassHeading, FlightInputs, updateAttitude, yawToTarget } from "../flight-model.mjs";
+import { compassHeading, FlightInputs, formatMetres, updateAttitude, yawToTarget } from "../flight-model.mjs";
+
+test("HUD metre labels do not imply fractional DEM accuracy or overflow with decimals", () => {
+  assert.equal(formatMetres(355.6802834888125), "356m");
+  assert.equal(formatMetres(652.6421823892934), "653m");
+  assert.equal(formatMetres(NaN), "—");
+  assert.equal(formatMetres(Infinity), "—");
+});
 
 test("targets use the same yaw convention as Three.js forward -Z", () => {
   const origin = { x: 0, z: 0 };
