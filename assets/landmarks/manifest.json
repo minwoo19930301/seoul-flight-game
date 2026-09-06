@@ -1,0 +1,967 @@
+{
+  "schemaVersion": 1,
+  "createdWith": "Blender 4.5.11 LTS through real project-local Blender MCP (ahujasid/blender-mcp 1.9.1)",
+  "notice": "Unofficial, independently authored source-informed landmark reconstructions. Not an architectural survey, engineering model, manufacturer model or photogrammetry.",
+  "units": "metres",
+  "axes": {
+    "gltf": [
+      "width X",
+      "height Y",
+      "depth Z"
+    ],
+    "front": "+Z",
+    "origin": "floor-centre",
+    "rootTransform": "identity"
+  },
+  "master": "../reference-source/landmarks/seoul-landmarks.blend",
+  "contactSheet": "../../docs/contact-sheet.png",
+  "runtimeIdsRetained": true,
+  "verificationScope": "Generated geometry and offline renders only. No app/browser/flight-flow QA performed.",
+  "references": "references.json",
+  "assets": [
+    {
+      "id": "sixtythree",
+      "model": "sixtythree.glb",
+      "thumbnail": "sixtythree.png",
+      "name": "63 BUILDING",
+      "nameKo": "63빌딩",
+      "units": "metres",
+      "dimensions": [
+        64.5,
+        249.58,
+        43.3
+      ],
+      "measuredGlbDimensions": [
+        64.5,
+        249.5800018,
+        43.2999992
+      ],
+      "bounds": {
+        "min": [
+          -32.25,
+          0.0,
+          -21.6499996
+        ],
+        "max": [
+          32.25,
+          249.5800018,
+          21.6499996
+        ]
+      },
+      "triangles": 4128,
+      "drawCalls": 3,
+      "bytes": 225364,
+      "sha256": "e981170c677a4f514a421a6d00a2e56ae753519f6fea8d51b49a19ab7a32276a",
+      "rootTransform": "identity",
+      "normalizationFactorsXYZ": [
+        1.0,
+        0.9985011006235158,
+        1.0
+      ],
+      "heightDatum": "249.58 m above ground; no invented rooftop antenna",
+      "referenceUrl": "https://museum.seoul.go.kr/archive/archiveNew/NR_archiveView.do?ctgryId=CTGRY489&fileId=H-TRNS-102535-491&fileSn=300&type=A&upperNodeId=CTGRY491",
+      "sources": [
+        {
+          "publisher": "Seoul Museum of History",
+          "url": "https://museum.seoul.go.kr/archive/archiveNew/NR_archiveView.do?ctgryId=CTGRY489&fileId=H-TRNS-102535-491&fileSn=300&type=A&upperNodeId=CTGRY491",
+          "supports": [
+            "249.58 m building height",
+            "264.58 m above sea level",
+            "historical exterior photograph"
+          ],
+          "confidence": "high"
+        },
+        {
+          "publisher": "Hanwha, owner group",
+          "url": "https://www.hanwha.com/newsroom/media-library/media-assets/hanwha-lifes-headquarters-in-seoul-korea.do",
+          "supports": [
+            "63 Building identity",
+            "owner exterior photo reference"
+          ],
+          "confidence": "high",
+          "usage": "Reference only; no texture license asserted"
+        },
+        {
+          "publisher": "Hanwha",
+          "url": "https://www.hanwha.com/newsroom/news/feature-stories/galleria-duty-free-63-a-journey-to-modern-luxury-to-seouls-golden-landmark.do",
+          "supports": [
+            "gold exterior identity"
+          ],
+          "confidence": "high"
+        }
+      ],
+      "referencePlanDimensionsM": {
+        "width": 64.5,
+        "depth": 43.3,
+        "height": 249.58
+      },
+      "dimensionEvidence": {
+        "widthDepth": "Estimated minimum-area oriented box of retained OSM footprint; podium/projections can differ from upper shaft",
+        "height": "Published Seoul Museum of History building height; technical antennas excluded from this model target",
+        "estimatedPlanUncertaintyPercent": 15
+      },
+      "modelingEstimates": {
+        "floorBands": 60,
+        "mullionPitchM": 1.7,
+        "mullionThicknessM": 0.14,
+        "materialBaseColor": "#B79758",
+        "materialRoughness": 0.25,
+        "materialMetalness": 0.45
+      },
+      "appearance": [
+        "Golden/bronze reflective curtain wall, not yellow self-emissive plastic",
+        "Thin regular floor bands and darker window mullions",
+        "Main slab silhouette with softened or curved transitions; inspect owner photograph before finalizing",
+        "Avoid invented 18 m box crown in legacy mesh"
+      ],
+      "coordinate": {
+        "lon": 126.9402516,
+        "lat": 37.5198496,
+        "basis": "existing repository landmark, agrees with named OSM footprint centre within 1 m",
+        "confidence": "medium_unsurveyed"
+      },
+      "osmWayId": 64989671,
+      "yawDegFromEast": 38.2202,
+      "estimatedDetails": [
+        "Independent game-art reconstruction; not official CAD or photogrammetry.",
+        "All facade pitch, glass tint, PBR coefficients, roof details and hidden structural details are author estimates.",
+        "Horizontal bounds are normalized to the documented footprint envelope. Small coping/fin overshoots are clamped at the total-height envelope without shifting floor/mast datums.",
+        "Reference photographs are linked only, never embedded or redistributed. Not all official photo endpoints could be rendered in the research tools."
+      ],
+      "materials": [
+        {
+          "name": "63_Champagne_Metal",
+          "pbr": {
+            "baseColorFactor": [
+              0.6299999952316284,
+              0.4699999988079071,
+              0.20999999344348907,
+              1
+            ],
+            "metallicFactor": 0.550000011920929,
+            "roughnessFactor": 0.30000001192092896
+          }
+        },
+        {
+          "name": "63_Dark_Bronze_Mullions",
+          "pbr": {
+            "baseColorFactor": [
+              0.10999999940395355,
+              0.07599999755620956,
+              0.03700000047683716,
+              1
+            ],
+            "metallicFactor": 0.6200000047683716,
+            "roughnessFactor": 0.3799999952316284
+          }
+        },
+        {
+          "name": "63_Gold_Bronze_Glazing",
+          "pbr": {
+            "baseColorFactor": [
+              0.49000000953674316,
+              0.3199999928474426,
+              0.10499999672174454,
+              1
+            ],
+            "metallicFactor": 0.5,
+            "roughnessFactor": 0.25999999046325684
+          }
+        }
+      ],
+      "validation": {
+        "finitePositions": true,
+        "unitNormals": true,
+        "indicesInRange": true,
+        "normalsAgreeWithTriangleWinding": true,
+        "degenerateTriangles": 0,
+        "noExternalResources": true
+      }
+    },
+    {
+      "id": "lotte",
+      "model": "lotte.glb",
+      "thumbnail": "lotte.png",
+      "name": "LOTTE WORLD TOWER",
+      "nameKo": "롯데월드타워",
+      "units": "metres",
+      "dimensions": [
+        71.5,
+        555,
+        71.5
+      ],
+      "measuredGlbDimensions": [
+        71.5,
+        555.0,
+        71.5
+      ],
+      "bounds": {
+        "min": [
+          -35.75,
+          0.0,
+          -35.75
+        ],
+        "max": [
+          35.75,
+          555.0,
+          35.75
+        ]
+      },
+      "triangles": 12888,
+      "drawCalls": 3,
+      "bytes": 672044,
+      "sha256": "f5be224ff863346194f079eebdcbd370b93385aa92764fdccb0547584b9adcda",
+      "rootTransform": "identity",
+      "normalizationFactorsXYZ": [
+        0.9941613633718824,
+        0.9977671831714686,
+        1.0
+      ],
+      "heightDatum": "555 m includes the open crown; no added spire",
+      "referenceUrl": "https://www.kpf.com/project/lotte-world-tower",
+      "sources": [
+        {
+          "publisher": "Kohn Pedersen Fox, project architect",
+          "url": "https://www.kpf.com/project/lotte-world-tower",
+          "supports": [
+            "555 m height",
+            "123 stories",
+            "tapered convex glass mass",
+            "vertical seam",
+            "split crown ears and sky bridge"
+          ],
+          "confidence": "high"
+        },
+        {
+          "publisher": "KPF project gallery",
+          "url": "https://e1.nmcdn.io/assets/kpf2024/wp-content/uploads/2015/10/1769_1_000_N278_large-2160x1440.webp",
+          "supports": [
+            "exterior photo reference"
+          ],
+          "confidence": "high",
+          "usage": "Reference only; no texture license asserted"
+        }
+      ],
+      "referencePlanDimensionsM": {
+        "width": 71.5,
+        "depth": 71.5,
+        "height": 555
+      },
+      "dimensionEvidence": {
+        "widthDepth": "Estimated rounded-square base plan from retained OSM footprint; footprint record itself is unnamed and its18.3 m height is unsuitable",
+        "height": "KPF project architect publishes555 m",
+        "estimatedPlanUncertaintyPercent": 12
+      },
+      "modelingEstimates": {
+        "profileHeightFractions": [
+          0,
+          0.2,
+          0.4,
+          0.6,
+          0.8,
+          0.92,
+          1
+        ],
+        "profileWidthFractions": [
+          1,
+          0.93,
+          0.79,
+          0.63,
+          0.47,
+          0.35,
+          0.2
+        ],
+        "crownStartHeightM": 500,
+        "crownGapM": 6,
+        "floorBandCount": 123,
+        "verticalFinCount": 48,
+        "materialBaseColor": "#9AACBB",
+        "materialRoughness": 0.22
+      },
+      "appearance": [
+        "Rounded-square/convex four-sided base transitioning into a smooth narrowing glass tower",
+        "Continuous silver vertical fins and thin horizontal floor bands",
+        "Pronounced vertical seam/opening oriented approximately toward historic Seoul",
+        "Split open crown with two pointed ears and connecting skybridge; do not add separate conical needle on top"
+      ],
+      "coordinate": {
+        "lon": 127.102679,
+        "lat": 37.5125537,
+        "basis": "existing landmark agrees within approximately3 m with local OSM tower-shaped footprint",
+        "confidence": "medium_unsurveyed"
+      },
+      "osmWayId": 914963586,
+      "yawDegFromEast": 22.5573,
+      "estimatedDetails": [
+        "Independent game-art reconstruction; not official CAD or photogrammetry.",
+        "All facade pitch, glass tint, PBR coefficients, roof details and hidden structural details are author estimates.",
+        "Horizontal bounds are normalized to the documented footprint envelope. Small coping/fin overshoots are clamped at the total-height envelope without shifting floor/mast datums.",
+        "Reference photographs are linked only, never embedded or redistributed. Not all official photo endpoints could be rendered in the research tools.",
+        "555 m includes the open twin-ear crown. 32 batched fins and 115 lower-body floor bands are visual simplifications, not exact mullion/floor counts."
+      ],
+      "materials": [
+        {
+          "name": "Lotte_Dark_Vertical_Seam",
+          "pbr": {
+            "baseColorFactor": [
+              0.054999999701976776,
+              0.09000000357627869,
+              0.10999999940395355,
+              1
+            ],
+            "metallicFactor": 0.47999998927116394,
+            "roughnessFactor": 0.2800000011920929
+          }
+        },
+        {
+          "name": "Lotte_Pale_Aluminium_Fins",
+          "pbr": {
+            "baseColorFactor": [
+              0.699999988079071,
+              0.7599999904632568,
+              0.7900000214576721,
+              1
+            ],
+            "metallicFactor": 0.7200000286102295,
+            "roughnessFactor": 0.30000001192092896
+          }
+        },
+        {
+          "name": "Lotte_Silver_Blue_Glazing",
+          "pbr": {
+            "baseColorFactor": [
+              0.36000001430511475,
+              0.4699999988079071,
+              0.550000011920929,
+              1
+            ],
+            "metallicFactor": 0.4699999988079071,
+            "roughnessFactor": 0.2199999988079071
+          }
+        }
+      ],
+      "validation": {
+        "finitePositions": true,
+        "unitNormals": true,
+        "indicesInRange": true,
+        "normalsAgreeWithTriangleWinding": true,
+        "degenerateTriangles": 0,
+        "noExternalResources": true
+      }
+    },
+    {
+      "id": "nseoul",
+      "model": "nseoul.glb",
+      "thumbnail": "nseoul.png",
+      "name": "N SEOUL TOWER",
+      "nameKo": "N서울타워",
+      "units": "metres",
+      "dimensions": [
+        28,
+        236.7,
+        28
+      ],
+      "measuredGlbDimensions": [
+        28.0,
+        236.6999969,
+        28.0
+      ],
+      "bounds": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.0
+        ],
+        "max": [
+          14.0,
+          236.6999969,
+          14.0
+        ]
+      },
+      "triangles": 4572,
+      "drawCalls": 5,
+      "bytes": 230492,
+      "sha256": "fc3cfafa7c007247d1b158e85c29ad5b429c6f4b3c971276fb09fef014ea73eb",
+      "rootTransform": "identity",
+      "normalizationFactorsXYZ": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "heightDatum": "236.7 m = 135.7 m tower body + 101 m transmission tower; hill is external",
+      "referenceUrl": "https://www.nseoultower.co.kr/global/intro2.asp",
+      "sources": [
+        {
+          "publisher": "CJ Foodville / N Seoul Tower operator",
+          "url": "https://www.nseoultower.co.kr/global/intro2.asp",
+          "supports": [
+            "236.7 m tower",
+            "135.7 m tower body plus 101 m steel tower",
+            "operator ground altitude 270 m",
+            "operator tip altitude 506.7 m",
+            "observation-floor areas 450, 460, 466, 271 square metres"
+          ],
+          "confidence": "high_for_tower_height_conflicting_for_ground_altitude"
+        },
+        {
+          "publisher": "Seoul Metropolitan Government, Future Heritage",
+          "url": "https://futureheritage.seoul.go.kr/futureHeritageMeet/futureHeritage/view.do?fetchStart=1&htNo=3084&searchTitle=%EB%82%A8%EC%82%B0&srchType=title",
+          "supports": [
+            "236.7 m tower",
+            "135.7+101 m split",
+            "city ground altitude 243 m",
+            "city tip altitude 479.7 m"
+          ],
+          "confidence": "high_for_tower_height_conflicting_for_ground_altitude"
+        },
+        {
+          "publisher": "N Seoul Tower operator",
+          "url": "https://www.nseoultower.co.kr/global/intro.asp",
+          "supports": [
+            "tower identity",
+            "link to operator photo gallery",
+            "lighting changes dynamically"
+          ],
+          "confidence": "high"
+        }
+      ],
+      "referencePlanDimensionsM": {
+        "width": 28,
+        "depth": 28,
+        "height": 236.7
+      },
+      "dimensionEvidence": {
+        "widthDepth": "Estimated observation-head outer envelope; 466 square metre public floor implies circular floor diameter24.36 m, not an exact exterior diameter",
+        "height": "Operator and city agree 135.7 m body +101 m steel tower",
+        "estimatedPlanUncertaintyPercent": 20
+      },
+      "modelingEstimates": {
+        "shaftBaseDiameterM": 14,
+        "shaftTopDiameterM": 7,
+        "headBottomHeightM": 106,
+        "headTopHeightM": 135.7,
+        "headDiameterM": 28,
+        "mastHeightM": 101,
+        "mastBaseDiameterM": 4.6,
+        "mastTipDiameterM": 0.9
+      },
+      "appearance": [
+        "Slender light-gray concrete shaft",
+        "Broad multi-level observation head around upper part of 135.7 m body; dark blue-gray glazed bands and light fascia",
+        "A further101 m slender antenna/steel transmission structure above the body, with maintenance platforms/radial details",
+        "Do not make 60 m diameter observation head or move whole observation head above160 m as legacy model does"
+      ],
+      "coordinate": {
+        "lon": 126.9882805,
+        "lat": 37.55127,
+        "basis": "existing repository landmark; no independent coordinate verification",
+        "confidence": "medium_unsurveyed"
+      },
+      "osmWayId": null,
+      "yawDegFromEast": 0,
+      "estimatedDetails": [
+        "Independent game-art reconstruction; not official CAD or photogrammetry.",
+        "All facade pitch, glass tint, PBR coefficients, roof details and hidden structural details are author estimates.",
+        "Horizontal bounds are normalized to the documented footprint envelope. Small coping/fin overshoots are clamped at the total-height envelope without shifting floor/mast datums.",
+        "Reference photographs are linked only, never embedded or redistributed. Not all official photo endpoints could be rendered in the research tools.",
+        "Observation-head diameter 28 m is estimated. Published 135.7 m body + 101 m mast = 236.7 m; conflicting ground altitudes are external terrain, not included. A closed 100.7-106 m neck/flared transition joins the shaft to the observation-head skirt; these connection proportions are artistic estimates, not structural specifications."
+      ],
+      "materials": [
+        {
+          "name": "NSeoul_Observation_Glass",
+          "pbr": {
+            "baseColorFactor": [
+              0.07199999690055847,
+              0.15000000596046448,
+              0.20499999821186066,
+              1
+            ],
+            "metallicFactor": 0.4000000059604645,
+            "roughnessFactor": 0.2199999988079071
+          }
+        },
+        {
+          "name": "NSeoul_Signal_Red",
+          "pbr": {
+            "baseColorFactor": [
+              0.5199999809265137,
+              0.0949999988079071,
+              0.054999999701976776,
+              1
+            ],
+            "metallicFactor": 0.10000000149011612,
+            "roughnessFactor": 0.550000011920929
+          }
+        },
+        {
+          "name": "NSeoul_Transmission_Silver",
+          "pbr": {
+            "baseColorFactor": [
+              0.6100000143051147,
+              0.6499999761581421,
+              0.6600000262260437,
+              1
+            ],
+            "metallicFactor": 0.6000000238418579,
+            "roughnessFactor": 0.44999998807907104
+          }
+        },
+        {
+          "name": "NSeoul_Warm_Concrete",
+          "pbr": {
+            "baseColorFactor": [
+              0.6899999976158142,
+              0.6899999976158142,
+              0.6499999761581421,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.7599999904632568
+          }
+        },
+        {
+          "name": "NSeoul_White_Fascia",
+          "pbr": {
+            "baseColorFactor": [
+              0.8799999952316284,
+              0.8899999856948853,
+              0.8700000047683716,
+              1
+            ],
+            "metallicFactor": 0.11999999731779099,
+            "roughnessFactor": 0.5
+          }
+        }
+      ],
+      "validation": {
+        "finitePositions": true,
+        "unitNormals": true,
+        "indicesInRange": true,
+        "normalsAgreeWithTriangleWinding": true,
+        "degenerateTriangles": 0,
+        "noExternalResources": true
+      }
+    },
+    {
+      "id": "coex",
+      "model": "coex.glb",
+      "thumbnail": "coex.png",
+      "name": "TRADE TOWER",
+      "nameKo": "무역센터 트레이드타워",
+      "units": "metres",
+      "dimensions": [
+        61.48,
+        256.5,
+        42.06
+      ],
+      "measuredGlbDimensions": [
+        61.4799995,
+        256.5,
+        42.0600014
+      ],
+      "bounds": {
+        "min": [
+          -30.7399998,
+          0.0,
+          -21.0300007
+        ],
+        "max": [
+          30.7399998,
+          256.5,
+          21.0300007
+        ]
+      },
+      "triangles": 6352,
+      "drawCalls": 3,
+      "bytes": 346560,
+      "sha256": "f29108b8030d1f52ff356d653b5afb6be6012062e00e93fe158632a3b966d29c",
+      "rootTransform": "identity",
+      "normalizationFactorsXYZ": [
+        0.9993497975054285,
+        0.9979831425592496,
+        1.0
+      ],
+      "heightDatum": "228 m roof / 256.5 m tip; 28.5 m slim technical mast",
+      "referenceUrl": "https://wtcseoul.com/office/office01.php",
+      "sources": [
+        {
+          "publisher": "WTC Seoul, property operator",
+          "url": "https://wtcseoul.com/office/office01.php",
+          "supports": [
+            "Trade Tower is distinct from COEX exhibition centre",
+            "54 above-ground floors according to operator",
+            "1988 completion",
+            "exterior photographs"
+          ],
+          "confidence": "high"
+        },
+        {
+          "publisher": "WTC Seoul",
+          "url": "https://wtcseoul.com/images/sub/trade_img1.jpg",
+          "supports": [
+            "exterior massing and facade reference"
+          ],
+          "confidence": "high",
+          "usage": "Reference only; no texture license asserted"
+        },
+        {
+          "publisher": "Council on Vertical Urbanism / CTBUH, original building database",
+          "url": "https://www.skyscrapercenter.com/building/trade-tower/1141",
+          "supports": [
+            "architectural height 228 m",
+            "to-tip height 256.5 m",
+            "helipad 228 m",
+            "database counts 55 floors, unlike operator 54"
+          ],
+          "confidence": "high_for_published_database_not_a_new_survey"
+        }
+      ],
+      "referencePlanDimensionsM": {
+        "width": 61.48,
+        "depth": 42.06,
+        "height": 256.5
+      },
+      "dimensionEvidence": {
+        "widthDepth": "Estimated oriented bounds of retained irregular OSM tower footprint, not official construction drawings",
+        "height": "Published CTBUH/CVU to-tip256.5 m; main architectural roof/helipad228 m",
+        "estimatedPlanUncertaintyPercent": 15
+      },
+      "modelingEstimates": {
+        "floorBands": 54,
+        "mullionPitchM": 1.8,
+        "materialBaseColor": "#879AAB",
+        "materialRoughness": 0.3,
+        "mastHeightM": 28.5
+      },
+      "appearance": [
+        "Stepped/setback upper profile formed by adjacent interlocking vertical masses, not single flat-topped square box",
+        "Cool silver/blue-gray curtain-wall glazing with strong dark horizontal bands",
+        "Roof/helipad at228 m; very slim technical mast to256.5 m may be separate low-polygon part",
+        "COEX exhibition hall is a separate large low-rise footprint and must not become another228 m tower"
+      ],
+      "coordinate": {
+        "lon": 127.0610204,
+        "lat": 37.5103271,
+        "basis": "Estimated oriented-box centre of named Trade Tower OSM footprint; not COEX exhibition-centre midpoint",
+        "confidence": "medium_unsurveyed"
+      },
+      "osmWayId": 74056379,
+      "yawDegFromEast": 22.9297,
+      "estimatedDetails": [
+        "Independent game-art reconstruction; not official CAD or photogrammetry.",
+        "All facade pitch, glass tint, PBR coefficients, roof details and hidden structural details are author estimates.",
+        "Horizontal bounds are normalized to the documented footprint envelope. Small coping/fin overshoots are clamped at the total-height envelope without shifting floor/mast datums.",
+        "Reference photographs are linked only, never embedded or redistributed. Not all official photo endpoints could be rendered in the research tools.",
+        "Runtime ID coex maps only to Trade Tower, not COEX exhibition hall or the complete complex. Stepped upper-mass dimensions are estimates."
+      ],
+      "materials": [
+        {
+          "name": "Trade_Blue_Grey_Glazing",
+          "pbr": {
+            "baseColorFactor": [
+              0.27000001072883606,
+              0.4000000059604645,
+              0.47999998927116394,
+              1
+            ],
+            "metallicFactor": 0.46000000834465027,
+            "roughnessFactor": 0.30000001192092896
+          }
+        },
+        {
+          "name": "Trade_Dark_Horizontal_Spandrels",
+          "pbr": {
+            "baseColorFactor": [
+              0.08500000089406967,
+              0.14000000059604645,
+              0.18000000715255737,
+              1
+            ],
+            "metallicFactor": 0.41999998688697815,
+            "roughnessFactor": 0.3499999940395355
+          }
+        },
+        {
+          "name": "Trade_Silver_Mullions",
+          "pbr": {
+            "baseColorFactor": [
+              0.5799999833106995,
+              0.6499999761581421,
+              0.6800000071525574,
+              1
+            ],
+            "metallicFactor": 0.6200000047683716,
+            "roughnessFactor": 0.30000001192092896
+          }
+        }
+      ],
+      "validation": {
+        "finitePositions": true,
+        "unitNormals": true,
+        "indicesInRange": true,
+        "normalsAgreeWithTriangleWinding": true,
+        "degenerateTriangles": 0,
+        "noExternalResources": true
+      }
+    },
+    {
+      "id": "gyeongbokgung",
+      "model": "gyeongbokgung.glb",
+      "thumbnail": "gyeongbokgung.png",
+      "name": "GEUNJEONGJEON",
+      "nameKo": "경복궁 근정전",
+      "units": "metres",
+      "dimensions": [
+        47,
+        26,
+        38
+      ],
+      "measuredGlbDimensions": [
+        47.0,
+        26.0,
+        38.0
+      ],
+      "bounds": {
+        "min": [
+          -23.5,
+          0.0,
+          -19.0
+        ],
+        "max": [
+          23.5,
+          26.0,
+          19.0
+        ]
+      },
+      "triangles": 20176,
+      "drawCalls": 10,
+      "bytes": 1069956,
+      "sha256": "3e2a1a730e5286d2dedb47336cb17fb5e6ec6a0bac2f6c8ca2ee8d61a2c27aa8",
+      "rootTransform": "identity",
+      "normalizationFactorsXYZ": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "heightDatum": "26 m total is an artistic estimate (approximately +/-4 m), including 3.5 m estimated terrace",
+      "referenceUrl": "https://www.heritage.go.kr/heri/cul/culSelectDetail.do?ccbaAsno=0002230000000&ccbaCpno=1111102230000&ccbaCtcd=11&ccbaKdcd=11&ccbaLcto=11&culPageNo=1&header=region&pageNo=1_1_3_1&s_ctcd=11&sngl=Y",
+      "sources": [
+        {
+          "publisher": "Korea Heritage Service, National Heritage Portal",
+          "url": "https://www.heritage.go.kr/heri/cul/culSelectDetail.do?ccbaAsno=0002230000000&ccbaCpno=1111102230000&ccbaCtcd=11&ccbaKdcd=11&ccbaLcto=11&culPageNo=1&header=region&pageNo=1_1_3_1&s_ctcd=11&sngl=Y",
+          "supports": [
+            "Geunjeongjeon identity and official exterior photographs/drawings index"
+          ],
+          "access": "Search-index content obtained; live page open returned internal error",
+          "confidence": "high_for_identity_no_verified_height"
+        },
+        {
+          "publisher": "Korea Heritage Service, Royal Palaces and Tombs Center",
+          "url": "https://royal.khs.go.kr/ROYAL/contents/R404000000.do?schGroupCode=gbg",
+          "supports": [
+            "Geunjeongjeon five bays by five bays"
+          ],
+          "confidence": "high"
+        },
+        {
+          "publisher": "Korea Heritage Service, Royal Palaces and Tombs Center",
+          "url": "https://royal.khs.go.kr/ROYAL/contents/R311050000.do",
+          "supports": [
+            "Geunjeongjeon exterior reference and palace-building hierarchy"
+          ],
+          "confidence": "high"
+        },
+        {
+          "publisher": "Seoul public building register",
+          "url": "https://openab.seoul.go.kr/build/detail.do?mgmBldrgstPk=10021100184283",
+          "supports": [
+            "Geunjeongjeon registered building area 636 square metres",
+            "timber structure and tile roof"
+          ],
+          "confidence": "high_for_registry_not_roof_bounds"
+        }
+      ],
+      "referencePlanDimensionsM": {
+        "width": 32.04,
+        "depth": 23.57,
+        "height": 26
+      },
+      "dimensionEvidence": {
+        "widthDepth": "Estimated OSM footprint oriented bounds; not official surveyed roof dimensions",
+        "height": "Modeling estimate including approximately 3.5 m raised stone terrace; no primary height measurement verified",
+        "estimatedHeightUncertaintyM": 4,
+        "estimatedPlanUncertaintyPercent": 15
+      },
+      "modelingEstimates": {
+        "terraceWidthM": 47,
+        "terraceDepthM": 38,
+        "terraceHeightM": 3.5,
+        "roofRidgeHeightAboveTerraceM": 22.5,
+        "columnDiameterM": 0.75,
+        "hallWidthM": 30,
+        "hallDepthM": 21
+      },
+      "appearance": [
+        "Five-bay front and five-bay side rhythm",
+        "Two-tier hipped-and-gabled tiled roof with long horizontal ridges and gently lifted eaves; not a four-sided conical/pagoda roof",
+        "Red-brown timber columns, muted green/red dancheong brackets, charcoal roof tiles",
+        "Pale stone two-level terrace, south-facing central steps and low balustrade"
+      ],
+      "coordinate": {
+        "lon": 126.9769911,
+        "lat": 37.5785475,
+        "basis": "Estimated oriented-box centre of named Geunjeongjeon OSM footprint",
+        "confidence": "medium_unsurveyed"
+      },
+      "osmWayId": 170199428,
+      "yawDegFromEast": -2.3602,
+      "estimatedDetails": [
+        "Independent game-art reconstruction; not official CAD or photogrammetry.",
+        "All facade pitch, glass tint, PBR coefficients, roof details and hidden structural details are author estimates.",
+        "Horizontal bounds are normalized to the documented footprint envelope. Small coping/fin overshoots are clamped at the total-height envelope without shifting floor/mast datums.",
+        "Reference photographs are linked only, never embedded or redistributed. Not all official photo endpoints could be rendered in the research tools.",
+        "26 m overall height including 3.5 m terrace is estimated (approximately +/-4 m); full terrace is 47 x 38 m, not the main-hall roof plan. Only main hall and terrace are modeled."
+      ],
+      "materials": [
+        {
+          "name": "Palace_Charcoal_Roof_Tiles",
+          "pbr": {
+            "baseColorFactor": [
+              0.06499999761581421,
+              0.07900000363588333,
+              0.08699999749660492,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.6600000262260437
+          }
+        },
+        {
+          "name": "Palace_Dancheong_Green",
+          "pbr": {
+            "baseColorFactor": [
+              0.06499999761581421,
+              0.2549999952316284,
+              0.17000000178813934,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.699999988079071
+          }
+        },
+        {
+          "name": "Palace_Dancheong_Jade",
+          "pbr": {
+            "baseColorFactor": [
+              0.23999999463558197,
+              0.41999998688697815,
+              0.28999999165534973,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.6800000071525574
+          }
+        },
+        {
+          "name": "Palace_Dancheong_Ochre",
+          "pbr": {
+            "baseColorFactor": [
+              0.5799999833106995,
+              0.36000001430511475,
+              0.10000000149011612,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.6800000071525574
+          }
+        },
+        {
+          "name": "Palace_Door_Shadow",
+          "pbr": {
+            "baseColorFactor": [
+              0.07500000298023224,
+              0.10499999672174454,
+              0.07500000298023224,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.800000011920929
+          }
+        },
+        {
+          "name": "Palace_Granite",
+          "pbr": {
+            "baseColorFactor": [
+              0.6399999856948853,
+              0.6200000047683716,
+              0.5600000023841858,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.8399999737739563
+          }
+        },
+        {
+          "name": "Palace_Granite_Capstones",
+          "pbr": {
+            "baseColorFactor": [
+              0.800000011920929,
+              0.7699999809265137,
+              0.6899999976158142,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.7799999713897705
+          }
+        },
+        {
+          "name": "Palace_Raised_Tile_Seams",
+          "pbr": {
+            "baseColorFactor": [
+              0.14000000059604645,
+              0.1599999964237213,
+              0.17000000178813934,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.5799999833106995
+          }
+        },
+        {
+          "name": "Palace_Vermilion_Columns",
+          "pbr": {
+            "baseColorFactor": [
+              0.4000000059604645,
+              0.07000000029802322,
+              0.03500000014901161,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.699999988079071
+          }
+        },
+        {
+          "name": "Palace_Window_Paper",
+          "pbr": {
+            "baseColorFactor": [
+              0.5099999904632568,
+              0.49000000953674316,
+              0.36000001430511475,
+              1
+            ],
+            "metallicFactor": 0,
+            "roughnessFactor": 0.8799999952316284
+          }
+        }
+      ],
+      "validation": {
+        "finitePositions": true,
+        "unitNormals": true,
+        "indicesInRange": true,
+        "normalsAgreeWithTriangleWinding": true,
+        "degenerateTriangles": 0,
+        "noExternalResources": true
+      }
+    }
+  ]
+}

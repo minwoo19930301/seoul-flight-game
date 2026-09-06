@@ -1,4 +1,12 @@
 import * as THREE from "./vendor/three.module.js";
+import { controlByCode, FlightInputs, formatMetres, updateAttitude, yawToTarget } from "./flight-model.mjs";
+import { localMetreProjection } from "./geographic-model.mjs";
+import { sampleLocalElevation } from "./terrain-model.mjs";
+import { GLTFLoader } from "./vendor/loaders/GLTFLoader.js";
+import { makeWaterGeometry } from "./water-geometry.mjs";
+import { CityStream } from "./city-stream.mjs";
+import { createTerrainGeometry } from "./terrain-geometry.mjs";
+import { projectWater } from "./water-model.mjs";
 
 const dom = {
   root: document.getElementById("game-root"),
@@ -18,6 +26,10 @@ const dom = {
   messageTitle: document.getElementById("message-title"),
   messageBody: document.getElementById("message-body"),
   restartBtn: document.getElementById("restart-btn"),
+  pauseBtn: document.getElementById("pause-btn"),
+  resumeBtn: document.getElementById("resume-btn"),
+  progressValue: document.getElementById("progress-value"),
+  targetAltitude: document.getElementById("target-altitude"),
   horizonInner: document.getElementById("horizon-inner"),
   mapCredit: document.getElementById("map-credit"),
   miniMap: document.getElementById("mini-map"),
@@ -27,7 +39,7 @@ const dom = {
 const world = {
   width: 3200,
   depth: 2300,
-  ceiling: 720,
+  ceiling: 1000,
   boundaryPadding: 140,
 };
 
@@ -40,29 +52,6 @@ let landmarkDefs = [];
 let checkpointDefs = [];
 let bridgeDefs = [];
 
-const buildingMaterials = [
-  [
-    new THREE.MeshStandardMaterial({ color: 0x8d8298, roughness: 0.92, metalness: 0.06, vertexColors: true }),
-    new THREE.MeshStandardMaterial({ color: 0x6f7fa8, roughness: 0.72, metalness: 0.2, emissive: 0x2a1f3a, emissiveIntensity: 0.16, vertexColors: true }),
-  ],
-  [
-    new THREE.MeshStandardMaterial({ color: 0x7a7390, roughness: 0.7, metalness: 0.16, vertexColors: true }),
-    new THREE.MeshStandardMaterial({ color: 0x6f7fa8, roughness: 0.46, metalness: 0.42, emissive: 0x33244a, emissiveIntensity: 0.2, vertexColors: true }),
-  ],
-  [
-    new THREE.MeshStandardMaterial({ color: 0x8d8298, roughness: 0.68, metalness: 0.12, vertexColors: true }),
-    new THREE.MeshStandardMaterial({ color: 0x7a7390, roughness: 0.58, metalness: 0.32, emissive: 0x2c2140, emissiveIntensity: 0.18, vertexColors: true }),
-  ],
-];
-
-const shared = {
-  box: new THREE.BoxGeometry(1, 1, 1),
-  cylinder: new THREE.CylinderGeometry(1, 1, 1, 24),
-  towerRing: new THREE.TorusGeometry(1, 0.14, 12, 48),
-  beam: new THREE.CylinderGeometry(1, 1.4, 1, 20, 1, true),
-};
-
-addVerticalAoColors(shared.box);
 
 const state = {
   mode: "intro",
@@ -74,20 +63,11 @@ const state = {
   roll: 0,
   speed: 0,
   elapsedMs: 0,
-  startedAt: 0,
   checkpointIndex: 0,
 };
 
-const input = {
-  pitchUp: false,
-  pitchDown: false,
-  bankLeft: false,
-  bankRight: false,
-  yawLeft: false,
-  yawRight: false,
-  boost: false,
-  level: false,
-};
+const inputController = new FlightInputs();
+const input = inputController.state;
 
 const runtime = {
   scene: null,
@@ -103,7 +83,7 @@ const runtime = {
   checkpointGroups: [],
   clouds: [],
   riverSamples: [],
-  waterMasks: [],
+  waterData: null,
   boundaryBeacons: [],
   projectedMap: null,
   rasterMapImage: null,
@@ -111,6 +91,11 @@ const runtime = {
   pointerLocked: false,
   lookRollVelocity: 0,
   currentStatus: "서울 상공 뷰를 준비 중입니다.",
+  frameId: null,
+  terrain: null,
+  landmarkReferences: null,
+  city: null,
+  lastCityUpdate: 0,
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -125,23 +110,32 @@ try {
 
 async function init() {
   const mapData = await loadMapData();
+  [runtime.terrain,runtime.landmarkReferences,runtime.waterData]=await Promise.all([
+    loadJson("./assets/terrain/elevation.json"),loadJson("./assets/landmarks/references.json"),
+    loadJson("./assets/water/water.geojson"),
+  ]);
   runtime.rasterMapImage = await loadRasterMapImage();
   configureSeoulMap(mapData);
   buildMiniMapBase();
   setupThree();
-  buildWorld();
+  await buildWorld();
   bindEvents();
   resetFlight();
-  dom.mapCredit.textContent = mapData.attribution;
+  dom.mapCredit.textContent = `${mapData.attribution} · Terrain: USGS / Mapzen · 일반 건물 높이·외관 추정`;
+  dom.startBtn.disabled = false;
+  dom.startBtn.textContent = "둘러보기 시작";
   if (urlParams.get("autostart") === "1") {
     startGame();
   }
   updateHud();
-  requestAnimationFrame(loop);
+  runtime.frameId = requestAnimationFrame(loop);
 }
 
 function showFatalError(error) {
   console.error(error);
+  state.mode = "error";
+  clearInputs();
+  cancelAnimationFrame(runtime.frameId);
   const message = error instanceof Error ? error.message : String(error);
   runtime.currentStatus = `초기화 오류: ${message}`;
   dom.startPanel.classList.add("hidden");
@@ -149,6 +143,10 @@ function showFatalError(error) {
   dom.messageTitle.textContent = "초기화 오류";
   dom.messageBody.textContent = message;
   dom.messagePanel.classList.remove("hidden");
+  dom.pauseBtn.disabled = true;
+  dom.resumeBtn.hidden = true;
+  dom.restartBtn.textContent = "다시 불러오기";
+  dom.restartBtn.onclick = () => window.location.reload();
   updateHud();
 }
 
@@ -159,6 +157,8 @@ async function loadMapData() {
   }
   return response.json();
 }
+
+async function loadJson(url){const response=await fetch(url);if(!response.ok)throw new Error(`자료 로딩 실패: ${url} (${response.status})`);return response.json();}
 
 async function loadRasterMapImage() {
   return new Promise((resolve) => {
@@ -174,24 +174,17 @@ async function loadRasterMapImage() {
 }
 
 function configureSeoulMap(mapData) {
-  const mercMinX = mercatorX(mapData.bbox.minLon);
-  const mercMaxX = mercatorX(mapData.bbox.maxLon);
-  const mercMinY = mercatorY(mapData.bbox.minLat);
-  const mercMaxY = mercatorY(mapData.bbox.maxLat);
-  const spanX = mercMaxX - mercMinX;
-  const spanY = mercMaxY - mercMinY;
-  const scale = Math.min((world.width - 320) / spanX, (world.depth - 320) / spanY);
-  const centerX = (mercMinX + mercMaxX) * 0.5;
-  const centerY = (mercMinY + mercMaxY) * 0.5;
-
-  const project = (lon, lat) => ({
-    x: (mercatorX(lon) - centerX) * scale,
-    z: -(mercatorY(lat) - centerY) * scale,
-  });
+  const { project, width, depth } = localMetreProjection(mapData.bbox);
+  world.width = width + 1000;
+  world.depth = depth + 1000;
 
   runtime.projectedMap = {
+    rasterBounds: {
+      northWest: project(mapData.bbox.minLon, mapData.bbox.maxLat),
+      southEast: project(mapData.bbox.maxLon, mapData.bbox.minLat),
+    },
     attribution: mapData.attribution,
-    waterPolygons: mapData.waterPolygons.map((points) => projectLine(points, project)),
+    waterPolygons: projectWater(runtime.waterData,project),
     waterLines: mapData.waterLines.map((points) => projectLine(points, project)),
     roads: {
       trunk: mapData.roads.trunk.map((points) => projectLine(points, project)),
@@ -202,82 +195,25 @@ function configureSeoulMap(mapData) {
     buildings: mapData.buildings.map((building) => projectBuilding(building, project)).filter(Boolean),
   };
 
-  runtime.waterMasks = runtime.projectedMap.waterPolygons
-    .filter((polygon) => polygon.length >= 3)
-    .map((polygon) => {
-      const bounds = polygonBounds(polygon);
-      const signedArea = polygonSignedArea(polygon);
-      const anchor = polygonCentroid(polygon, signedArea);
-      return {
-        points: polygon,
-        minX: bounds.minX,
-        maxX: bounds.maxX,
-        minZ: bounds.minZ,
-        maxZ: bounds.maxZ,
-        anchorX: anchor.x,
-        anchorZ: anchor.z,
-      };
-    });
-
   riverPath = pickLongestLine(runtime.projectedMap.waterLines).map(([x, z]) => new THREE.Vector2(x, z));
   if (riverPath.length < 2) {
     throw new Error("River path missing from map data");
   }
 
-  const landmarkPositions = {
-    sixtythree: project(mapData.landmarks.sixtythree.lon, mapData.landmarks.sixtythree.lat),
-    gyeongbokgung: project(mapData.landmarks.gyeongbokgung.lon, mapData.landmarks.gyeongbokgung.lat),
-    nseoul: project(mapData.landmarks.nseoul.lon, mapData.landmarks.nseoul.lat),
-    coex: project(mapData.landmarks.coex.lon, mapData.landmarks.coex.lat),
-    lotte: project(mapData.landmarks.lotte.lon, mapData.landmarks.lotte.lat),
-  };
 
-  landmarkDefs = [
-    { id: "sixtythree", label: "63빌딩", create: create63Building, height: 254, colliderRadius: 34, ...landmarkPositions.sixtythree },
-    { id: "gyeongbokgung", label: "경복궁", create: createGyeongbokgung, height: 26, colliderRadius: 84, ...landmarkPositions.gyeongbokgung },
-    { id: "nseoul", label: "N서울타워", create: createSeoulTower, height: 246, colliderRadius: 28, ...landmarkPositions.nseoul },
-    { id: "coex", label: "COEX", create: createCoexTower, height: 214, colliderRadius: 32, ...landmarkPositions.coex },
-    { id: "lotte", label: "롯데월드타워", create: createLotteTower, height: 548, colliderRadius: 42, ...landmarkPositions.lotte },
-  ];
-
-  checkpointDefs = [
-    { name: "63빌딩", y: 220, radius: 68, note: "여의도 구간을 보는 중입니다.", ...landmarkPositions.sixtythree },
-    { name: "경복궁", y: 252, radius: 76, note: "종로 북쪽 구간을 보는 중입니다.", ...landmarkPositions.gyeongbokgung },
-    { name: "N서울타워", y: 330, radius: 84, note: "남산 상공을 보는 중입니다.", ...landmarkPositions.nseoul },
-    { name: "COEX", y: 262, radius: 82, note: "강남 업무지구를 보는 중입니다.", ...landmarkPositions.coex },
-    { name: "롯데월드타워", y: 388, radius: 92, note: "잠실 구간을 보는 중입니다.", ...landmarkPositions.lotte },
-  ];
-
-  noBuildZones = landmarkDefs.map((landmark) => ({
-    x: landmark.x,
-    z: landmark.z,
-    radius: landmark.colliderRadius + 90,
+  landmarkDefs=runtime.landmarkReferences.landmarks.map(reference=>({
+    id:reference.id,label:reference.nameKo,height:reference.dimensionsM.height,
+    colliderRadius:Math.hypot(reference.dimensionsM.width,reference.dimensionsM.depth)/2,
+    yaw:THREE.MathUtils.degToRad(reference.yawDegFromEast||0),osmWayId:reference.osmWayId,
+    ...project(reference.coordinate.lon,reference.coordinate.lat),
   }));
+  checkpointDefs=landmarkDefs.map(landmark=>({
+    name:landmark.label,x:landmark.x,z:landmark.z,
+    y:getTerrainHeight(landmark.x,landmark.z)+landmark.height+75,
+    radius:180,note:`${landmark.label} 상공 · 높이와 외관의 근거는 자료 안내에서 확인하세요.`,
+  }));
+  dom.miniMap.height=Math.round(dom.miniMap.width*world.depth/world.width);
 
-  districtDefs = [
-    makeDistrict(project, "MAPO", 126.9105, 37.5485, 330, 220, 18, 90, 11, 0),
-    makeDistrict(project, "YEOUIDO", 126.9267, 37.5254, 210, 150, 14, 136, 31, 1),
-    makeDistrict(project, "JONGNO", 126.9840, 37.5720, 260, 190, 20, 88, 51, 2),
-    makeDistrict(project, "YONGSAN", 126.9765, 37.5348, 260, 180, 20, 112, 71, 0),
-    makeDistrict(project, "SEONGSU", 127.0468, 37.5440, 250, 160, 16, 120, 91, 2),
-    makeDistrict(project, "GANGNAM", 127.0285, 37.4985, 430, 250, 30, 162, 111, 1),
-    makeDistrict(project, "JAMSIL", 127.0870, 37.5160, 260, 170, 16, 122, 131, 0),
-  ];
-
-  hillDefs = [
-    makeHill(project, 126.9882805, 37.5512700, 160, 76, 0x516f46),
-    makeHill(project, 126.9750, 37.5920, 220, 58, 0x445d40),
-    makeHill(project, 127.0740, 37.5660, 210, 48, 0x4c6447),
-    makeHill(project, 127.0300, 37.4810, 240, 40, 0x4a6144),
-  ];
-
-  bridgeDefs = [
-    makeBridge(project, "양화대교", 126.9052, 37.5435, 300, 0.08),
-    makeBridge(project, "마포대교", 126.9359, 37.5392, 290, 0.1),
-    makeBridge(project, "반포대교", 126.9950, 37.5140, 318, 0.14),
-    makeBridge(project, "청담대교", 127.0668, 37.5262, 302, 0.08),
-    makeBridge(project, "올림픽대교", 127.1036105, 37.5343153, 336, 0.02),
-  ];
 }
 
 function setupThree() {
@@ -286,7 +222,7 @@ function setupThree() {
     alpha: false,
     powerPreference: "default",
     failIfMajorPerformanceCaveat: false,
-    precision: "mediump",
+    precision: "highp",
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -297,9 +233,9 @@ function setupThree() {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf0a877);
-  scene.fog = new THREE.Fog(0xd9927e, 800, 3000);
+  scene.fog = new THREE.Fog(0xd9927e, 6000, 22000);
 
-  const camera = new THREE.PerspectiveCamera(76, window.innerWidth / window.innerHeight, 0.5, 6000);
+  const camera = new THREE.PerspectiveCamera(76, window.innerWidth / window.innerHeight, 0.5, 36000);
   camera.position.set(0, 200, 0);
 
   const hemi = new THREE.HemisphereLight(0x7c6f9e, 0x2c2438, 1.5);
@@ -328,35 +264,31 @@ function setupThree() {
   runtime.cockpitLight = cockpitLight;
 }
 
-function buildWorld() {
+async function buildWorld() {
   const scene = runtime.scene;
 
   const groundTexture = createGroundTexture();
+  const terrainGeometry=createTerrainGeometry(runtime.terrain,world.width,world.depth);
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(world.width, world.depth),
+    terrainGeometry,
     new THREE.MeshStandardMaterial({
       map: groundTexture,
       roughness: 0.98,
       metalness: 0.04,
     }),
   );
-  ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
 
   const river = createRiverMesh();
   scene.add(river);
   runtime.riverMesh = river;
 
-  const waterGlow = createRiverMesh(riverWidth * 0.56, 2.4, 0xff9e6a, 0.28);
-  scene.add(waterGlow);
-  runtime.riverGlowMesh = waterGlow;
-
   createSky(scene);
-  createMountains(scene);
-  createActualBuildings(scene);
-  createLandmarks(scene);
-  createBridges(scene);
-  createBoundarySkyline(scene);
+  // DEM surface replaces randomly offset cone mountains.
+  await createLandmarks(scene);
+  await createCityTiles(scene);
+  // Legacy bridge pylons and lengths were invented; source roads remain on the map.
+  // No invented perimeter skyscrapers: the skyline follows the source footprint set.
   createCheckpoints(scene);
   createClouds(scene);
 }
@@ -366,7 +298,7 @@ function createSky(scene) {
 
   const sunDirection = runtime.sun.position.clone().normalize();
 
-  const skyGeometry = new THREE.SphereGeometry(4800, 32, 15);
+  const skyGeometry = new THREE.SphereGeometry(30000, 32, 15);
   const skyMaterial = new THREE.ShaderMaterial({
     side: THREE.BackSide,
     depthWrite: false,
@@ -396,7 +328,7 @@ function createSky(scene) {
       uniform vec3 scatterColor;
       uniform vec3 sunDir;
       void main() {
-        vec3 dir = normalize(vWorldPosition);
+        vec3 dir = normalize(vWorldPosition-cameraPosition);
         float h = dir.y;
         vec3 lowMix = mix(horizonColor, lowColor, smoothstep(0.0, 0.22, h));
         vec3 midMix = mix(lowMix, upperColor, smoothstep(0.22, 0.55, h));
@@ -433,8 +365,8 @@ function createSky(scene) {
     fog: false,
   });
   const sunSprite = new THREE.Sprite(sunMaterial);
-  sunSprite.scale.set(640, 640, 1);
-  sunSprite.position.copy(sunDirection).multiplyScalar(4200);
+  sunSprite.scale.set(3600, 3600, 1);
+  sunSprite.position.copy(sunDirection).multiplyScalar(26000);
   skyGroup.add(sunSprite);
 
   scene.add(skyGroup);
@@ -449,7 +381,7 @@ function buildMiniMapBase() {
   const map = runtime.projectedMap;
 
   if (runtime.rasterMapImage) {
-    ctx.drawImage(runtime.rasterMapImage, 0, 0, base.width, base.height);
+    drawRasterMap(ctx, base);
     ctx.fillStyle = "rgba(7, 14, 24, 0.16)";
     ctx.fillRect(0, 0, base.width, base.height);
   } else {
@@ -463,14 +395,13 @@ function buildMiniMapBase() {
       ctx.fillRect(0, y, base.width, 1);
     }
 
-    map.waterPolygons.forEach((polygon) => drawMiniMapPolygon(ctx, base, polygon, "rgba(48, 121, 212, 0.95)"));
+    map.waterPolygons.forEach((polygon) => drawWaterPolygon(ctx, base, polygon, "rgba(48, 121, 212, 0.95)"));
     map.buildings.forEach((building) => {
       if (building.area < 280 && building.height < 28) {
         return;
       }
       drawMiniMapPolygon(ctx, base, building.points, building.height >= 90 ? "rgba(187, 220, 255, 0.34)" : "rgba(226, 236, 242, 0.16)");
     });
-    map.waterLines.forEach((line) => drawMiniMapLine(ctx, base, line, 10, "rgba(105, 193, 255, 0.42)"));
     map.roads.primary.forEach((line) => drawMiniMapLine(ctx, base, line, 2.2, "rgba(255, 224, 157, 0.15)"));
     map.roads.trunk.forEach((line) => drawMiniMapLine(ctx, base, line, 3, "rgba(255, 200, 120, 0.24)"));
   }
@@ -487,7 +418,7 @@ function createGroundTexture() {
   if (runtime.rasterMapImage) {
     ctx.save();
     ctx.filter = "contrast(1.1) saturate(0.82) brightness(0.78)";
-    ctx.drawImage(runtime.rasterMapImage, 0, 0, canvas.width, canvas.height);
+    drawRasterMap(ctx, canvas);
     ctx.restore();
 
     // Dusk wash: multiply toward deep purple-mauve.
@@ -550,20 +481,10 @@ function createGroundTexture() {
     ctx.shadowBlur = 34;
     ctx.shadowColor = "rgba(58, 164, 255, 0.42)";
     map.waterPolygons.forEach((polygon) => {
-      drawPolygon(ctx, canvas, polygon, "rgba(38, 92, 174, 0.96)");
+      drawWaterPolygon(ctx, canvas, polygon, "rgba(38, 92, 174, 0.96)");
     });
     map.waterPolygons.forEach((polygon) => {
-      drawPolygon(ctx, canvas, polygon, "rgba(114, 194, 255, 0.38)");
-    });
-    ctx.restore();
-
-    ctx.save();
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.shadowBlur = 30;
-    ctx.shadowColor = "rgba(118, 198, 255, 0.32)";
-    map.waterLines.forEach((line) => {
-      drawProjectedLine(ctx, canvas, line, 44, "rgba(76, 171, 255, 0.52)");
+      drawWaterPolygon(ctx, canvas, polygon, "rgba(114, 194, 255, 0.38)");
     });
     ctx.restore();
 
@@ -572,19 +493,7 @@ function createGroundTexture() {
     drawProjectedFeatureSet(ctx, canvas, map.roads.trunk, 13, "rgba(255, 210, 138, 0.28)");
   }
 
-  ctx.save();
-  ctx.shadowBlur = 18;
-  ctx.shadowColor = "rgba(255, 247, 214, 0.2)";
-  bridgeDefs.forEach((bridge) => {
-    const point = worldToTexture(bridge.x, bridge.z, canvas);
-    ctx.fillStyle = "rgba(241, 238, 220, 0.34)";
-    ctx.save();
-    ctx.translate(point.x, point.y);
-    ctx.rotate(bridge.rotation + Math.PI / 2);
-    ctx.fillRect(-4, -bridge.length * 0.34, 8, bridge.length * 0.68);
-    ctx.restore();
-  });
-  ctx.restore();
+  // Source raster already contains bridges; no metre-to-pixel decorative overlays.
 
   if (!runtime.rasterMapImage) {
     ctx.fillStyle = "rgba(255, 232, 208, 0.95)";
@@ -623,470 +532,65 @@ function createGroundTexture() {
   return texture;
 }
 
-function createRiverMesh(width = riverWidth, y = 1.2, color = 0xb35a3a, opacity = 0.9) {
-  const curve = new THREE.SplineCurve(riverPath);
-  const points = curve.getPoints(140);
-  const positions = [];
-  const uvs = [];
-  const indices = [];
-  const samples = [];
-  let total = 0;
-  const lengths = [0];
-
-  for (let index = 1; index < points.length; index += 1) {
-    total += points[index].distanceTo(points[index - 1]);
-    lengths.push(total);
-  }
-
-  for (let index = 0; index < points.length; index += 1) {
-    const point = points[index];
-    const previous = points[Math.max(index - 1, 0)];
-    const next = points[Math.min(index + 1, points.length - 1)];
-    const tangent = next.clone().sub(previous).normalize();
-    const normal = new THREE.Vector2(-tangent.y, tangent.x).normalize();
-    const left = point.clone().add(normal.clone().multiplyScalar(width * 0.5));
-    const right = point.clone().add(normal.clone().multiplyScalar(-width * 0.5));
-
-    positions.push(left.x, y, left.y, right.x, y, right.y);
-    uvs.push(0, lengths[index] / Math.max(total, 1), 1, lengths[index] / Math.max(total, 1));
-    samples.push(point.clone());
-
-    if (index < points.length - 1) {
-      const base = index * 2;
-      indices.push(base, base + 1, base + 2, base + 1, base + 3, base + 2);
-    }
-  }
-
-  if (width === riverWidth) {
-    runtime.riverSamples = samples;
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-
-  return new THREE.Mesh(
-    geometry,
-    new THREE.MeshPhysicalMaterial({
-      color,
-      transparent: true,
-      opacity,
-      roughness: 0.12,
-      metalness: 0.12,
-      clearcoat: 1.0,
-      emissive: 0xd4703f,
-      emissiveIntensity: width === riverWidth ? 0.55 : 0.7,
-      side: THREE.DoubleSide,
-    }),
-  );
+function createRiverMesh() {
+  const geometry=makeWaterGeometry(runtime.projectedMap.waterPolygons,{
+    minX:-runtime.terrain.projectedWidthM/2,maxX:runtime.terrain.projectedWidthM/2,
+    minZ:-runtime.terrain.projectedDepthM/2,maxZ:runtime.terrain.projectedDepthM/2,
+  },getTerrainHeight,{columns:runtime.terrain.width-1,rows:runtime.terrain.height-1});
+  return new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({
+    color:0x4a7588,roughness:.38,metalness:.15,side:THREE.DoubleSide,
+  }));
 }
 
-function createMountains(scene) {
-  hillDefs.forEach((hill, hillIndex) => {
-    const rng = mulberry32(600 + hillIndex * 19);
-    for (let index = 0; index < 7; index += 1) {
-      const radius = hill.radius * (0.32 + rng() * 0.28);
-      const height = hill.height * (0.34 + rng() * 0.42);
-      const geometry = new THREE.ConeGeometry(radius, height, 18, 6);
-      displaceMountainGeometry(geometry, radius, height, hillIndex * 7 + index);
-      addMountainGradientColors(geometry, height, hill.color);
-      const material = new THREE.MeshStandardMaterial({
-        vertexColors: true,
-        roughness: 1,
-        metalness: 0,
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(
-        hill.x + (rng() - 0.5) * hill.radius * 0.78,
-        height * 0.5,
-        hill.z + (rng() - 0.5) * hill.radius * 0.78,
-      );
-      mesh.rotation.y = rng() * Math.PI;
-      scene.add(mesh);
-    }
+
+
+
+
+
+async function createCityTiles(scene){
+  const manifest=await loadJson('./assets/city/manifest.json');
+  const loader=new GLTFLoader();
+  runtime.city=new CityStream(manifest.tiles,{
+    load:async tile=>(await loader.loadAsync(`./assets/city/${tile.url}`)).scene,
+    attach:(object,tile)=>{object.position.fromArray(tile.origin);scene.add(object);},
+    dispose:object=>{
+      scene.remove(object);const geometries=new Set(),materials=new Set(),textures=new Set();
+      object.traverse(node=>{if(node.geometry)geometries.add(node.geometry);for(const material of (Array.isArray(node.material)?node.material:[node.material]))if(material){materials.add(material);for(const value of Object.values(material))if(value?.isTexture)textures.add(value);}});
+      for(const geometry of geometries)geometry.dispose();
+      for(const material of materials)material.dispose();
+      for(const texture of textures){texture.source?.data?.close?.();texture.dispose();}
+    },
+    onStatus:({ready,total,failed})=>{
+      const label=document.getElementById('asset-status');
+      label.textContent=failed?`건물 자료 ${failed}구역 로드 실패 · R로 재시도`:`주변 건물 ${ready} / ${total}구역 · 이동하면 다음 구역을 불러옵니다.`;
+    },
   });
+  const first=checkpointDefs[0];
+  await runtime.city.update({x:first.x-360,z:first.z+36});
 }
 
-function displaceMountainGeometry(geometry, radius, height, seed) {
-  geometry.computeBoundingBox();
-  const minY = geometry.boundingBox.min.y;
-  const maxY = geometry.boundingBox.max.y;
-  const positions = geometry.attributes.position;
-  const amplitude = height * 0.08;
-  for (let index = 0; index < positions.count; index += 1) {
-    const x = positions.getX(index);
-    const y = positions.getY(index);
-    const z = positions.getZ(index);
-    const fraction = maxY > minY ? (y - minY) / (maxY - minY) : 1;
-    const noise = hashFrac(x * 0.37 + z * 0.53 + seed * 3.1) - 0.5;
-    const falloff = fraction;
-    const displacement = 1 + (noise * amplitude * falloff) / Math.max(radius, 1);
-    positions.setX(index, x * displacement);
-    positions.setZ(index, z * displacement);
-  }
-  positions.needsUpdate = true;
-  geometry.computeVertexNormals();
-}
 
-function addMountainGradientColors(geometry, height, baseColorHex) {
-  geometry.computeBoundingBox();
-  const minY = geometry.boundingBox.min.y;
-  const maxY = geometry.boundingBox.max.y;
-  const positions = geometry.attributes.position;
-  const colors = new Float32Array(positions.count * 3);
-  const baseColor = new THREE.Color(0x3a3352);
-  const rockColor = new THREE.Color(0x554a68);
-  const ridgeColor = new THREE.Color(0x6e5a78);
-  const rimColor = new THREE.Color(0x8a6a70);
-  const tempColor = new THREE.Color();
-  void baseColorHex;
-  for (let index = 0; index < positions.count; index += 1) {
-    const fraction = maxY > minY ? (positions.getY(index) - minY) / (maxY - minY) : 1;
-    if (fraction < 0.6) {
-      tempColor.copy(baseColor).lerp(rockColor, THREE.MathUtils.smoothstep(fraction, 0.35, 0.6));
-    } else if (fraction < 0.88) {
-      tempColor.copy(rockColor).lerp(ridgeColor, THREE.MathUtils.smoothstep(fraction, 0.6, 0.88));
-    } else {
-      tempColor.copy(ridgeColor).lerp(rimColor, THREE.MathUtils.smoothstep(fraction, 0.88, 1));
-    }
-    colors[index * 3] = tempColor.r;
-    colors[index * 3 + 1] = tempColor.g;
-    colors[index * 3 + 2] = tempColor.b;
-  }
-  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-}
 
-function createBoundarySkyline(scene) {
-  const material = new THREE.MeshStandardMaterial({
-    color: 0x453a5c,
-    roughness: 0.78,
-    metalness: 0.08,
-    transparent: true,
-    opacity: 0.86,
-  });
 
-  const rng = mulberry32(911);
-  for (let index = 0; index < 96; index += 1) {
-    const edge = index % 4;
-    const mesh = new THREE.Mesh(shared.box, material);
-    const width = 30 + rng() * 60;
-    const depth = 30 + rng() * 60;
-    const height = 80 + rng() * 280;
-    mesh.scale.set(width, height, depth);
 
-    if (edge === 0) {
-      mesh.position.set(-world.width * 0.5 - 120 + rng() * 60, height * 0.5, -world.depth * 0.5 + rng() * world.depth);
-    } else if (edge === 1) {
-      mesh.position.set(world.width * 0.5 + 120 - rng() * 60, height * 0.5, -world.depth * 0.5 + rng() * world.depth);
-    } else if (edge === 2) {
-      mesh.position.set(-world.width * 0.5 + rng() * world.width, height * 0.5, -world.depth * 0.5 - 100 + rng() * 60);
-    } else {
-      mesh.position.set(-world.width * 0.5 + rng() * world.width, height * 0.5, world.depth * 0.5 + 100 - rng() * 60);
-    }
 
-    scene.add(mesh);
-  }
-}
 
-function createActualBuildings(scene) {
-  const city = new THREE.Group();
-  const candidates = [];
-  const instancedBuckets = {
-    residential: [],
-    commercial: [],
-    mixed: [],
-  };
-
-  runtime.projectedMap.buildings.forEach((building) => {
-    if (isInsideLandmarkClearance(building) || isBuildingOnWater(building)) {
-      return;
-    }
-
-    candidates.push({
-      building,
-      terrainHeight: getTerrainHeight(building.x, building.z),
-      detailScore: getBuildingDetailScore(building),
-    });
-  });
-
-  candidates.sort((left, right) => right.detailScore - left.detailScore);
-  const detailLimit = getDetailBuildingLimit(candidates.length);
-
-  candidates.forEach((candidate, index) => {
-    const shouldUseDetailedMesh = index < detailLimit
-      && candidate.building.points.length <= 52
-      && candidate.building.footprintArea >= 80;
-
-    if (shouldUseDetailedMesh) {
-      const mesh = createBuildingMesh(candidate.building, candidate.terrainHeight);
-      if (mesh) {
-        city.add(mesh);
-        return;
-      }
-    }
-
-    enqueueInstancedBuilding(instancedBuckets, candidate);
-  });
-
-  createInstancedBuildingGroups(city, instancedBuckets);
-  scene.add(city);
-}
-
-function getBuildingDetailScore(building) {
-  const heightFactor = 1 + building.height * 0.012;
-  const areaFactor = Math.max(building.footprintArea, 40);
-  const kindFactor = (
-    building.kind === "apartments" || building.kind === "residential" || building.kind === "house"
-      ? 1.1
-      : building.kind === "office" || building.kind === "commercial"
-        ? 1.14
-        : 1
-  );
-  return areaFactor * heightFactor * kindFactor;
-}
-
-function getDetailBuildingLimit(totalBuildings) {
-  if (totalBuildings >= 90000) {
-    return 1200;
-  }
-  if (totalBuildings >= 60000) {
-    return 1450;
-  }
-  if (totalBuildings >= 30000) {
-    return 1800;
-  }
-  return 2200;
-}
-
-function enqueueInstancedBuilding(buckets, candidate) {
-  const { building, terrainHeight } = candidate;
-  const width = THREE.MathUtils.clamp(building.footprintWidth * 0.94, 5, 210);
-  const depth = THREE.MathUtils.clamp(building.footprintDepth * 0.94, 5, 210);
-  const height = THREE.MathUtils.clamp(building.height, 6, 320);
-
-  const key = building.kind === "apartments" || building.kind === "residential" || building.kind === "house"
-    ? "residential"
-    : building.kind === "office" || building.kind === "commercial" || building.kind === "hotel"
-      ? "commercial"
-      : "mixed";
-
-  buckets[key].push({
-    x: building.x,
-    y: terrainHeight + height * 0.5,
-    z: building.z,
-    width,
-    depth,
-    height,
-  });
-}
-
-function createInstancedBuildingGroups(group, buckets) {
-  const baseColors = {
-    residential: new THREE.Color(0x8d8298),
-    commercial: new THREE.Color(0x6f7fa8),
-    mixed: new THREE.Color(0x7a7390),
-  };
-
-  const materials = {
-    residential: new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.84,
-      metalness: 0.12,
-      emissive: 0x261c34,
-      emissiveIntensity: 0.1,
-      vertexColors: true,
-    }),
-    commercial: new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.56,
-      metalness: 0.34,
-      emissive: 0x2f2248,
-      emissiveIntensity: 0.18,
-      vertexColors: true,
-    }),
-    mixed: new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.7,
-      metalness: 0.18,
-      emissive: 0x281f3a,
-      emissiveIntensity: 0.12,
-      vertexColors: true,
-    }),
-  };
-
-  const matrix = new THREE.Matrix4();
-  const quaternion = new THREE.Quaternion();
-  const position = new THREE.Vector3();
-  const scale = new THREE.Vector3();
-  const instanceColor = new THREE.Color();
-
-  Object.entries(buckets).forEach(([key, buildings]) => {
-    if (!buildings.length) {
-      return;
-    }
-
-    const mesh = new THREE.InstancedMesh(shared.box, materials[key], buildings.length);
-    mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
-
-    buildings.forEach((item, index) => {
-      position.set(item.x, item.y, item.z);
-      scale.set(item.width, item.height, item.depth);
-      matrix.compose(position, quaternion, scale);
-      mesh.setMatrixAt(index, matrix);
-
-      const jH = (hashFrac(index * 1.7 + 0.13) - 0.5) * 0.024;
-      const jS = (hashFrac(index * 3.1 + 0.41) - 0.5) * 0.1;
-      const jL = (hashFrac(index * 5.3 + 0.77) - 0.5) * 0.14;
-      instanceColor.copy(baseColors[key]).offsetHSL(jH, jS, jL);
-      mesh.setColorAt(index, instanceColor);
-    });
-
-    mesh.instanceColor.needsUpdate = true;
-    mesh.castShadow = false;
-    mesh.receiveShadow = true;
-    group.add(mesh);
-  });
-}
-
-function createBuildingMesh(building, terrainHeight) {
-  const shape = new THREE.Shape();
-  building.points.forEach(([x, z], index) => {
-    const localX = x - building.x;
-    const localZ = z - building.z;
-    if (index === 0) {
-      shape.moveTo(localX, -localZ);
-    } else {
-      shape.lineTo(localX, -localZ);
-    }
-  });
-  shape.closePath();
-
-  const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth: building.height,
-    bevelEnabled: false,
-    curveSegments: 1,
-    steps: 1,
-  });
-  geometry.rotateX(-Math.PI / 2);
-  geometry.computeVertexNormals();
-  addHeightFractionColors(geometry, building.height);
-
-  const mesh = new THREE.Mesh(geometry, pickBuildingMaterial(building));
-  mesh.position.set(building.x, terrainHeight, building.z);
-  return mesh;
-}
-
-function pickBuildingMaterial(building) {
-  if (building.height >= 120 || building.kind === "office" || building.kind === "commercial") {
-    return buildingMaterials[1];
-  }
-  if (building.kind === "apartments" || building.kind === "residential" || building.kind === "house") {
-    return buildingMaterials[0];
-  }
-  return buildingMaterials[2];
-}
-
-function createLandmarks(scene) {
-  landmarkDefs.forEach((landmark) => {
+async function createLandmarks(scene) {
+  const loader=new GLTFLoader();
+  await Promise.all(landmarkDefs.map(async landmark=>{
     const terrainHeight = getTerrainHeight(landmark.x, landmark.z);
-    const group = landmark.create(terrainHeight);
-    group.position.set(landmark.x, 0, landmark.z);
+    const {scene:group}=await loader.loadAsync(`./assets/landmarks/${landmark.id}.glb`);
+    group.position.set(landmark.x, terrainHeight, landmark.z);
+    group.rotation.y=landmark.yaw;
     scene.add(group);
 
     const label = createLabelSprite(landmark.label, "#ffe8d0");
     label.position.set(landmark.x, terrainHeight + landmark.height + 32, landmark.z);
     scene.add(label);
-  });
+  }));
 }
 
-function createBridges(scene) {
-  const deckMaterial = new THREE.MeshStandardMaterial({ color: 0xd1d5d9, roughness: 0.5, metalness: 0.48 });
-  const towerMaterial = new THREE.MeshStandardMaterial({ color: 0xf0f2f5, roughness: 0.42, metalness: 0.42 });
-  const cableMaterial = new THREE.MeshStandardMaterial({ color: 0xe8ecef, roughness: 0.3, metalness: 0.6 });
-  const lightGeometry = new THREE.SphereGeometry(1.1, 8, 8);
-  const lightMaterial = new THREE.MeshStandardMaterial({ color: 0xffb15e, emissive: 0xffb15e, emissiveIntensity: 1.1, roughness: 0.4 });
 
-  bridgeDefs.forEach((bridge) => {
-    const group = new THREE.Group();
-
-    const deck = new THREE.Mesh(new THREE.BoxGeometry(14, 7, bridge.length), deckMaterial);
-    deck.position.y = 12;
-    group.add(deck);
-
-    const lightCount = 10 + Math.floor(bridge.length / 60) % 5;
-    for (let index = 0; index < lightCount; index += 1) {
-      const fraction = index / (lightCount - 1) - 0.5;
-      [-8, 8].forEach((side) => {
-        const light = new THREE.Mesh(lightGeometry, lightMaterial);
-        light.position.set(side, 16, fraction * bridge.length * 0.94);
-        group.add(light);
-      });
-    }
-
-    if (bridge.name === "반포대교") {
-      const lowerDeck = new THREE.Mesh(new THREE.BoxGeometry(12, 3.4, bridge.length * 0.94), deckMaterial);
-      lowerDeck.position.y = 3;
-      group.add(lowerDeck);
-    } else if (bridge.name === "올림픽대교") {
-      const legBases = [
-        new THREE.Vector3(14, 6, 0),
-        new THREE.Vector3(-14, 6, 0),
-        new THREE.Vector3(0, 6, 10),
-        new THREE.Vector3(0, 6, -10),
-      ];
-      const pylonHeight = 96;
-      const apex = new THREE.Vector3(0, pylonHeight, 0);
-      legBases.forEach((base) => {
-        const legMesh = createCylinderBetween(base, apex, 3.2, towerMaterial);
-        group.add(legMesh);
-      });
-
-      for (let index = 0; index < 8; index += 1) {
-        const side = index < 4 ? -1 : 1;
-        const along = ((index % 4) / 3 - 0.5) * bridge.length * 0.5;
-        const deckPoint = new THREE.Vector3(side * 7, 12, along);
-        const cable = createCylinderBetween(apex, deckPoint, 0.5, cableMaterial);
-        group.add(cable);
-      }
-    } else if (bridge.name === "청담대교" || bridge.name === "마포대교") {
-      const pylonHeight = 70;
-      [-bridge.length * 0.22, bridge.length * 0.22].forEach((offset) => {
-        const pylonTop = new THREE.Vector3(0, pylonHeight, offset);
-        const pylon = createCylinderBetween(new THREE.Vector3(0, 6, offset), pylonTop, 3.4, towerMaterial);
-        group.add(pylon);
-
-        for (let cableIndex = 0; cableIndex < 6; cableIndex += 1) {
-          const fraction = (cableIndex / 5 - 0.5) * bridge.length * 0.42;
-          const deckPoint = new THREE.Vector3(0, 12, offset + fraction);
-          const cable = createCylinderBetween(pylonTop, deckPoint, 0.5, cableMaterial);
-          group.add(cable);
-        }
-      });
-    } else {
-      [-bridge.length * 0.24, bridge.length * 0.24].forEach((offset) => {
-        const tower = new THREE.Mesh(new THREE.BoxGeometry(12, 44, 12), towerMaterial);
-        tower.position.set(0, 32, offset);
-        group.add(tower);
-      });
-    }
-
-    group.position.set(bridge.x, 0, bridge.z);
-    group.rotation.y = bridge.rotation;
-    scene.add(group);
-  });
-}
-
-function createCylinderBetween(start, end, radius, material) {
-  const direction = new THREE.Vector3().subVectors(end, start);
-  const length = direction.length();
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, length, 8), material);
-  mesh.position.copy(start).addScaledVector(direction, 0.5);
-  const axis = new THREE.Vector3(0, 1, 0);
-  mesh.quaternion.setFromUnitVectors(axis, direction.clone().normalize());
-  return mesh;
-}
 
 function createCheckpoints(scene) {
   void scene;
@@ -1151,260 +655,10 @@ function createCloudPuffTexture() {
   return texture;
 }
 
-function create63Building(terrainHeight) {
-  const group = new THREE.Group();
-  const material = new THREE.MeshStandardMaterial({
-    color: 0xe8b356,
-    roughness: 0.18,
-    metalness: 0.85,
-    emissive: 0xffb84d,
-    emissiveIntensity: 0.7,
-    vertexColors: true,
-  });
 
-  const bodyGeometry = shared.box.clone();
-  addVerticalAoColors(bodyGeometry);
-  const body = new THREE.Mesh(bodyGeometry, material);
-  body.scale.set(54, 250, 34);
-  body.position.y = terrainHeight + 125;
-  group.add(body);
 
-  const parapet = new THREE.Mesh(
-    new THREE.BoxGeometry(50, 3, 30),
-    new THREE.MeshStandardMaterial({ color: 0x3a2410, roughness: 0.6, metalness: 0.3, emissive: 0xffb84d, emissiveIntensity: 0.2 }),
-  );
-  parapet.position.y = terrainHeight + 251.5;
-  group.add(parapet);
 
-  const crown = new THREE.Mesh(new THREE.BoxGeometry(38, 18, 22), material);
-  crown.position.y = terrainHeight + 262;
-  group.add(crown);
 
-  return group;
-}
-
-function createSeoulTower(terrainHeight) {
-  const group = new THREE.Group();
-  const shaftMaterial = new THREE.MeshStandardMaterial({ color: 0xe6c3a8, roughness: 0.3, metalness: 0.44, emissive: 0xff8f52, emissiveIntensity: 0.18 });
-
-  const shaft = new THREE.Mesh(
-    new THREE.CylinderGeometry(5.4, 10, 160, 20),
-    shaftMaterial,
-  );
-  shaft.position.y = terrainHeight + 80;
-  group.add(shaft);
-
-  const legMaterial = new THREE.MeshStandardMaterial({ color: 0xc7d0d8, roughness: 0.5, metalness: 0.36 });
-  for (let index = 0; index < 4; index += 1) {
-    const angle = (index / 4) * Math.PI * 2;
-    const leg = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 2, 42, 8), legMaterial);
-    leg.position.set(Math.cos(angle) * 10, terrainHeight + 21, Math.sin(angle) * 10);
-    leg.rotation.z = Math.cos(angle) * 0.26;
-    leg.rotation.x = Math.sin(angle) * -0.26;
-    group.add(leg);
-  }
-
-  const deckLower = new THREE.Mesh(
-    new THREE.CylinderGeometry(30, 27, 11, 24),
-    new THREE.MeshStandardMaterial({ color: 0xe0edf8, roughness: 0.28, metalness: 0.52 }),
-  );
-  deckLower.position.y = terrainHeight + 144;
-  group.add(deckLower);
-
-  const deckBand = new THREE.Mesh(
-    new THREE.CylinderGeometry(27.4, 30, 6, 24),
-    new THREE.MeshStandardMaterial({ color: 0x2a3440, roughness: 0.5, metalness: 0.3 }),
-  );
-  deckBand.position.y = terrainHeight + 152.5;
-  group.add(deckBand);
-
-  const deckUpper = new THREE.Mesh(
-    new THREE.CylinderGeometry(24, 30, 12, 24),
-    new THREE.MeshStandardMaterial({ color: 0xe0edf8, roughness: 0.28, metalness: 0.52 }),
-  );
-  deckUpper.position.y = terrainHeight + 161.5;
-  group.add(deckUpper);
-
-  const head = new THREE.Mesh(
-    new THREE.CylinderGeometry(15, 22, 18, 24),
-    new THREE.MeshStandardMaterial({ color: 0x98d6ff, roughness: 0.22, metalness: 0.52, emissive: 0x1a3044, emissiveIntensity: 0.32 }),
-  );
-  head.position.y = terrainHeight + 176;
-  group.add(head);
-
-  const antennaMaterial = new THREE.MeshStandardMaterial({ color: 0xffdf92, roughness: 0.34, metalness: 0.48 });
-  const antennaLower = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 2.4, 44, 10), antennaMaterial);
-  antennaLower.position.y = terrainHeight + 207;
-  group.add(antennaLower);
-
-  const antennaUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.8, 30, 8), antennaMaterial);
-  antennaUpper.position.y = terrainHeight + 244;
-  group.add(antennaUpper);
-
-  const beacon = new THREE.Mesh(
-    new THREE.SphereGeometry(2.4, 12, 12),
-    new THREE.MeshStandardMaterial({ color: 0xff6a4d, emissive: 0xff6a4d, emissiveIntensity: 1, roughness: 0.4 }),
-  );
-  beacon.position.y = terrainHeight + 260;
-  group.add(beacon);
-  runtime.towerBeacon = beacon;
-
-  return group;
-}
-
-function createGyeongbokgung(terrainHeight) {
-  const group = new THREE.Group();
-  const stone = new THREE.MeshStandardMaterial({ color: 0xbfa98a, roughness: 0.9, metalness: 0.02 });
-  const roofTile = new THREE.MeshStandardMaterial({ color: 0x3a3f46, roughness: 0.68, metalness: 0.1, vertexColors: true });
-  const wall = new THREE.MeshStandardMaterial({ color: 0x9b5039, roughness: 0.82, metalness: 0.02 });
-  const column = new THREE.MeshStandardMaterial({ color: 0x7a3b2e, roughness: 0.7, metalness: 0.05 });
-  const eaveBand = new THREE.MeshStandardMaterial({ color: 0xcfe6d2, roughness: 0.6, metalness: 0.04, emissive: 0xffb87a, emissiveIntensity: 0.3 });
-
-  const base = new THREE.Mesh(new THREE.BoxGeometry(118, 5, 94), stone);
-  base.position.y = terrainHeight + 2.5;
-  group.add(base);
-
-  [
-    { x: 0, z: 0, sx: 64, sy: 18, sz: 40 },
-    { x: -38, z: 30, sx: 28, sy: 12, sz: 22 },
-    { x: 38, z: 30, sx: 28, sy: 12, sz: 22 },
-    { x: 0, z: -30, sx: 32, sy: 12, sz: 18 },
-  ].forEach((building) => {
-    const hall = new THREE.Mesh(shared.box, wall);
-    hall.scale.set(building.sx, building.sy, building.sz);
-    hall.position.set(building.x, terrainHeight + building.sy * 0.5 + 5, building.z);
-    group.add(hall);
-
-    const eave = new THREE.Mesh(new THREE.BoxGeometry(building.sx + 4, 1.6, building.sz + 4), eaveBand);
-    eave.position.set(building.x, terrainHeight + building.sy + 5.8, building.z);
-    group.add(eave);
-
-    const cornerOffsetX = building.sx * 0.42;
-    const cornerOffsetZ = building.sz * 0.42;
-    [-1, 1].forEach((signX) => {
-      [-1, 1].forEach((signZ) => {
-        const post = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, building.sy, 8), column);
-        post.position.set(building.x + signX * cornerOffsetX, terrainHeight + building.sy * 0.5 + 5, building.z + signZ * cornerOffsetZ);
-        group.add(post);
-      });
-    });
-
-    const roofBaseRadius = Math.hypot(building.sx, building.sz) * 0.5;
-    const roofHeight = building.sy * 0.62;
-    const roofProfile = [
-      new THREE.Vector2(roofBaseRadius * 1.1, 0),
-      new THREE.Vector2(roofBaseRadius * 1.16, roofHeight * 0.18),
-      new THREE.Vector2(roofBaseRadius * 1.02, roofHeight * 0.4),
-      new THREE.Vector2(roofBaseRadius * 0.7, roofHeight * 0.68),
-      new THREE.Vector2(roofBaseRadius * 0.32, roofHeight * 0.9),
-      new THREE.Vector2(0.4, roofHeight),
-    ];
-    const roofGeometry = new THREE.LatheGeometry(roofProfile, 4);
-    addHeightFractionColors(roofGeometry, roofHeight);
-    const roofMesh = new THREE.Mesh(roofGeometry, roofTile);
-    roofMesh.position.set(building.x, terrainHeight + building.sy + 7, building.z);
-    roofMesh.rotation.y = Math.PI / 4;
-    roofMesh.scale.set(1, 1, building.sz / building.sx);
-    group.add(roofMesh);
-  });
-
-  const roofStripMaterial = new THREE.MeshStandardMaterial({ color: 0x3a3f46, roughness: 0.7, metalness: 0.08 });
-  const perimeter = [
-    { sx: 132, sz: 4, x: 0, z: 50 },
-    { sx: 132, sz: 4, x: 0, z: -50 },
-    { sx: 4, sz: 104, x: -66, z: 0 },
-    { sx: 4, sz: 104, x: 66, z: 0 },
-  ];
-  perimeter.forEach((segment) => {
-    const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(segment.sx, 9, segment.sz), stone);
-    wallMesh.position.set(segment.x, terrainHeight + 4.5 + 5, segment.z);
-    group.add(wallMesh);
-
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(segment.sx + 1.5, 1.6, segment.sz + 1.5), roofStripMaterial);
-    strip.position.set(segment.x, terrainHeight + 9.8 + 5, segment.z);
-    group.add(strip);
-  });
-
-  return group;
-}
-
-function createCoexTower(terrainHeight) {
-  const group = new THREE.Group();
-
-  const body = new THREE.Mesh(
-    shared.box,
-    new THREE.MeshStandardMaterial({
-      color: 0xd6a888,
-      roughness: 0.22,
-      metalness: 0.74,
-      emissive: 0xd97a4a,
-      emissiveIntensity: 0.3,
-    }),
-  );
-  body.scale.set(42, 212, 42);
-  body.position.y = terrainHeight + 106;
-  group.add(body);
-
-  const cap = new THREE.Mesh(
-    new THREE.BoxGeometry(44, 12, 44),
-    new THREE.MeshStandardMaterial({ color: 0xe6c2a2, roughness: 0.3, metalness: 0.62, emissive: 0xd97a4a, emissiveIntensity: 0.2 }),
-  );
-  cap.position.y = terrainHeight + 218;
-  group.add(cap);
-
-  const lowWing = new THREE.Mesh(
-    shared.box,
-    new THREE.MeshStandardMaterial({ color: 0x8a7466, roughness: 0.46, metalness: 0.4, emissive: 0xb06a3a, emissiveIntensity: 0.15 }),
-  );
-  lowWing.scale.set(74, 22, 48);
-  lowWing.position.set(-48, terrainHeight + 11, 12);
-  group.add(lowWing);
-
-  return group;
-}
-
-function createLotteTower(terrainHeight) {
-  const group = new THREE.Group();
-  const material = new THREE.MeshStandardMaterial({
-    color: 0x8aa8c4,
-    roughness: 0.18,
-    metalness: 0.55,
-    emissive: 0xb06a3a,
-    emissiveIntensity: 0.25,
-    vertexColors: true,
-  });
-
-  const towerHeight = 496;
-  const profile = [
-    new THREE.Vector2(34, 0),
-    new THREE.Vector2(33.4, towerHeight * 0.06),
-    new THREE.Vector2(31.8, towerHeight * 0.14),
-    new THREE.Vector2(29.4, towerHeight * 0.24),
-    new THREE.Vector2(26.6, towerHeight * 0.34),
-    new THREE.Vector2(23.6, towerHeight * 0.44),
-    new THREE.Vector2(20.6, towerHeight * 0.54),
-    new THREE.Vector2(17.8, towerHeight * 0.64),
-    new THREE.Vector2(15.2, towerHeight * 0.74),
-    new THREE.Vector2(12.9, towerHeight * 0.83),
-    new THREE.Vector2(11, towerHeight * 0.91),
-    new THREE.Vector2(9.6, towerHeight * 0.96),
-    new THREE.Vector2(9, towerHeight),
-  ];
-  const bodyGeometry = new THREE.LatheGeometry(profile, 24);
-  addHeightFractionColors(bodyGeometry, towerHeight);
-  const body = new THREE.Mesh(bodyGeometry, material);
-  body.position.y = terrainHeight;
-  group.add(body);
-
-  const spire = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.2, 9, 70, 12),
-    new THREE.MeshStandardMaterial({ color: 0xe7f2fb, roughness: 0.26, metalness: 0.84 }),
-  );
-  spire.position.y = terrainHeight + towerHeight + 35;
-  group.add(spire);
-
-  return group;
-}
 
 function createLabelSprite(text, color) {
   const canvas = document.createElement("canvas");
@@ -1444,6 +698,14 @@ function bindEvents() {
   window.addEventListener("keyup", handleKeyUp);
   document.addEventListener("pointerlockchange", handlePointerLockChange);
   document.addEventListener("mousemove", handleMouseMove);
+  window.addEventListener("blur", pauseFlight);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseFlight();
+  });
+  runtime.renderer.domElement.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    showFatalError(new Error("3D 화면 연결이 끊겼습니다. 다시 불러오면 비행을 시작할 수 있습니다."));
+  });
 
   dom.startBtn.addEventListener("click", () => {
     startGame();
@@ -1451,7 +713,13 @@ function bindEvents() {
   });
 
   dom.restartBtn.addEventListener("click", () => {
+    if (state.mode === "error") return;
     resetFlight();
+    startGame();
+    requestFlightPointerLock();
+  });
+  dom.pauseBtn.addEventListener("click", pauseFlight);
+  dom.resumeBtn.addEventListener("click", () => {
     startGame();
     requestFlightPointerLock();
   });
@@ -1465,31 +733,42 @@ function bindEvents() {
   dom.touchButtons.forEach((button) => {
     const control = button.dataset.control;
     const activate = (event) => {
+      if (state.mode !== "running") return;
       event.preventDefault();
-      input[control] = true;
+      button.setPointerCapture(event.pointerId);
+      inputController.set(control, `pointer:${event.pointerId}`, true);
       button.classList.add("active");
     };
     const deactivate = (event) => {
       event.preventDefault();
-      input[control] = false;
-      button.classList.remove("active");
+      inputController.set(control, `pointer:${event.pointerId}`, false);
+      button.classList.toggle("active", input[control]);
     };
 
     button.addEventListener("pointerdown", activate);
     button.addEventListener("pointerup", deactivate);
-    button.addEventListener("pointerleave", deactivate);
     button.addEventListener("pointercancel", deactivate);
+    button.addEventListener("lostpointercapture", deactivate);
   });
 }
 
 function requestFlightPointerLock() {
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
   if (runtime.renderer?.domElement && document.pointerLockElement !== runtime.renderer.domElement) {
-    runtime.renderer.domElement.requestPointerLock?.();
+    try {
+      runtime.renderer.domElement.requestPointerLock?.()?.catch(() => {
+        runtime.currentStatus = "마우스 조종을 사용할 수 없습니다. W/S, A/D, Q/E로 조종하세요.";
+      });
+    } catch {
+      runtime.currentStatus = "키보드 W/S, A/D, Q/E로 조종하세요.";
+    }
   }
 }
 
 function handlePointerLockChange() {
+  const wasLocked = runtime.pointerLocked;
   runtime.pointerLocked = document.pointerLockElement === runtime.renderer?.domElement;
+  if (wasLocked && !runtime.pointerLocked) pauseFlight();
 }
 
 function handleMouseMove(event) {
@@ -1510,11 +789,23 @@ function onResize() {
 }
 
 function handleKeyDown(event) {
+  if (state.mode === "error") return;
+  if (event.target instanceof Element) {
+    if (event.target.closest("input, select, textarea, [contenteditable]")) return;
+    if (event.target.closest("button") && ["Enter", "Space"].includes(event.code)) return;
+  }
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
     event.preventDefault();
   }
 
   if (event.repeat) {
+    return;
+  }
+
+  if (event.code === "KeyP" || event.code === "Escape") {
+    event.preventDefault();
+    if (state.mode === "paused") startGame();
+    else pauseFlight();
     return;
   }
 
@@ -1527,11 +818,11 @@ function handleKeyDown(event) {
     return;
   }
 
-  if (event.code === "Enter" && state.mode === "intro") {
+  if (event.code === "Enter" && (state.mode === "intro" || state.mode === "paused")) {
     startGame();
   }
 
-  setInputByCode(event.code, true);
+  if (state.mode === "running") setInputByCode(event.code, true);
 }
 
 function handleKeyUp(event) {
@@ -1539,23 +830,7 @@ function handleKeyUp(event) {
 }
 
 function setInputByCode(code, active) {
-  if (code === "KeyW" || code === "ArrowUp") {
-    input.pitchUp = active;
-  } else if (code === "KeyS" || code === "ArrowDown") {
-    input.pitchDown = active;
-  } else if (code === "KeyA" || code === "ArrowLeft") {
-    input.bankLeft = active;
-  } else if (code === "KeyD" || code === "ArrowRight") {
-    input.bankRight = active;
-  } else if (code === "KeyQ") {
-    input.yawLeft = active;
-  } else if (code === "KeyE") {
-    input.yawRight = active;
-  } else if (code === "ShiftLeft" || code === "ShiftRight") {
-    input.boost = active;
-  } else if (code === "Space") {
-    input.level = active;
-  }
+  inputController.set(controlByCode[code], `key:${code}`, active);
 }
 
 function resetFlight() {
@@ -1563,96 +838,90 @@ function resetFlight() {
   document.exitPointerLock?.();
   runtime.pointerLocked = false;
   const firstCheckpoint = checkpointDefs[0];
-  const startX = firstCheckpoint.x - 360;
+  const startX = Math.max(-world.width * 0.5 + world.boundaryPadding + 20, firstCheckpoint.x - 360);
   const startZ = firstCheckpoint.z + 36;
   state.mode = "intro";
-  state.position.set(startX, 236, startZ);
-  state.yaw = Math.atan2(firstCheckpoint.x - startX, -(firstCheckpoint.z - startZ));
-  state.pitch = -0.18;
+  state.position.set(startX, firstCheckpoint.y, startZ);
+  if(runtime.city){runtime.city.retry();runtime.city.update(state.position);}
+  state.yaw = yawToTarget(state.position, firstCheckpoint);
+  state.pitch = 0;
   state.roll = 0;
   state.speed = 68;
   state.elapsedMs = 0;
-  state.startedAt = 0;
   state.checkpointIndex = 0;
+  runtime.lookRollVelocity = 0;
 
   runtime.currentStatus = "서울 상공 뷰 준비 완료. 시작하면 바로 이동합니다.";
   dom.startPanel.classList.remove("hidden");
   dom.messagePanel.classList.add("hidden");
+  dom.pauseBtn.disabled = true;
   updateCheckpointVisuals();
   updateCamera(0);
   updateHud();
 }
 
 function startGame() {
-  if (state.mode === "running") {
+  if (state.mode !== "intro" && state.mode !== "paused") {
     return;
   }
 
   state.mode = "running";
-  state.startedAt = performance.now() - state.elapsedMs;
+  runtime.lastTime = performance.now();
   dom.startPanel.classList.add("hidden");
   dom.messagePanel.classList.add("hidden");
-  runtime.currentStatus = checkpointDefs[state.checkpointIndex].note;
+  dom.pauseBtn.disabled = false;
+  runtime.currentStatus = checkpointDefs[state.checkpointIndex]?.note || "서울 상공을 둘러보세요.";
+  // Keep global keyboard controls available after activating a focused button.
+  runtime.renderer.domElement.tabIndex = 0;
+  runtime.renderer.domElement.focus({ preventScroll: true });
+}
+
+function pauseFlight() {
+  clearInputs();
+  if (state.mode !== "running") return;
+  state.mode = "paused";
+  document.exitPointerLock?.();
+  dom.pauseBtn.disabled = true;
+  runtime.currentStatus = "일시정지 · 이어서 비행하면 같은 위치에서 계속합니다.";
+  dom.messageTag.textContent = "PAUSED";
+  dom.messageTitle.textContent = "비행을 잠시 멈췄습니다.";
+  dom.messageBody.textContent = "위치와 둘러본 랜드마크를 보관했습니다. 이어서 비행하거나 처음부터 다시 시작하세요.";
+  dom.resumeBtn.hidden = false;
+  dom.restartBtn.textContent = "처음부터 다시";
+  dom.messagePanel.classList.remove("hidden");
 }
 
 function loop(now) {
-  const delta = Math.min((now - runtime.lastTime) / 1000, 0.05);
+  const delta = Math.max(0, Math.min((now - runtime.lastTime) / 1000, 0.05));
   runtime.lastTime = now;
 
   if (state.mode === "running") {
-    state.elapsedMs = now - state.startedAt;
+    state.elapsedMs += delta * 1000;
     updateFlight(delta);
     updateClouds(delta);
     if (state.mode === "running") {
       updateCheckpoints(now);
     }
-  } else {
-    updateIdleCamera(delta, now);
+  } else if (state.mode === "intro") {
+    updateCamera(delta);
     updateClouds(delta);
   }
 
   updateHud();
   runtime.skyGroup.position.copy(runtime.camera.position);
-  runtime.riverGlowMesh.material.opacity = 0.28 + 0.05 * Math.sin(now * 0.0007);
-  runtime.riverMesh.material.emissiveIntensity = 0.55 * (1 + 0.15 * Math.sin(now * 0.0004));
+  if(runtime.city&&now-runtime.lastCityUpdate>1000){runtime.lastCityUpdate=now;runtime.city.update(state.position);}
   if (runtime.towerBeacon) {
     runtime.towerBeacon.material.emissiveIntensity = 0.6 + 0.5 * Math.max(Math.sin(now * 0.0028), 0);
   }
   runtime.renderer.render(runtime.scene, runtime.camera);
-  requestAnimationFrame(loop);
+  if (state.mode !== "error") runtime.frameId = requestAnimationFrame(loop);
 }
 
 function updateFlight(delta) {
-  const pitchInput = Number(input.pitchUp) - Number(input.pitchDown);
-  const bankInput = Number(input.bankRight) - Number(input.bankLeft);
-  const yawInput = Number(input.yawRight) - Number(input.yawLeft);
-
   const targetSpeed = input.boost ? 116 : 74;
   state.speed = THREE.MathUtils.damp(state.speed, targetSpeed, 2.1, delta);
-
-  const pitchSpeed = input.level ? 0.16 : 0.82;
-  const pitchDamp = input.level ? 3.2 : 1.3;
-  state.pitch += pitchInput * pitchSpeed * delta;
-  state.yaw += yawInput * 0.86 * delta;
-
-  if (input.level) {
-    state.pitch = THREE.MathUtils.damp(state.pitch, -0.08, 3.4, delta);
-  }
-
-  if (!runtime.pointerLocked && !pitchInput && !input.level) {
-    state.pitch = THREE.MathUtils.damp(state.pitch, -0.02, pitchDamp, delta);
-  }
-
-  const targetRoll = THREE.MathUtils.clamp(
-    runtime.lookRollVelocity * 1.8 + bankInput * 0.34 + yawInput * 0.18,
-    -0.72,
-    0.72,
-  );
-  state.roll = THREE.MathUtils.damp(state.roll, targetRoll, input.level ? 4.2 : 3.2, delta);
+  updateAttitude(state, input, delta, runtime.lookRollVelocity, runtime.pointerLocked);
   runtime.lookRollVelocity = THREE.MathUtils.damp(runtime.lookRollVelocity, 0, 4.8, delta);
-
-  state.pitch = THREE.MathUtils.clamp(state.pitch, -0.48, 0.58);
-  state.roll = THREE.MathUtils.clamp(state.roll, -1.15, 1.15);
 
   const euler = new THREE.Euler(state.pitch, state.yaw, state.roll, "YXZ");
   state.forward.set(0, 0, -1).applyEuler(euler).normalize();
@@ -1670,17 +939,10 @@ function updateFlight(delta) {
 
   if (state.position.y > world.ceiling) {
     state.position.y = world.ceiling;
-    state.pitch = Math.min(state.pitch, 0.04);
+    state.pitch = Math.min(state.pitch, 0);
   }
 
   enforceBoundary(delta);
-  updateCamera(delta);
-}
-
-function updateIdleCamera(delta, now) {
-  state.yaw += delta * 0.16;
-  state.roll = Math.sin(now * 0.0004) * 0.08;
-  state.pitch = -0.2 + Math.sin(now * 0.0003) * 0.04;
   updateCamera(delta);
 }
 
@@ -1782,16 +1044,18 @@ function updateCheckpointVisuals() {
 
 function updateHud() {
   const headingDegrees = normalizeDegrees(THREE.MathUtils.radToDeg(getHeadingRadians()));
-  const current = checkpointDefs[Math.min(state.checkpointIndex, checkpointDefs.length - 1)];
+  const current = checkpointDefs[state.checkpointIndex];
   const distance = current ? horizontalDistance(state.position.x, state.position.z, current.x, current.z) : 0;
   const relativeBearing = current ? getRelativeBearing(current) : 0;
 
-  dom.speedValue.textContent = String(Math.round(state.speed)).padStart(3, "0");
+  dom.speedValue.textContent = String(Math.round(state.speed * 3.6)).padStart(3, "0");
   dom.altitudeValue.textContent = String(Math.max(0, Math.round(state.position.y))).padStart(3, "0");
-  dom.headingValue.textContent = String(Math.round(headingDegrees)).padStart(3, "0");
+  dom.headingValue.textContent = String(Math.round(headingDegrees) % 360).padStart(3, "0");
   dom.headingCardinal.textContent = getCardinal(headingDegrees);
   dom.timerValue.textContent = formatTime(state.elapsedMs);
-  dom.targetName.textContent = current ? current.name : "서울 상공";
+  dom.targetName.textContent = current ? current.name : "둘러보기 완료";
+  dom.progressValue.textContent = `${Math.min(state.checkpointIndex, checkpointDefs.length)} / ${checkpointDefs.length}`;
+  dom.targetAltitude.textContent = current ? formatMetres(current.y) : "—";
   dom.distanceValue.textContent = `${Math.round(distance)}m`;
   dom.bearingValue.textContent = `${Math.round(relativeBearing)}°`;
   dom.statusText.textContent = runtime.currentStatus;
@@ -1800,8 +1064,18 @@ function updateHud() {
 }
 
 function finishRun() {
-  state.checkpointIndex = checkpointDefs.length - 1;
+  state.mode = "complete";
+  clearInputs();
+  document.exitPointerLock?.();
+  dom.pauseBtn.disabled = true;
   runtime.currentStatus = "주요 랜드마크 안내를 모두 지났습니다.";
+  dom.messageTag.textContent = "TOUR COMPLETE";
+  dom.messageTitle.textContent = "서울의 다섯 랜드마크를 모두 둘러봤습니다.";
+  dom.messageBody.textContent = `둘러본 곳 ${checkpointDefs.length}곳 · 비행 시간 ${formatTime(state.elapsedMs)}`;
+  dom.resumeBtn.hidden = true;
+  dom.restartBtn.textContent = "다시 둘러보기";
+  dom.messagePanel.classList.remove("hidden");
+  dom.restartBtn.focus({ preventScroll: true });
 }
 
 function enforceBoundary(delta) {
@@ -1817,79 +1091,18 @@ function enforceBoundary(delta) {
   state.position.x = THREE.MathUtils.clamp(state.position.x, -limitX, limitX);
   state.position.z = THREE.MathUtils.clamp(state.position.z, -limitZ, limitZ);
 
-  const desired = Math.atan2(-state.position.x, state.position.z);
+  const desired = yawToTarget(state.position, { x: 0, z: 0 });
   const deltaAngle = shortestAngle(state.yaw, desired);
   state.yaw += deltaAngle * Math.min(1, delta * 1.8);
   runtime.currentStatus = "서울 지도 경계 접근. 지도 안쪽으로 복귀 중.";
 }
 
 function getTerrainHeight(x, z) {
-  let height = 0;
-  hillDefs.forEach((hill) => {
-    const distance = horizontalDistance(x, z, hill.x, hill.z);
-    if (distance < hill.radius) {
-      const ratio = 1 - distance / hill.radius;
-      height += hill.height * ratio * ratio;
-    }
-  });
-  return height;
+  return sampleLocalElevation(runtime.terrain,x,z);
 }
 
-function isInsideLandmarkClearance(building) {
-  return landmarkDefs.some((landmark) => (
-    horizontalDistance(building.x, building.z, landmark.x, landmark.z) < Math.max(22, landmark.colliderRadius * 0.72)
-  ));
-}
 
-function isBuildingOnWater(building) {
-  const riverThreshold = riverWidth * 0.46 + Math.min(building.radius * 0.24, 10);
-  if (isNearRiver(building.x, building.z, riverThreshold)) {
-    return true;
-  }
 
-  const margin = 2;
-  for (const water of runtime.waterMasks) {
-    if (!rectanglesOverlap(
-      building.footprintMinX,
-      building.footprintMaxX,
-      building.footprintMinZ,
-      building.footprintMaxZ,
-      water.minX,
-      water.maxX,
-      water.minZ,
-      water.maxZ,
-      margin,
-    )) {
-      continue;
-    }
-
-    if (isPointInPolygon(building.x, building.z, water.points)) {
-      return true;
-    }
-
-    const step = Math.max(1, Math.floor(building.points.length / 7));
-    for (let index = 0; index < building.points.length; index += step) {
-      const [x, z] = building.points[index];
-      if (isPointInPolygon(x, z, water.points)) {
-        return true;
-      }
-    }
-
-    if (isPointInPolygon(water.anchorX, water.anchorZ, building.points)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isNearRiver(x, z, threshold) {
-  for (const point of runtime.riverSamples) {
-    if (horizontalDistance(x, z, point.x, point.y) < threshold) {
-      return true;
-    }
-  }
-  return false;
-}
 
 function isPointInPolygon(x, z, points) {
   let inside = false;
@@ -1937,6 +1150,17 @@ function worldToTexture(x, z, canvas) {
     x: ((x + world.width * 0.5) / world.width) * canvas.width,
     y: ((z + world.depth * 0.5) / world.depth) * canvas.height,
   };
+}
+
+function drawRasterMap(ctx, canvas) {
+  const bounds = runtime.projectedMap.rasterBounds;
+  const start = worldToTexture(bounds.northWest.x, bounds.northWest.z, canvas);
+  const end = worldToTexture(bounds.southEast.x, bounds.southEast.z, canvas);
+  // The raster covers the geographic bbox, not the padded simulation world.
+  // Use the same projection as buildings, roads and landmark positions.
+  ctx.fillStyle = "#303442";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(runtime.rasterMapImage, start.x, start.y, end.x - start.x, end.y - start.y);
 }
 
 function placeLabel(ctx, canvas, text, x, z, color = "rgba(225, 242, 251, 0.62)") {
@@ -1989,6 +1213,16 @@ function drawPolygon(ctx, canvas, points, color) {
   ctx.fill();
 }
 
+function drawWaterPolygon(ctx,canvas,rings,color){
+  ctx.beginPath();
+  for(const ring of rings){
+    ring.forEach(([x,z],index)=>{const p=worldToTexture(x,z,canvas);if(index===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+    ctx.closePath();
+  }
+  ctx.fillStyle=color;
+  ctx.fill('evenodd');
+}
+
 function drawMiniMapLine(ctx, canvas, points, width, color) {
   ctx.beginPath();
   points.forEach((point, index) => {
@@ -2034,10 +1268,34 @@ function drawMiniMap() {
   ctx.drawImage(runtime.miniMapBase, 0, 0);
 
   const player = worldToTexture(state.position.x, state.position.z, dom.miniMap);
+  const current = checkpointDefs[state.checkpointIndex];
+  if (current) {
+    const target = worldToTexture(current.x, current.z, dom.miniMap);
+    ctx.save();
+    ctx.strokeStyle = "#ffe4a3";
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y);
+    ctx.lineTo(target.x, target.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+  checkpointDefs.forEach((checkpoint, index) => {
+    const point = worldToTexture(checkpoint.x, checkpoint.z, dom.miniMap);
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = index < state.checkpointIndex ? "#88f2a1" : index === state.checkpointIndex ? "#ffe4a3" : "#b6eaff";
+    ctx.fill();
+    ctx.fillStyle = "#07131d";
+    ctx.font = "bold 10px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(String(index + 1), point.x, point.y);
+  });
   const heading = getHeadingRadians();
   ctx.save();
   ctx.translate(player.x, player.y);
-  ctx.rotate(heading + Math.PI * 0.5);
+  ctx.rotate(heading);
   ctx.fillStyle = "#ff8d64";
   ctx.beginPath();
   ctx.moveTo(0, -8);
@@ -2230,20 +1488,8 @@ function mercatorY(lat) {
   return Math.log(Math.tan(Math.PI * 0.25 + radians * 0.5));
 }
 
-function makeDistrict(project, name, lon, lat, width, depth, density, maxHeight, seed, palette) {
-  const point = project(lon, lat);
-  return { name, width, depth, density, maxHeight, seed, palette, x: point.x, z: point.z };
-}
 
-function makeHill(project, lon, lat, radius, height, color) {
-  const point = project(lon, lat);
-  return { radius, height, color, x: point.x, z: point.z };
-}
 
-function makeBridge(project, name, lon, lat, length, rotation) {
-  const point = project(lon, lat);
-  return { name, length, rotation, x: point.x, z: point.z };
-}
 
 function roundRect(ctx, x, y, width, height, radius) {
   ctx.beginPath();
@@ -2267,7 +1513,7 @@ function getHeadingRadians() {
   if (state.forward.lengthSq() > 0.0001) {
     return Math.atan2(state.forward.x, -state.forward.z);
   }
-  return state.yaw;
+  return -state.yaw;
 }
 
 function shortestAngle(from, to) {
@@ -2279,9 +1525,8 @@ function shortestAngle(from, to) {
 }
 
 function clearInputs() {
-  Object.keys(input).forEach((key) => {
-    input[key] = false;
-  });
+  inputController.clear();
+  runtime.lookRollVelocity = 0;
   dom.touchButtons.forEach((button) => {
     button.classList.remove("active");
   });
@@ -2300,39 +1545,4 @@ function mulberry32(seed) {
 function hashFrac(i) {
   const value = Math.sin(i * 12.9898) * 43758.5453;
   return value - Math.floor(value);
-}
-
-const duskShadowColor = new THREE.Color(0x241c38);
-const duskLitColor = new THREE.Color(0xffffff);
-const aoTempColor = new THREE.Color();
-
-function addVerticalAoColors(geometry) {
-  geometry.computeBoundingBox();
-  const minY = geometry.boundingBox.min.y;
-  const maxY = geometry.boundingBox.max.y;
-  const positions = geometry.attributes.position;
-  const colors = new Float32Array(positions.count * 3);
-  for (let index = 0; index < positions.count; index += 1) {
-    const fraction = maxY > minY ? (positions.getY(index) - minY) / (maxY - minY) : 1;
-    aoTempColor.copy(duskShadowColor).lerp(duskLitColor, THREE.MathUtils.lerp(0.55, 1, fraction));
-    colors[index * 3] = aoTempColor.r;
-    colors[index * 3 + 1] = aoTempColor.g;
-    colors[index * 3 + 2] = aoTempColor.b;
-  }
-  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-}
-
-function addHeightFractionColors(geometry, height) {
-  geometry.computeBoundingBox();
-  const minY = geometry.boundingBox.min.y;
-  const positions = geometry.attributes.position;
-  const colors = new Float32Array(positions.count * 3);
-  for (let index = 0; index < positions.count; index += 1) {
-    const fraction = height > 0 ? THREE.MathUtils.clamp((positions.getY(index) - minY) / height, 0, 1) : 1;
-    aoTempColor.copy(duskShadowColor).lerp(duskLitColor, THREE.MathUtils.lerp(0.62, 1, fraction));
-    colors[index * 3] = aoTempColor.r;
-    colors[index * 3 + 1] = aoTempColor.g;
-    colors[index * 3 + 2] = aoTempColor.b;
-  }
-  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 }
