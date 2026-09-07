@@ -7,6 +7,7 @@ import { makeWaterGeometry } from "./water-geometry.mjs";
 import { CityStream } from "./city-stream.mjs";
 import { createTerrainGeometry } from "./terrain-geometry.mjs";
 import { projectWater } from "./water-model.mjs";
+import { validateSceneContract, validateRasterDimensions } from "./scene-contract.mjs";
 
 const dom = {
   root: document.getElementById("game-root"),
@@ -95,6 +96,8 @@ const runtime = {
   terrain: null,
   landmarkReferences: null,
   city: null,
+  cityManifest: null,
+  rasterMetadata: null,
   lastCityUpdate: 0,
 };
 
@@ -110,11 +113,15 @@ try {
 
 async function init() {
   const mapData = await loadMapData();
-  [runtime.terrain,runtime.landmarkReferences,runtime.waterData]=await Promise.all([
+  [runtime.terrain,runtime.landmarkReferences,runtime.waterData,runtime.cityManifest,runtime.rasterMetadata]=await Promise.all([
     loadJson("./assets/terrain/elevation.json"),loadJson("./assets/landmarks/references.json"),
     loadJson("./assets/water/water.geojson"),
+    loadJson("./assets/city/manifest.json"),loadJson("./assets/seoul-raster-map.metadata.json"),
   ]);
+  validateSceneContract({map:mapData,terrain:runtime.terrain,city:runtime.cityManifest,
+    raster:runtime.rasterMetadata,references:runtime.landmarkReferences});
   runtime.rasterMapImage = await loadRasterMapImage();
+  validateRasterDimensions(runtime.rasterMapImage,runtime.rasterMetadata);
   configureSeoulMap(mapData);
   buildMiniMapBase();
   setupThree();
@@ -548,7 +555,7 @@ function createRiverMesh() {
 
 
 async function createCityTiles(scene){
-  const manifest=await loadJson('./assets/city/manifest.json');
+  const manifest=runtime.cityManifest;
   const loader=new GLTFLoader();
   runtime.city=new CityStream(manifest.tiles,{
     load:async tile=>(await loader.loadAsync(`./assets/city/${tile.url}`)).scene,
