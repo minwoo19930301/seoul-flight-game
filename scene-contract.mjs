@@ -18,11 +18,12 @@ function sameMetres(expected, actual, label) {
 
 // A larger bbox is not new source coverage. Refuse mixed-origin datasets before
 // creating any terrain, city meshes or stretched raster textures.
-export function validateSceneContract({ map, terrain, city, raster, references }) {
+export function validateSceneContract({ map, terrain, city, raster, references, districts }) {
   const projection = localMetreProjection(map.bbox);
   sameBounds(map.bbox, terrain.bbox, '지형');
   sameBounds(map.bbox, city.projection?.bbox, '건물 타일');
-  sameBounds(map.bbox, raster.bbox, '바탕 지도');
+  const fullCity = map.schemaVersion === 2;
+  if (!fullCity) sameBounds(map.bbox, raster?.bbox, '바탕 지도');
   sameMetres(projection.width, terrain.projectedWidthM, '지형 가로');
   sameMetres(projection.depth, terrain.projectedDepthM, '지형 세로');
   sameMetres(projection.width, city.projection?.width, '건물 가로');
@@ -38,11 +39,27 @@ export function validateSceneContract({ map, terrain, city, raster, references }
     || !terrain.elevations.every(Number.isFinite)) {
     fail('지형 표본이 누락되었거나 유효하지 않습니다.');
   }
-  if (!Number.isInteger(raster.width) || raster.width <= 0
-    || !Number.isInteger(raster.height) || raster.height <= 0) {
+  if (!fullCity && (!Number.isInteger(raster.width) || raster.width <= 0
+    || !Number.isInteger(raster.height) || raster.height <= 0)) {
     fail('바탕 지도 이미지 크기가 유효하지 않습니다.');
   }
-  if (!Array.isArray(map.buildings) || !Array.isArray(city.tiles)
+  if (fullCity) {
+    if (city.schemaVersion !== 2 || !Array.isArray(city.tiles)
+      || city.totals?.inputBuildings !== map.sourceCounts?.building?.count
+      || city.totals?.inputParts !== map.sourceCounts?.building_part?.count
+      || city.totals?.tiles !== city.tiles.length
+      || city.tiles.reduce((sum, tile) => sum + tile.features, 0) !== city.totals.renderFeatures) {
+      fail('원본 건물 수와 타일 목록이 일치하지 않습니다.');
+    }
+    const ids = new Set(districts?.features?.map(feature => feature.id));
+    if (ids.size !== 25 || districts.features.length !== 25 || map.districts?.length !== 25
+      || new Set(map.districts.map(d => d.id)).size !== 25
+      || map.districts.some(d => !ids.has(d.id) || !Array.isArray(d.position)
+        || d.position.length !== 2 || !d.position.every(Number.isFinite)
+        || Math.abs(d.position[0]) > projection.width / 2 || Math.abs(d.position[1]) > projection.depth / 2)) {
+      fail('서울 25개 구의 경계와 이동 좌표가 일치하지 않습니다.');
+    }
+  } else if (!Array.isArray(map.buildings) || !Array.isArray(city.tiles)
     || city.totals?.inputBuildings !== map.buildings.length
     || city.totals?.tiles !== city.tiles.length
     || city.tiles.reduce((sum, tile) => sum + tile.buildings, 0) !== city.totals.includedBuildings) {
@@ -69,7 +86,8 @@ export function validateSceneContract({ map, terrain, city, raster, references }
   return {
     widthM: projection.width,
     depthM: projection.depth,
-    buildings: city.totals.includedBuildings,
+    buildings: fullCity ? city.totals.inputBuildings : city.totals.includedBuildings,
+    ...(fullCity ? { parts:city.totals.inputParts, renderedFeatures:city.totals.renderFeatures, districts:25 } : {}),
     landmarks: references.landmarks.length,
   };
 }

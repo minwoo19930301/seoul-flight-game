@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "status": "Source assets ready with explicit historical DEM anomalies and 3 excluded water relations; not runtime/visual QA",
+  "bbox": {
+    "minLon": 126.7644328,
+    "minLat": 37.4285424,
+    "maxLon": 127.1837886,
+    "maxLat": 37.7014794
+  },
+  "boundary": {
+    "dataset": "Overture Maps division_area",
+    "release": "2026-08-19.0",
+    "gersId": "2d4b9f73-5037-4823-92b9-2084675e7d8d",
+    "osmSource": "relation/2297418@149",
+    "osmUpdatedAt": "2026-07-22T08:58:04Z",
+    "osmPlanetSnapshot": "2026-07-23T00:00:00Z",
+    "sourceUrl": "https://www.openstreetmap.org/relation/2297418",
+    "releaseUrl": "https://stac.overturemaps.org/2026-08-19.0/divisions/division_area/collection.json",
+    "license": "ODbL-1.0; https://docs.overturemaps.org/attribution/",
+    "boundaryFileSha256": "d94d181999c0bc93d99950cc50800ed2b0d7a36508b3ba6367c196706749b5bc",
+    "districtsFileSha256": "30972e84d35349d51b213a38fe61c32c9c25769bb839927536358d39e35fc0ee",
+    "localSiblingFile": "../seoul-full-city-assets-20260907/seoul-boundary.geojson",
+    "policy": "Exact geometry-derived bbox shared with city buildings. Rectangular terrain/water coverage includes Seoul administrative city and neighboring land within that bbox; not an administrative-polygon cutout."
+  },
+  "terrain": {
+    "file": "elevation.json",
+    "sampler": "terrain-model.mjs::sampleLocalElevation",
+    "sha256": "80d5fd912de0942f2899b7f44aa08a772fb042d015b390003cb1a57c24a08460",
+    "width": 824,
+    "height": 677,
+    "samples": 557848,
+    "spacingM": {
+      "eastWest": 44.9616376428264,
+      "northSouth": 44.945666531404186
+    },
+    "physicalWidthM": 37003.42778004613,
+    "physicalDepthM": 30383.270575229228,
+    "triangleDiagonal": "SW--NE",
+    "fullRectangularMeshTriangles": 1112696,
+    "noDataCount": 0,
+    "sourceTileCount": 30,
+    "sourcePayloadBytes": 1261799,
+    "statistics": {
+      "sampleCount": 557848,
+      "noDataCount": 0,
+      "minimumM": -137.37,
+      "maximumM": 809.309,
+      "sourceTiles": 30,
+      "sourceBytes": 1261799
+    },
+    "sourceQualityFile": "terrain-quality-audit.json",
+    "largeNegativeInsideCityCount": 9,
+    "datum": "Source-native SRTM/GMTED composite; approximately EGM96 orthometric. Per-pixel source/datum not independently verified; no conversion applied."
+  },
+  "water": {
+    "file": "water.geojson",
+    "sha256": "6d4772da167ade424d435c395e5629851cc8abd4757f056635bbd4349351df84",
+    "sourceSnapshot": "2026-09-07T03:46:19Z",
+    "sourcePayloadBytes": 2308990,
+    "acceptedSourceFeatures": 660,
+    "polygons": 548,
+    "holes": 121,
+    "coordinates": 27700,
+    "trianglesBeforeTerrainSubdivision": 26171,
+    "degenerateTriangles": 0,
+    "mainHanIslandProbesDry": 18,
+    "excludedInvalidRelations": [
+      {
+        "id": "relation/9721964",
+        "reason": "Self-intersection[127.0345963 37.573105]",
+        "name": "정릉천"
+      },
+      {
+        "id": "relation/9721965",
+        "reason": "Self-intersection[127.0345963 37.573105]",
+        "name": "청계천"
+      },
+      {
+        "id": "relation/20188785",
+        "reason": "Self-intersection[126.9301325 37.5464241]",
+        "name": null
+      }
+    ],
+    "coordinatesAre": "WGS84 longitude/latitude; source footprint only, no water elevation baked"
+  },
+  "downloadedSourcePayloadBytes": 3570789,
+  "reproducibility": {
+    "offlineTerrainRebuild": "All original PNG hashes rechecked; final complete elevation.json SHA identical",
+    "offlineWaterRebuild": "Reassembled retained Overpass response without network; both source-features and union SHA identical",
+    "runtimeSampler": "10001 local points exactly equal to current production SW--NE triangle sampler; terrain.test.mjs 4 tests pass",
+    "runtimeSamplerSourceSha256": "f9f0c475f76201cd9e7e7a87717c2fac8c6efdb3e288d403c8b1e68a1fd9b0c6",
+    "previousSources": [
+      {
+        "file": "../seoul-terrain-assets/elevation.json",
+        "sha256": "3025792e6215f23fecb95ef300e8dba96e9f0e7fbff1dcb20ecce5546afb082b",
+        "unchanged": true
+      },
+      {
+        "file": "../seoul-water-assets/water.geojson",
+        "sha256": "41b2ce4b21c7f4905f599405244160859c56da072a7007707bcc092b8764fabb",
+        "unchanged": true
+      }
+    ]
+  },
+  "privacy": {
+    "publicArtifactPatternMatches": 0,
+    "rawOverpass": "Retain privately for reproducibility; contributor edit metadata omitted from public outputs",
+    "limit": "Pattern scan, not a universal secret-detection proof"
+  },
+  "scope": "No credentials, account changes, checkout edits, browser/DOM/visual QA, game deployment or Blender changes. Only source asset generation and CPU checks.",
+  "artifacts": [
+    {
+      "file": "elevation.json",
+      "sha256": "80d5fd912de0942f2899b7f44aa08a772fb042d015b390003cb1a57c24a08460",
+      "bytes": 3874157
+    },
+    {
+      "file": "terrain-model.mjs",
+      "sha256": "a5955f937ba9d395dfaba1d536cc71cc061fd11a85fc665b3e64029ed753e13d",
+      "bytes": 1767
+    },
+    {
+      "file": "water.geojson",
+      "sha256": "6d4772da167ade424d435c395e5629851cc8abd4757f056635bbd4349351df84",
+      "bytes": 700716
+    },
+    {
+      "file": "water-source-features.geojson",
+      "sha256": "51ae3f543333007bf525eb6236e053981b845255715da36ce94b4f6d7971810b",
+      "bytes": 939126
+    },
+    {
+      "file": "scope.json",
+      "sha256": "6146e42abf857eadf2a37fdf706cba593e894e0d4cee1b9102170160be112bf7",
+      "bytes": 1343
+    },
+    {
+      "file": "provenance.json",
+      "sha256": "e734324e28b49a27e15eee60dd041da75a50b50a70d38d98f2a5b9e2d0567d6a",
+      "bytes": 428402
+    },
+    {
+      "file": "terrain-verification.json",
+      "sha256": "f43bd47cdfa246866d44d5ad081ee2cd1c64c0d03a072caf49f22e2dece5b0e4",
+      "bytes": 887
+    },
+    {
+      "file": "terrain-quality-audit.json",
+      "sha256": "6a21e28176a1fd8d4c1f6623ec6ae5e0e4553b5dc6d1875df3e7337021399619",
+      "bytes": 3568
+    },
+    {
+      "file": "water-validation.json",
+      "sha256": "1500c87ec519d771002af13c5fb9e99a93c545f9eec2425ce74f161371f26fc6",
+      "bytes": 524
+    },
+    {
+      "file": "README.md",
+      "sha256": "38c0673e1a0dc024d05fd3bc9f950a26b6bed883abd5583c2b668cd39eb9f5a4",
+      "bytes": 9577
+    }
+  ]
+}

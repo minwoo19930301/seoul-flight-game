@@ -1,0 +1,29 @@
+{
+  "bbox": {
+    "minLon": 126.7644328,
+    "minLat": 37.4285424,
+    "maxLon": 127.1837886,
+    "maxLat": 37.7014794
+  },
+  "boundary": {
+    "dataset": "Overture Maps division_area",
+    "release": "2026-08-19.0",
+    "gersId": "2d4b9f73-5037-4823-92b9-2084675e7d8d",
+    "osmSource": "relation/2297418@149",
+    "osmUpdatedAt": "2026-07-22T08:58:04Z",
+    "osmPlanetSnapshot": "2026-07-23T00:00:00Z",
+    "sourceUrl": "https://www.openstreetmap.org/relation/2297418",
+    "releaseUrl": "https://stac.overturemaps.org/2026-08-19.0/divisions/division_area/collection.json",
+    "license": "ODbL-1.0; https://docs.overturemaps.org/attribution/",
+    "boundaryFileSha256": "d94d181999c0bc93d99950cc50800ed2b0d7a36508b3ba6367c196706749b5bc",
+    "districtsFileSha256": "30972e84d35349d51b213a38fe61c32c9c25769bb839927536358d39e35fc0ee",
+    "localSiblingFile": "../seoul-full-city-assets-20260907/seoul-boundary.geojson",
+    "policy": "Exact geometry-derived bbox shared with city buildings. Rectangular terrain/water coverage includes Seoul administrative city and neighboring land within that bbox; not an administrative-polygon cutout."
+  },
+  "terrain": {
+    "source": "Mapzen/Tilezen Terrarium zoom 12",
+    "targetGridSpacingM": 45,
+    "surfaceDiagonal": "SW--NE",
+    "runtimeSampler": "terrain-model.mjs::sampleLocalElevation"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "bbox": {
+    "minLon": 126.7644328,
+    "minLat": 37.4285424,
+    "maxLon": 127.1837886,
+    "maxLat": 37.7014794
+  },
+  "width": 824,
+  "height": 677,
+  "actualGridSpacingM": {
+    "eastWest": 44.9616376428264,
+    "northSouth": 44.945666531404186
+  },
+  "projectedWidthM": 37003.42778004613,
+  "projectedDepthM": 30383.270575229228,
+  "sampleCount": 557848,
+  "noDataCount": 0,
+  "minimumM": -137.37,
+  "maximumM": 809.309,
+  "sourceTiles": 30,
+  "sourceBytes": 1261799,
+  "rawSources": [
+    "srtm/N37E126.tif",
+    "gmted/30N120E_20101117_gmted_mea075.tif",
+    "srtm/N37E127.tif"
+  ],
+  "sampledGroundM": {
+    "sixtythree": 32.66708381407993,
+    "gyeongbokgung": 42.20016359158646,
+    "nseoul": 258.3906758727546,
+    "coex": 28.929427315373033,
+    "lotte": 23.861385910179195
+  },
+  "noStretchedOldGrid": true,
+  "physicalGroundUsesSWNEDiagonal": true
+}

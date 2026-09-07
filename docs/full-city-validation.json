@@ -1,0 +1,54 @@
+{
+  "evidence": "CPU only; no browser, GPU, mobile-device, frame-rate or visual approval",
+  "coverage": {
+    "widthM": 37003.427780047175,
+    "depthM": 30383.27057523216,
+    "buildings": 365456,
+    "parts": 1684,
+    "renderedFeatures": 366746,
+    "districts": 25,
+    "landmarks": 5
+  },
+  "geometry": {
+    "tiles": 657,
+    "features": 366746,
+    "source": 26846,
+    "estimated": 339900,
+    "holes": 253,
+    "roofAreaError": 0.0000010053327059722506,
+    "skippedInvalidVolume": 0,
+    "float32CollapsedTriangles": 19,
+    "float32ReorientedTriangles": 26,
+    "triangles": 4754660,
+    "vertices": 9147791,
+    "degenerateTriangles": 0,
+    "wrongNormals": 0,
+    "maxChunkBytes": 533377,
+    "maxTileGeometryBytes": 4516920,
+    "lod": {
+      "near": {
+        "features": 324653,
+        "triangles": 3767756
+      },
+      "far": {
+        "features": 42093,
+        "triangles": 986904
+      }
+    }
+  },
+  "terrain": {
+    "sourceSamples": 557848,
+    "desktopLod": [
+      421,
+      346
+    ],
+    "desktopTriangles": 289800
+  },
+  "water": {
+    "triangles": 243408,
+    "bytes": 8762688,
+    "buildMs": 166
+  },
+  "startupCoreBytes": 2422645,
+  "result": "PASS"
+}

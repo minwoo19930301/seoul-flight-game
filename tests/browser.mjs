@@ -33,7 +33,7 @@ async function openPage(options = {}, failMap = false) {
     const source = await response.text();
     await route.fulfill({ response, body: `${source}\nwindow.__flightTest = { state, runtime, input, world, checkpointDefs, updateFlight, updateCheckpoints, updateHud, resetFlight, startGame, pauseFlight, enforceBoundary };` });
   });
-  if (failMap) await page.route("**/seoul-scene-data.json", (route) => route.fulfill({ status: 503, body: "unavailable" }));
+  if (failMap) await page.route("**/full-seoul/scene.json", (route) => route.fulfill({ status: 503, body: "unavailable" }));
   await page.goto(`${origin}/index-seoul-flight.html`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__flightTest, null, { timeout: 60000 });
   return { context, page };
@@ -93,7 +93,8 @@ try {
   assert.deepEqual(completed, { mode: "complete", index: 5, count: 5 });
   assert.equal(await page.locator("#progress-value").textContent(), "5 / 5");
   assert.equal(await page.locator("#message-panel").isVisible(), true);
-  assert.equal(await page.locator("#resume-btn").isVisible(), false);
+  assert.equal(await page.locator("#resume-btn").isVisible(), true);
+  assert.equal(await page.locator("#district-select option").count(),25);
   await page.screenshot({ path: resolve(evidence, "flight-complete.png") });
   await page.locator("#restart-btn").click();
   await page.waitForFunction(() => __flightTest.state.mode === "running" && __flightTest.state.checkpointIndex === 0);
@@ -127,7 +128,7 @@ try {
   const failed = await openPage({ viewport: { width: 1280, height: 720 } }, true);
   assert.equal(await failed.page.evaluate(() => __flightTest.state.mode), "error");
   assert.equal(await failed.page.locator("#restart-btn").textContent(), "다시 불러오기");
-  await failed.page.unroute("**/seoul-scene-data.json");
+  await failed.page.unroute("**/full-seoul/scene.json");
   await failed.page.locator("#restart-btn").click();
   await failed.page.waitForFunction(() => window.__flightTest?.state.mode === "intro", null, { timeout: 60000 });
   assert.equal(await failed.page.locator("#start-btn").isEnabled(), true, "failed initialization can reload and recover");

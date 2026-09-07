@@ -1,0 +1,13 @@
+{
+  "result": "PASS",
+  "evidence": "Offline CPU regeneration from the bundled public source data into a separate temporary directory; every listed category compared by SHA256, no network or app browser",
+  "generator": "scripts/prepare-full-seoul.py",
+  "python": "3.12",
+  "shapely": "2.1.2",
+  "byteIdenticalFiles": 662,
+  "tileCount": 657,
+  "otherFiles": ["city-manifest.json", "scene.json", "terrain/elevation.json.gz", "districts.json.gz", "water/water.geojson.gz"],
+  "cityManifestSha256": "1af6445858ea74c1d02bbf38ea851ab9fcf6805b8b8a5cee98687e8dd27bb56a",
+  "sceneSha256": "4660a4022fd10bb1f13052ec167ed65a276ae271c92b880c5183ade8bb5cf303",
+  "sourceManifestSha256": "1c71d5177c9a6f9ccfd88702f2319f20f70fa5fb9f2df840ac5be0d59d4aaa0b"
+}

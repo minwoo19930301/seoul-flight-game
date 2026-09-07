@@ -85,6 +85,7 @@ test('runtime validates the combined dataset before creating the scene', () => {
   const source = read('seoul-flight.mjs').toString();
   const init = source.slice(source.indexOf('async function init()'),source.indexOf('function showFatalError'));
   assert.ok(init.indexOf('validateSceneContract(') < init.indexOf('configureSeoulMap('));
-  assert.ok(init.indexOf('validateRasterDimensions(') < init.indexOf('setupThree('));
+  assert.doesNotMatch(init,/loadRasterMapImage|validateRasterDimensions/);
+  assert.match(init,/full-seoul\/terrain\/elevation.json.gz/);
   assert.match(source,/async function createCityTiles\(scene\)\{\s*const manifest=runtime.cityManifest;/);
 });
