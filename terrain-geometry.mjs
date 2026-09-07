@@ -1,8 +1,12 @@
 import * as THREE from './vendor/three.module.js';
 import {sampleLocalElevation} from './terrain-model.mjs';
 export function createTerrainGeometry(grid,width,depth){
-  const xs=[-width/2,...Array.from({length:grid.width},(_,i)=>(i/(grid.width-1)-.5)*grid.projectedWidthM),width/2];
-  const zs=[-depth/2,...Array.from({length:grid.height},(_,i)=>(i/(grid.height-1)-.5)*grid.projectedDepthM),depth/2];
+  const xs=Array.from({length:grid.width},(_,i)=>(i/(grid.width-1)-.5)*grid.projectedWidthM);
+  const zs=Array.from({length:grid.height},(_,i)=>(i/(grid.height-1)-.5)*grid.projectedDepthM);
+  // A legacy padded world may need skirts; an exact source bbox must not add
+  // duplicate edge coordinates and thousands of zero-area border triangles.
+  if(width>grid.projectedWidthM+.01){xs.unshift(-width/2);xs.push(width/2);}
+  if(depth>grid.projectedDepthM+.01){zs.unshift(-depth/2);zs.push(depth/2);}
   const positions=[],uvs=[],indices=[];
   for(const z of zs)for(const x of xs){positions.push(x,sampleLocalElevation(grid,x,z),z);uvs.push(x/width+.5,.5-z/depth);}
   for(let row=0;row<zs.length-1;row++)for(let col=0;col<xs.length-1;col++){

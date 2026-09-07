@@ -1,0 +1,1950 @@
+{
+  "schemaVersion": 1,
+  "release": "2026-08-19.0",
+  "format": "gzip of UTF-8 newline-delimited GeoJSON Features; no record separator",
+  "coordinateSystem": "WGS84 longitude/latitude; original double coordinates, no rounding",
+  "bbox": {
+    "minLon": 126.7644328,
+    "minLat": 37.4285424,
+    "maxLon": 127.1837886,
+    "maxLat": 37.7014794
+  },
+  "selectionPolicy": "Keep original building or building_part geometry if it intersects Seoul; do not physically cut boundary-crossing footprints or remove holes.",
+  "districtPolicy": "Representative interior point if covered by a district; boundary-crossing fallback uses greatest intersection area. Exactly one district per retained feature.",
+  "heightPolicy": "height and min_height are unmodified optional source values in metres, NOT independently surveyed. Missing height is explicit null, not 0 and not a fabricated estimate. No floor multiplier applied.",
+  "geometryPolicy": "All source Polygon/MultiPolygon exterior/interior rings preserved. No repair or simplification. Invalid source geometry is flagged and needs an explicitly documented rendering policy.",
+  "propertyPolicy": "Original non-null properties retained; null height/min_height retained explicitly. sources array retained with only null-valued fields omitted. Arrow map-valued fields use their original list-of-pairs representation.",
+  "buildingPartsPolicy": "building_part carries original building_id; parts and parent outlines both preserved. Renderer must avoid double-extruding covered parent footprints.",
+  "attribution": "© OpenStreetMap contributors, Overture Maps Foundation; Qian Shi et al. East Asian Buildings (doi:10.5281/zenodo.8174931, CC BY 4.0).",
+  "license": "ODbL-1.0; https://docs.overturemaps.org/attribution/",
+  "sourceUrls": [
+    "https://stac.overturemaps.org/2026-08-19.0/buildings/building/collection.json",
+    "https://stac.overturemaps.org/2026-08-19.0/buildings/building_part/collection.json"
+  ],
+  "sources": [
+    {
+      "filename": "buildings-bbox.parquet",
+      "sha256": "3ea89fc3917e0a9852c187cc9e86a640782a001fc60e68c5cd112b8baca61e98",
+      "bytes": 66608813,
+      "bboxRows": 481883
+    },
+    {
+      "filename": "building-parts-bbox.parquet",
+      "sha256": "7397584fb4a5e253754f5d8729af6cd3c739cb330848b456fdaea4d8b3e506c3",
+      "bytes": 567495,
+      "bboxRows": 3337
+    }
+  ],
+  "totals": {
+    "building": {
+      "count": 365456,
+      "height": {
+        "source-reported-unverified": 26626,
+        "missing": 338830
+      },
+      "geometry": {
+        "Polygon": 365116,
+        "MultiPolygon": 340
+      },
+      "rootSource": {
+        "OpenStreetMap": 164237,
+        "doi:10.5281/zenodo.8174931": 201219
+      },
+      "heightSource": {
+        "OpenStreetMap": 26626
+      },
+      "numFloorsPresent": 40648,
+      "hasParts": 502,
+      "boundaryCrossing": 51,
+      "invalidGeometry": 0,
+      "polygons": 365859,
+      "holes": 217,
+      "vertices": 2188207,
+      "heightMin": 0.5,
+      "heightMax": 322.0
+    },
+    "building_part": {
+      "count": 1684,
+      "height": {
+        "missing": 1180,
+        "source-reported-unverified": 504
+      },
+      "geometry": {
+        "Polygon": 1676,
+        "MultiPolygon": 8
+      },
+      "rootSource": {
+        "OpenStreetMap": 1684
+      },
+      "heightSource": {
+        "OpenStreetMap": 504
+      },
+      "numFloorsPresent": 949,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 1770,
+      "holes": 3,
+      "vertices": 16932,
+      "heightMin": 0.18,
+      "heightMax": 554.5
+    }
+  },
+  "files": [
+    {
+      "path": "district-data/d4a81fa1-97c9-475f-a40b-1d7ef87f0c91.building.ndjson.gz",
+      "type": "building",
+      "districtId": "d4a81fa1-97c9-475f-a40b-1d7ef87f0c91",
+      "districtName": "강남구",
+      "bytes": 2446803,
+      "sha256": "b64a7df74b8d5fa6998a0141ab73f6565a893400bcb93d391ae495150234151e",
+      "count": 22072
+    },
+    {
+      "path": "district-data/bda1d9bc-b6ad-4716-b4b3-069a9f5072fd.building.ndjson.gz",
+      "type": "building",
+      "districtId": "bda1d9bc-b6ad-4716-b4b3-069a9f5072fd",
+      "districtName": "강동구",
+      "bytes": 1538675,
+      "sha256": "60edbfa4f5bc56775acae5b7678a9e3ef843b9f0c0b49805aee0da0cabcbb3ad",
+      "count": 15099
+    },
+    {
+      "path": "district-data/15fa251f-2d59-4a2d-92cf-2b263be62f1d.building.ndjson.gz",
+      "type": "building",
+      "districtId": "15fa251f-2d59-4a2d-92cf-2b263be62f1d",
+      "districtName": "강북구",
+      "bytes": 1493311,
+      "sha256": "1827f0f8679acde5a647032f42c1142b51be05329c0deaedcbf0932439893ba0",
+      "count": 15605
+    },
+    {
+      "path": "district-data/caafb9a5-eff5-441f-9fd4-45745f35e41c.building.ndjson.gz",
+      "type": "building",
+      "districtId": "caafb9a5-eff5-441f-9fd4-45745f35e41c",
+      "districtName": "강서구",
+      "bytes": 1715513,
+      "sha256": "d14bc5f277ff62c5c1b15c4aa7328258bec089d49dbf1b6373e50c1823665b92",
+      "count": 16203
+    },
+    {
+      "path": "district-data/7246abd6-c79c-4223-8a94-05fbcb3261f3.building.ndjson.gz",
+      "type": "building",
+      "districtId": "7246abd6-c79c-4223-8a94-05fbcb3261f3",
+      "districtName": "관악구",
+      "bytes": 1731309,
+      "sha256": "9ae821e41152a26caa422fa3cf7339673857a4203a4dc350e4022c7bdf2dd6d8",
+      "count": 16987
+    },
+    {
+      "path": "district-data/2c49a608-bcfb-41f3-95c5-cf19dc74f9d4.building.ndjson.gz",
+      "type": "building",
+      "districtId": "2c49a608-bcfb-41f3-95c5-cf19dc74f9d4",
+      "districtName": "광진구",
+      "bytes": 1967187,
+      "sha256": "f73762b76ea6543f47a81631a148c371f0ddf33eb653dae54849c9af0757954d",
+      "count": 20186
+    },
+    {
+      "path": "district-data/f8a4838b-9d7d-4623-839f-6db642345b0a.building.ndjson.gz",
+      "type": "building",
+      "districtId": "f8a4838b-9d7d-4623-839f-6db642345b0a",
+      "districtName": "구로구",
+      "bytes": 1086008,
+      "sha256": "2c54c5790aede5762731fd00313819f6649bbbcb7fbb3a6db2c5decff672c6a8",
+      "count": 10105
+    },
+    {
+      "path": "district-data/9b911448-d25f-4453-a12a-596fe5e176dd.building.ndjson.gz",
+      "type": "building",
+      "districtId": "9b911448-d25f-4453-a12a-596fe5e176dd",
+      "districtName": "금천구",
+      "bytes": 690334,
+      "sha256": "ba630329a8b5d415715a7073e85d31e13288d872b563ea4e00615388bc6d93d6",
+      "count": 6645
+    },
+    {
+      "path": "district-data/445f5fea-72a1-4543-8170-bb7f4ac43cc8.building.ndjson.gz",
+      "type": "building",
+      "districtId": "445f5fea-72a1-4543-8170-bb7f4ac43cc8",
+      "districtName": "노원구",
+      "bytes": 1030874,
+      "sha256": "9ce3eb4a4a275cd37d1a31277f54fd0b0c86fa74022290ba7a6129a764602f0e",
+      "count": 9218
+    },
+    {
+      "path": "district-data/f1bb6d67-316d-4dfb-948a-fabaa535afcd.building.ndjson.gz",
+      "type": "building",
+      "districtId": "f1bb6d67-316d-4dfb-948a-fabaa535afcd",
+      "districtName": "도봉구",
+      "bytes": 1101004,
+      "sha256": "0c1eb015f05058bb36d7edc634c4ff09eeaa519477c825d3d5eb650b241ed268",
+      "count": 11170
+    },
+    {
+      "path": "district-data/f0178795-c548-4c9f-9b61-a3b3ce2c7cb7.building.ndjson.gz",
+      "type": "building",
+      "districtId": "f0178795-c548-4c9f-9b61-a3b3ce2c7cb7",
+      "districtName": "동대문구",
+      "bytes": 1907456,
+      "sha256": "66719f411ad795fafcc6d6dfd281bc57f1068562c54ffde3e73e0307ab5214dd",
+      "count": 18105
+    },
+    {
+      "path": "district-data/9b0107fb-0a00-488e-b683-305df891c12c.building.ndjson.gz",
+      "type": "building",
+      "districtId": "9b0107fb-0a00-488e-b683-305df891c12c",
+      "districtName": "동작구",
+      "bytes": 1402630,
+      "sha256": "985d8c349d66dd0678d1cdf61c29eca42b03debad428dec047e7b199b91be3e0",
+      "count": 13334
+    },
+    {
+      "path": "district-data/bcb3e6b5-b90e-4819-9c38-0cee6d99b6bd.building.ndjson.gz",
+      "type": "building",
+      "districtId": "bcb3e6b5-b90e-4819-9c38-0cee6d99b6bd",
+      "districtName": "마포구",
+      "bytes": 2294058,
+      "sha256": "217090c3de4dcd502bec5b3d9036b2d8ce3a0ef04143b4b2ad9fa34039bf3991",
+      "count": 19763
+    },
+    {
+      "path": "district-data/5a7a9715-5216-49b7-b5ef-b45cf51f08df.building.ndjson.gz",
+      "type": "building",
+      "districtId": "5a7a9715-5216-49b7-b5ef-b45cf51f08df",
+      "districtName": "서대문구",
+      "bytes": 1390129,
+      "sha256": "cfb364846b4855d8f95d2c0378192880827c0991212cdc68f1e22975a99ff365",
+      "count": 12828
+    },
+    {
+      "path": "district-data/5056ad90-b154-46b1-a3b1-88140d162432.building.ndjson.gz",
+      "type": "building",
+      "districtId": "5056ad90-b154-46b1-a3b1-88140d162432",
+      "districtName": "서초구",
+      "bytes": 1400997,
+      "sha256": "c4e1b891fcdf8f2f167156b5f173eeb92d86d9f694d781691c2ba6d520ae50cc",
+      "count": 12701
+    },
+    {
+      "path": "district-data/69a3b37d-611f-41ef-9797-73294297a165.building.ndjson.gz",
+      "type": "building",
+      "districtId": "69a3b37d-611f-41ef-9797-73294297a165",
+      "districtName": "성동구",
+      "bytes": 1275900,
+      "sha256": "f8f6abdc68d9d251ad0bccefe0e24b9ec6b4709563ce8a22f9bc71d2e58666b3",
+      "count": 12115
+    },
+    {
+      "path": "district-data/106fd53f-00ec-4233-b97f-2fe5cf092d3b.building.ndjson.gz",
+      "type": "building",
+      "districtId": "106fd53f-00ec-4233-b97f-2fe5cf092d3b",
+      "districtName": "성북구",
+      "bytes": 1810819,
+      "sha256": "cda8da82dc6f3be4e0ea05aea0ca7dd3ba09504693c9a03ff55aadf7f5d4b1d5",
+      "count": 17781
+    },
+    {
+      "path": "district-data/7f8b7bd7-2924-49d0-9704-89659bcf6504.building.ndjson.gz",
+      "type": "building",
+      "districtId": "7f8b7bd7-2924-49d0-9704-89659bcf6504",
+      "districtName": "송파구",
+      "bytes": 2076760,
+      "sha256": "c9d07c7f9aaae1c75da7ce6bda979bef0210caa10291f052ec0534c2f8794b5c",
+      "count": 19554
+    },
+    {
+      "path": "district-data/5f65ac65-bc60-46c8-b9aa-3002cf9a5aa0.building.ndjson.gz",
+      "type": "building",
+      "districtId": "5f65ac65-bc60-46c8-b9aa-3002cf9a5aa0",
+      "districtName": "양천구",
+      "bytes": 1065779,
+      "sha256": "477f95d69630b67e09f6a0d4f235f65b62a1e0991035a05c7db4c7bad3ef117d",
+      "count": 10094
+    },
+    {
+      "path": "district-data/08afc166-21c4-45c5-8763-3684d4a0286f.building.ndjson.gz",
+      "type": "building",
+      "districtId": "08afc166-21c4-45c5-8763-3684d4a0286f",
+      "districtName": "영등포구",
+      "bytes": 1210838,
+      "sha256": "a6fd5d224f26db4a9b7081cffba196bc2622e8fe82839c3b936c26cb635d81b5",
+      "count": 11539
+    },
+    {
+      "path": "district-data/5a6610a0-e422-4af4-985e-401e44c1a4a4.building.ndjson.gz",
+      "type": "building",
+      "districtId": "5a6610a0-e422-4af4-985e-401e44c1a4a4",
+      "districtName": "용산구",
+      "bytes": 1297416,
+      "sha256": "8155a2a7312bbaf05c4f6f1332289cff55f28c96d89ba311dc211d386b6b5ad7",
+      "count": 11965
+    },
+    {
+      "path": "district-data/cf1b9b1d-0160-4a4a-a85e-5f8daac0162d.building.ndjson.gz",
+      "type": "building",
+      "districtId": "cf1b9b1d-0160-4a4a-a85e-5f8daac0162d",
+      "districtName": "은평구",
+      "bytes": 1812963,
+      "sha256": "9abc8035df7eeec74ec31e4b3ce531dc5630d3f052522a92e6907324c3337f07",
+      "count": 17303
+    },
+    {
+      "path": "district-data/de7222b1-71d6-4afe-a30a-6cdd68253e01.building.ndjson.gz",
+      "type": "building",
+      "districtId": "de7222b1-71d6-4afe-a30a-6cdd68253e01",
+      "districtName": "종로구",
+      "bytes": 1604285,
+      "sha256": "41e00543a05e77ccaf367904acd8ebcd0cccfed5a1d69fa04726834cf404566d",
+      "count": 14032
+    },
+    {
+      "path": "district-data/11819d9a-7b7b-4d35-8475-870a838c2282.building.ndjson.gz",
+      "type": "building",
+      "districtId": "11819d9a-7b7b-4d35-8475-870a838c2282",
+      "districtName": "중구",
+      "bytes": 1052903,
+      "sha256": "8fc010dab8fc8903d25befd47174e6f83102978c8466acdecf62eded0ff2071e",
+      "count": 9185
+    },
+    {
+      "path": "district-data/823f64f9-26da-4ce3-a439-b659f546b701.building.ndjson.gz",
+      "type": "building",
+      "districtId": "823f64f9-26da-4ce3-a439-b659f546b701",
+      "districtName": "중랑구",
+      "bytes": 2264320,
+      "sha256": "034d86b781d524c186c861ad93fc8c8516f71432dabbf6d712b55640e64fceb7",
+      "count": 21867
+    },
+    {
+      "path": "district-data/d4a81fa1-97c9-475f-a40b-1d7ef87f0c91.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "d4a81fa1-97c9-475f-a40b-1d7ef87f0c91",
+      "districtName": "강남구",
+      "bytes": 5684,
+      "sha256": "c2cca7768274d651eb4f593659216c2393b9a301dae26fa07f6552a8f61fba26",
+      "count": 40
+    },
+    {
+      "path": "district-data/bda1d9bc-b6ad-4716-b4b3-069a9f5072fd.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "bda1d9bc-b6ad-4716-b4b3-069a9f5072fd",
+      "districtName": "강동구",
+      "bytes": 11439,
+      "sha256": "78aa65d835954d63d68a32b7d3a6f701e0aa0005d31e4083e47482588f5092eb",
+      "count": 58
+    },
+    {
+      "path": "district-data/15fa251f-2d59-4a2d-92cf-2b263be62f1d.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "15fa251f-2d59-4a2d-92cf-2b263be62f1d",
+      "districtName": "강북구",
+      "bytes": 20,
+      "sha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83",
+      "count": 0
+    },
+    {
+      "path": "district-data/caafb9a5-eff5-441f-9fd4-45745f35e41c.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "caafb9a5-eff5-441f-9fd4-45745f35e41c",
+      "districtName": "강서구",
+      "bytes": 613,
+      "sha256": "6cc5d9c590eee884a3de37cde510441151d41daabb1bc7936f78d69872aa5106",
+      "count": 1
+    },
+    {
+      "path": "district-data/7246abd6-c79c-4223-8a94-05fbcb3261f3.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "7246abd6-c79c-4223-8a94-05fbcb3261f3",
+      "districtName": "관악구",
+      "bytes": 3390,
+      "sha256": "0d7700f2ece55cb2632cb96982b25b2533180432b8177c6e2b4dc4d297e9b799",
+      "count": 20
+    },
+    {
+      "path": "district-data/2c49a608-bcfb-41f3-95c5-cf19dc74f9d4.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "2c49a608-bcfb-41f3-95c5-cf19dc74f9d4",
+      "districtName": "광진구",
+      "bytes": 15390,
+      "sha256": "830f97db30934e6054b039700f5f64b580aabeee1befd03ef15fb7e24a6e79ca",
+      "count": 118
+    },
+    {
+      "path": "district-data/f8a4838b-9d7d-4623-839f-6db642345b0a.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "f8a4838b-9d7d-4623-839f-6db642345b0a",
+      "districtName": "구로구",
+      "bytes": 959,
+      "sha256": "007e168b71bcaced1cc251b107ca0e36c8e0b4e229fd9c70efdab8f02a085f9f",
+      "count": 3
+    },
+    {
+      "path": "district-data/9b911448-d25f-4453-a12a-596fe5e176dd.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "9b911448-d25f-4453-a12a-596fe5e176dd",
+      "districtName": "금천구",
+      "bytes": 1562,
+      "sha256": "f67871e34559918169f9999c12a5f1d164c00a2ccc3fd3477f666da28916486d",
+      "count": 8
+    },
+    {
+      "path": "district-data/445f5fea-72a1-4543-8170-bb7f4ac43cc8.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "445f5fea-72a1-4543-8170-bb7f4ac43cc8",
+      "districtName": "노원구",
+      "bytes": 883,
+      "sha256": "742d2c8a41a1dba86565bbd1e5e5b8667bc0ba0491ebd817cc5564f7adc36ce9",
+      "count": 3
+    },
+    {
+      "path": "district-data/f1bb6d67-316d-4dfb-948a-fabaa535afcd.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "f1bb6d67-316d-4dfb-948a-fabaa535afcd",
+      "districtName": "도봉구",
+      "bytes": 20,
+      "sha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83",
+      "count": 0
+    },
+    {
+      "path": "district-data/f0178795-c548-4c9f-9b61-a3b3ce2c7cb7.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "f0178795-c548-4c9f-9b61-a3b3ce2c7cb7",
+      "districtName": "동대문구",
+      "bytes": 3860,
+      "sha256": "4dd2d2861460dd17664fa765b85e518bb435846f20ed07edd803b3be0421737e",
+      "count": 21
+    },
+    {
+      "path": "district-data/9b0107fb-0a00-488e-b683-305df891c12c.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "9b0107fb-0a00-488e-b683-305df891c12c",
+      "districtName": "동작구",
+      "bytes": 20,
+      "sha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83",
+      "count": 0
+    },
+    {
+      "path": "district-data/bcb3e6b5-b90e-4819-9c38-0cee6d99b6bd.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "bcb3e6b5-b90e-4819-9c38-0cee6d99b6bd",
+      "districtName": "마포구",
+      "bytes": 31755,
+      "sha256": "685ee29ad5aecae31f2914a38b6863e45fc1450d853787db8de0cc70045025e4",
+      "count": 245
+    },
+    {
+      "path": "district-data/5a7a9715-5216-49b7-b5ef-b45cf51f08df.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "5a7a9715-5216-49b7-b5ef-b45cf51f08df",
+      "districtName": "서대문구",
+      "bytes": 1445,
+      "sha256": "69cf8ed9f8886729a3662780cfc0acb2ccbcd666221fab7319a790ebb7ccc254",
+      "count": 8
+    },
+    {
+      "path": "district-data/5056ad90-b154-46b1-a3b1-88140d162432.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "5056ad90-b154-46b1-a3b1-88140d162432",
+      "districtName": "서초구",
+      "bytes": 12911,
+      "sha256": "44f3b6add3515727ccc7846e8e3847eaac051a61580f02ecd38b604295722846",
+      "count": 76
+    },
+    {
+      "path": "district-data/69a3b37d-611f-41ef-9797-73294297a165.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "69a3b37d-611f-41ef-9797-73294297a165",
+      "districtName": "성동구",
+      "bytes": 9278,
+      "sha256": "cf9e61953f82ea57f10757abf964b8e58827a690d893c6dde390adadadac5597",
+      "count": 62
+    },
+    {
+      "path": "district-data/106fd53f-00ec-4233-b97f-2fe5cf092d3b.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "106fd53f-00ec-4233-b97f-2fe5cf092d3b",
+      "districtName": "성북구",
+      "bytes": 20,
+      "sha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83",
+      "count": 0
+    },
+    {
+      "path": "district-data/7f8b7bd7-2924-49d0-9704-89659bcf6504.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "7f8b7bd7-2924-49d0-9704-89659bcf6504",
+      "districtName": "송파구",
+      "bytes": 18129,
+      "sha256": "c7a74c5c86918ac6bc45a83777dfd55ec55d6dcf164b95c404a86fcb3d0a32ab",
+      "count": 74
+    },
+    {
+      "path": "district-data/5f65ac65-bc60-46c8-b9aa-3002cf9a5aa0.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "5f65ac65-bc60-46c8-b9aa-3002cf9a5aa0",
+      "districtName": "양천구",
+      "bytes": 8661,
+      "sha256": "8a09299e25bc0d52259dd056b3bebe2cd2a3a9a29d8406d24075a4bde85358b0",
+      "count": 55
+    },
+    {
+      "path": "district-data/08afc166-21c4-45c5-8763-3684d4a0286f.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "08afc166-21c4-45c5-8763-3684d4a0286f",
+      "districtName": "영등포구",
+      "bytes": 18812,
+      "sha256": "90ecfc4b39b39bc787479d7f85df94a581dc4889270f6b4144005d5d8e96794a",
+      "count": 157
+    },
+    {
+      "path": "district-data/5a6610a0-e422-4af4-985e-401e44c1a4a4.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "5a6610a0-e422-4af4-985e-401e44c1a4a4",
+      "districtName": "용산구",
+      "bytes": 11679,
+      "sha256": "be80e1eecdbd6066abc37fc856b80fcc5a1d7d8af125d7689811eaa56582728e",
+      "count": 80
+    },
+    {
+      "path": "district-data/cf1b9b1d-0160-4a4a-a85e-5f8daac0162d.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "cf1b9b1d-0160-4a4a-a85e-5f8daac0162d",
+      "districtName": "은평구",
+      "bytes": 37579,
+      "sha256": "675778c88501baab52d002617db91f3ee586d5990d4152604bf6e5b2da901023",
+      "count": 327
+    },
+    {
+      "path": "district-data/de7222b1-71d6-4afe-a30a-6cdd68253e01.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "de7222b1-71d6-4afe-a30a-6cdd68253e01",
+      "districtName": "종로구",
+      "bytes": 22533,
+      "sha256": "d94308109b913b76edbf02e4be86ac441ee2e140f3432d712e1bcb248bddcb7b",
+      "count": 168
+    },
+    {
+      "path": "district-data/11819d9a-7b7b-4d35-8475-870a838c2282.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "11819d9a-7b7b-4d35-8475-870a838c2282",
+      "districtName": "중구",
+      "bytes": 24246,
+      "sha256": "0736a4615508e5460b4de7a0b8d1fa2c5980258edb49e4537efcc4bcee8d9619",
+      "count": 158
+    },
+    {
+      "path": "district-data/823f64f9-26da-4ce3-a439-b659f546b701.building_part.ndjson.gz",
+      "type": "building_part",
+      "districtId": "823f64f9-26da-4ce3-a439-b659f546b701",
+      "districtName": "중랑구",
+      "bytes": 775,
+      "sha256": "a65c3b387b611c77460bf4736a9cdec0d2ed108012b23f4b5f5a44774538bdb5",
+      "count": 2
+    }
+  ],
+  "districts": [
+    {
+      "id": "d4a81fa1-97c9-475f-a40b-1d7ef87f0c91",
+      "name": "강남구",
+      "type": "building",
+      "count": 22072,
+      "height": {
+        "missing": 20027,
+        "source-reported-unverified": 2045
+      },
+      "geometry": {
+        "Polygon": 22066,
+        "MultiPolygon": 6
+      },
+      "rootSource": {
+        "OpenStreetMap": 16796,
+        "doi:10.5281/zenodo.8174931": 5276
+      },
+      "heightSource": {
+        "OpenStreetMap": 2045
+      },
+      "numFloorsPresent": 3405,
+      "hasParts": 9,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 22078,
+      "holes": 11,
+      "vertices": 135300,
+      "heightMin": 4.3,
+      "heightMax": 264.0
+    },
+    {
+      "id": "bda1d9bc-b6ad-4716-b4b3-069a9f5072fd",
+      "name": "강동구",
+      "type": "building",
+      "count": 15099,
+      "height": {
+        "source-reported-unverified": 1103,
+        "missing": 13996
+      },
+      "geometry": {
+        "Polygon": 15087,
+        "MultiPolygon": 12
+      },
+      "rootSource": {
+        "OpenStreetMap": 3006,
+        "doi:10.5281/zenodo.8174931": 12093
+      },
+      "heightSource": {
+        "OpenStreetMap": 1103
+      },
+      "numFloorsPresent": 1357,
+      "hasParts": 48,
+      "boundaryCrossing": 1,
+      "invalidGeometry": 0,
+      "polygons": 15112,
+      "holes": 1,
+      "vertices": 88070,
+      "heightMin": 3.1,
+      "heightMax": 150.0
+    },
+    {
+      "id": "15fa251f-2d59-4a2d-92cf-2b263be62f1d",
+      "name": "강북구",
+      "type": "building",
+      "count": 15605,
+      "height": {
+        "missing": 15182,
+        "source-reported-unverified": 423
+      },
+      "geometry": {
+        "Polygon": 15599,
+        "MultiPolygon": 6
+      },
+      "rootSource": {
+        "OpenStreetMap": 1231,
+        "doi:10.5281/zenodo.8174931": 14374
+      },
+      "heightSource": {
+        "OpenStreetMap": 423
+      },
+      "numFloorsPresent": 610,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 15611,
+      "holes": 2,
+      "vertices": 82448,
+      "heightMin": 14.0,
+      "heightMax": 86.0
+    },
+    {
+      "id": "caafb9a5-eff5-441f-9fd4-45745f35e41c",
+      "name": "강서구",
+      "type": "building",
+      "count": 16203,
+      "height": {
+        "missing": 14521,
+        "source-reported-unverified": 1682
+      },
+      "geometry": {
+        "Polygon": 16192,
+        "MultiPolygon": 11
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 5710,
+        "OpenStreetMap": 10493
+      },
+      "heightSource": {
+        "OpenStreetMap": 1682
+      },
+      "numFloorsPresent": 2557,
+      "hasParts": 1,
+      "boundaryCrossing": 8,
+      "invalidGeometry": 0,
+      "polygons": 16216,
+      "holes": 2,
+      "vertices": 92984,
+      "heightMin": 3.0,
+      "heightMax": 97.0
+    },
+    {
+      "id": "7246abd6-c79c-4223-8a94-05fbcb3261f3",
+      "name": "관악구",
+      "type": "building",
+      "count": 16987,
+      "height": {
+        "missing": 16278,
+        "source-reported-unverified": 709
+      },
+      "geometry": {
+        "Polygon": 16971,
+        "MultiPolygon": 16
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 9818,
+        "OpenStreetMap": 7169
+      },
+      "heightSource": {
+        "OpenStreetMap": 709
+      },
+      "numFloorsPresent": 1289,
+      "hasParts": 7,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 17008,
+      "holes": 4,
+      "vertices": 93993,
+      "heightMin": 10.0,
+      "heightMax": 137.0
+    },
+    {
+      "id": "2c49a608-bcfb-41f3-95c5-cf19dc74f9d4",
+      "name": "광진구",
+      "type": "building",
+      "count": 20186,
+      "height": {
+        "missing": 19751,
+        "source-reported-unverified": 435
+      },
+      "geometry": {
+        "Polygon": 20179,
+        "MultiPolygon": 7
+      },
+      "rootSource": {
+        "OpenStreetMap": 5678,
+        "doi:10.5281/zenodo.8174931": 14508
+      },
+      "heightSource": {
+        "OpenStreetMap": 435
+      },
+      "numFloorsPresent": 1219,
+      "hasParts": 28,
+      "boundaryCrossing": 1,
+      "invalidGeometry": 0,
+      "polygons": 20193,
+      "holes": 6,
+      "vertices": 108656,
+      "heightMin": 3.0,
+      "heightMax": 192.0
+    },
+    {
+      "id": "f8a4838b-9d7d-4623-839f-6db642345b0a",
+      "name": "구로구",
+      "type": "building",
+      "count": 10105,
+      "height": {
+        "source-reported-unverified": 975,
+        "missing": 9130
+      },
+      "geometry": {
+        "Polygon": 10098,
+        "MultiPolygon": 7
+      },
+      "rootSource": {
+        "OpenStreetMap": 3491,
+        "doi:10.5281/zenodo.8174931": 6614
+      },
+      "heightSource": {
+        "OpenStreetMap": 975
+      },
+      "numFloorsPresent": 2170,
+      "hasParts": 1,
+      "boundaryCrossing": 10,
+      "invalidGeometry": 0,
+      "polygons": 10112,
+      "holes": 0,
+      "vertices": 61455,
+      "heightMin": 5.0,
+      "heightMax": 190.0
+    },
+    {
+      "id": "9b911448-d25f-4453-a12a-596fe5e176dd",
+      "name": "금천구",
+      "type": "building",
+      "count": 6645,
+      "height": {
+        "source-reported-unverified": 571,
+        "missing": 6074
+      },
+      "geometry": {
+        "Polygon": 6634,
+        "MultiPolygon": 11
+      },
+      "rootSource": {
+        "OpenStreetMap": 1511,
+        "doi:10.5281/zenodo.8174931": 5134
+      },
+      "heightSource": {
+        "OpenStreetMap": 571
+      },
+      "numFloorsPresent": 694,
+      "hasParts": 7,
+      "boundaryCrossing": 6,
+      "invalidGeometry": 0,
+      "polygons": 6656,
+      "holes": 2,
+      "vertices": 37191,
+      "heightMin": 12.5,
+      "heightMax": 150.0
+    },
+    {
+      "id": "445f5fea-72a1-4543-8170-bb7f4ac43cc8",
+      "name": "노원구",
+      "type": "building",
+      "count": 9218,
+      "height": {
+        "missing": 8262,
+        "source-reported-unverified": 956
+      },
+      "geometry": {
+        "Polygon": 9206,
+        "MultiPolygon": 12
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 5861,
+        "OpenStreetMap": 3357
+      },
+      "heightSource": {
+        "OpenStreetMap": 956
+      },
+      "numFloorsPresent": 1740,
+      "hasParts": 1,
+      "boundaryCrossing": 5,
+      "invalidGeometry": 0,
+      "polygons": 9230,
+      "holes": 5,
+      "vertices": 59124,
+      "heightMin": 12.0,
+      "heightMax": 119.0
+    },
+    {
+      "id": "f1bb6d67-316d-4dfb-948a-fabaa535afcd",
+      "name": "도봉구",
+      "type": "building",
+      "count": 11170,
+      "height": {
+        "missing": 10667,
+        "source-reported-unverified": 503
+      },
+      "geometry": {
+        "Polygon": 11166,
+        "MultiPolygon": 4
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 9610,
+        "OpenStreetMap": 1560
+      },
+      "heightSource": {
+        "OpenStreetMap": 503
+      },
+      "numFloorsPresent": 781,
+      "hasParts": 0,
+      "boundaryCrossing": 1,
+      "invalidGeometry": 0,
+      "polygons": 11178,
+      "holes": 4,
+      "vertices": 61122,
+      "heightMin": 20.0,
+      "heightMax": 168.0
+    },
+    {
+      "id": "f0178795-c548-4c9f-9b61-a3b3ce2c7cb7",
+      "name": "동대문구",
+      "type": "building",
+      "count": 18105,
+      "height": {
+        "missing": 16965,
+        "source-reported-unverified": 1140
+      },
+      "geometry": {
+        "Polygon": 18092,
+        "MultiPolygon": 13
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 11087,
+        "OpenStreetMap": 7018
+      },
+      "heightSource": {
+        "OpenStreetMap": 1140
+      },
+      "numFloorsPresent": 1425,
+      "hasParts": 9,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 18119,
+      "holes": 4,
+      "vertices": 112569,
+      "heightMin": 2.0,
+      "heightMax": 199.0
+    },
+    {
+      "id": "9b0107fb-0a00-488e-b683-305df891c12c",
+      "name": "동작구",
+      "type": "building",
+      "count": 13334,
+      "height": {
+        "source-reported-unverified": 777,
+        "missing": 12557
+      },
+      "geometry": {
+        "Polygon": 13327,
+        "MultiPolygon": 7
+      },
+      "rootSource": {
+        "OpenStreetMap": 6983,
+        "doi:10.5281/zenodo.8174931": 6351
+      },
+      "heightSource": {
+        "OpenStreetMap": 777
+      },
+      "numFloorsPresent": 910,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 13346,
+      "holes": 8,
+      "vertices": 80095,
+      "heightMin": 3.0,
+      "heightMax": 163.0
+    },
+    {
+      "id": "bcb3e6b5-b90e-4819-9c38-0cee6d99b6bd",
+      "name": "마포구",
+      "type": "building",
+      "count": 19763,
+      "height": {
+        "missing": 17709,
+        "source-reported-unverified": 2054
+      },
+      "geometry": {
+        "Polygon": 19740,
+        "MultiPolygon": 23
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 2992,
+        "OpenStreetMap": 16771
+      },
+      "heightSource": {
+        "OpenStreetMap": 2054
+      },
+      "numFloorsPresent": 5202,
+      "hasParts": 77,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 19794,
+      "holes": 8,
+      "vertices": 137476,
+      "heightMin": 1.0,
+      "heightMax": 164.0
+    },
+    {
+      "id": "5a7a9715-5216-49b7-b5ef-b45cf51f08df",
+      "name": "서대문구",
+      "type": "building",
+      "count": 12828,
+      "height": {
+        "source-reported-unverified": 742,
+        "missing": 12086
+      },
+      "geometry": {
+        "Polygon": 12811,
+        "MultiPolygon": 17
+      },
+      "rootSource": {
+        "OpenStreetMap": 8117,
+        "doi:10.5281/zenodo.8174931": 4711
+      },
+      "heightSource": {
+        "OpenStreetMap": 742
+      },
+      "numFloorsPresent": 972,
+      "hasParts": 3,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 12847,
+      "holes": 3,
+      "vertices": 78015,
+      "heightMin": 2.5,
+      "heightMax": 104.0
+    },
+    {
+      "id": "5056ad90-b154-46b1-a3b1-88140d162432",
+      "name": "서초구",
+      "type": "building",
+      "count": 12701,
+      "height": {
+        "source-reported-unverified": 1532,
+        "missing": 11169
+      },
+      "geometry": {
+        "Polygon": 12668,
+        "MultiPolygon": 33
+      },
+      "rootSource": {
+        "OpenStreetMap": 5518,
+        "doi:10.5281/zenodo.8174931": 7183
+      },
+      "heightSource": {
+        "OpenStreetMap": 1532
+      },
+      "numFloorsPresent": 1938,
+      "hasParts": 35,
+      "boundaryCrossing": 10,
+      "invalidGeometry": 0,
+      "polygons": 12738,
+      "holes": 7,
+      "vertices": 77967,
+      "heightMin": 3.0,
+      "heightMax": 203.0
+    },
+    {
+      "id": "69a3b37d-611f-41ef-9797-73294297a165",
+      "name": "성동구",
+      "type": "building",
+      "count": 12115,
+      "height": {
+        "missing": 10534,
+        "source-reported-unverified": 1581
+      },
+      "geometry": {
+        "Polygon": 12108,
+        "MultiPolygon": 7
+      },
+      "rootSource": {
+        "OpenStreetMap": 4819,
+        "doi:10.5281/zenodo.8174931": 7296
+      },
+      "heightSource": {
+        "OpenStreetMap": 1581
+      },
+      "numFloorsPresent": 1106,
+      "hasParts": 25,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 12122,
+      "holes": 1,
+      "vertices": 72120,
+      "heightMin": 1.7,
+      "heightMax": 200.0
+    },
+    {
+      "id": "106fd53f-00ec-4233-b97f-2fe5cf092d3b",
+      "name": "성북구",
+      "type": "building",
+      "count": 17781,
+      "height": {
+        "missing": 16745,
+        "source-reported-unverified": 1036
+      },
+      "geometry": {
+        "Polygon": 17772,
+        "MultiPolygon": 9
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 13368,
+        "OpenStreetMap": 4413
+      },
+      "heightSource": {
+        "OpenStreetMap": 1036
+      },
+      "numFloorsPresent": 1265,
+      "hasParts": 0,
+      "boundaryCrossing": 1,
+      "invalidGeometry": 0,
+      "polygons": 17793,
+      "holes": 5,
+      "vertices": 101531,
+      "heightMin": 9.0,
+      "heightMax": 141.0
+    },
+    {
+      "id": "7f8b7bd7-2924-49d0-9704-89659bcf6504",
+      "name": "송파구",
+      "type": "building",
+      "count": 19554,
+      "height": {
+        "source-reported-unverified": 1934,
+        "missing": 17620
+      },
+      "geometry": {
+        "Polygon": 19529,
+        "MultiPolygon": 25
+      },
+      "rootSource": {
+        "OpenStreetMap": 8282,
+        "doi:10.5281/zenodo.8174931": 11272
+      },
+      "heightSource": {
+        "OpenStreetMap": 1934
+      },
+      "numFloorsPresent": 2857,
+      "hasParts": 20,
+      "boundaryCrossing": 5,
+      "invalidGeometry": 0,
+      "polygons": 19583,
+      "holes": 9,
+      "vertices": 117151,
+      "heightMin": 2.0,
+      "heightMax": 149.0
+    },
+    {
+      "id": "5f65ac65-bc60-46c8-b9aa-3002cf9a5aa0",
+      "name": "양천구",
+      "type": "building",
+      "count": 10094,
+      "height": {
+        "source-reported-unverified": 769,
+        "missing": 9325
+      },
+      "geometry": {
+        "Polygon": 10083,
+        "MultiPolygon": 11
+      },
+      "rootSource": {
+        "OpenStreetMap": 4398,
+        "doi:10.5281/zenodo.8174931": 5696
+      },
+      "heightSource": {
+        "OpenStreetMap": 769
+      },
+      "numFloorsPresent": 1375,
+      "hasParts": 14,
+      "boundaryCrossing": 1,
+      "invalidGeometry": 0,
+      "polygons": 10108,
+      "holes": 3,
+      "vertices": 58979,
+      "heightMin": 11.0,
+      "heightMax": 256.0
+    },
+    {
+      "id": "08afc166-21c4-45c5-8763-3684d4a0286f",
+      "name": "영등포구",
+      "type": "building",
+      "count": 11539,
+      "height": {
+        "missing": 9898,
+        "source-reported-unverified": 1641
+      },
+      "geometry": {
+        "Polygon": 11530,
+        "MultiPolygon": 9
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 8630,
+        "OpenStreetMap": 2909
+      },
+      "heightSource": {
+        "OpenStreetMap": 1641
+      },
+      "numFloorsPresent": 1817,
+      "hasParts": 16,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 11548,
+      "holes": 8,
+      "vertices": 66921,
+      "heightMin": 4.0,
+      "heightMax": 322.0
+    },
+    {
+      "id": "5a6610a0-e422-4af4-985e-401e44c1a4a4",
+      "name": "용산구",
+      "type": "building",
+      "count": 11965,
+      "height": {
+        "source-reported-unverified": 989,
+        "missing": 10976
+      },
+      "geometry": {
+        "Polygon": 11958,
+        "MultiPolygon": 7
+      },
+      "rootSource": {
+        "OpenStreetMap": 6502,
+        "doi:10.5281/zenodo.8174931": 5463
+      },
+      "heightSource": {
+        "OpenStreetMap": 989
+      },
+      "numFloorsPresent": 838,
+      "hasParts": 19,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 11973,
+      "holes": 4,
+      "vertices": 73550,
+      "heightMin": 1.4,
+      "heightMax": 196.0
+    },
+    {
+      "id": "cf1b9b1d-0160-4a4a-a85e-5f8daac0162d",
+      "name": "은평구",
+      "type": "building",
+      "count": 17303,
+      "height": {
+        "missing": 16138,
+        "source-reported-unverified": 1165
+      },
+      "geometry": {
+        "Polygon": 17250,
+        "MultiPolygon": 53
+      },
+      "rootSource": {
+        "OpenStreetMap": 8562,
+        "doi:10.5281/zenodo.8174931": 8741
+      },
+      "heightSource": {
+        "OpenStreetMap": 1165
+      },
+      "numFloorsPresent": 2598,
+      "hasParts": 114,
+      "boundaryCrossing": 1,
+      "invalidGeometry": 0,
+      "polygons": 17359,
+      "holes": 1,
+      "vertices": 100493,
+      "heightMin": 1.0,
+      "heightMax": 100.0
+    },
+    {
+      "id": "de7222b1-71d6-4afe-a30a-6cdd68253e01",
+      "name": "종로구",
+      "type": "building",
+      "count": 14032,
+      "height": {
+        "source-reported-unverified": 438,
+        "missing": 13594
+      },
+      "geometry": {
+        "Polygon": 14025,
+        "MultiPolygon": 7
+      },
+      "rootSource": {
+        "OpenStreetMap": 10946,
+        "doi:10.5281/zenodo.8174931": 3086
+      },
+      "heightSource": {
+        "OpenStreetMap": 438
+      },
+      "numFloorsPresent": 682,
+      "hasParts": 37,
+      "boundaryCrossing": 1,
+      "invalidGeometry": 0,
+      "polygons": 14046,
+      "holes": 45,
+      "vertices": 96337,
+      "heightMin": 0.5,
+      "heightMax": 160.0
+    },
+    {
+      "id": "11819d9a-7b7b-4d35-8475-870a838c2282",
+      "name": "중구",
+      "type": "building",
+      "count": 9185,
+      "height": {
+        "missing": 8453,
+        "source-reported-unverified": 732
+      },
+      "geometry": {
+        "Polygon": 9169,
+        "MultiPolygon": 16
+      },
+      "rootSource": {
+        "OpenStreetMap": 6393,
+        "doi:10.5281/zenodo.8174931": 2792
+      },
+      "heightSource": {
+        "OpenStreetMap": 732
+      },
+      "numFloorsPresent": 1082,
+      "hasParts": 29,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 9203,
+      "holes": 69,
+      "vertices": 61463,
+      "heightMin": 3.0,
+      "heightMax": 156.0
+    },
+    {
+      "id": "823f64f9-26da-4ce3-a439-b659f546b701",
+      "name": "중랑구",
+      "type": "building",
+      "count": 21867,
+      "height": {
+        "missing": 21173,
+        "source-reported-unverified": 694
+      },
+      "geometry": {
+        "Polygon": 21856,
+        "MultiPolygon": 11
+      },
+      "rootSource": {
+        "doi:10.5281/zenodo.8174931": 13553,
+        "OpenStreetMap": 8314
+      },
+      "heightSource": {
+        "OpenStreetMap": 694
+      },
+      "numFloorsPresent": 759,
+      "hasParts": 2,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 21886,
+      "holes": 5,
+      "vertices": 133197,
+      "heightMin": 6.0,
+      "heightMax": 184.0
+    },
+    {
+      "id": "d4a81fa1-97c9-475f-a40b-1d7ef87f0c91",
+      "name": "강남구",
+      "type": "building_part",
+      "count": 40,
+      "height": {
+        "missing": 13,
+        "source-reported-unverified": 27
+      },
+      "geometry": {
+        "Polygon": 40
+      },
+      "rootSource": {
+        "OpenStreetMap": 40
+      },
+      "heightSource": {
+        "OpenStreetMap": 27
+      },
+      "numFloorsPresent": 12,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 40,
+      "holes": 0,
+      "vertices": 320,
+      "heightMin": 6.0,
+      "heightMax": 229.0
+    },
+    {
+      "id": "bda1d9bc-b6ad-4716-b4b3-069a9f5072fd",
+      "name": "강동구",
+      "type": "building_part",
+      "count": 58,
+      "height": {
+        "missing": 57,
+        "source-reported-unverified": 1
+      },
+      "geometry": {
+        "Polygon": 58
+      },
+      "rootSource": {
+        "OpenStreetMap": 58
+      },
+      "heightSource": {
+        "OpenStreetMap": 1
+      },
+      "numFloorsPresent": 58,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 58,
+      "holes": 0,
+      "vertices": 794,
+      "heightMin": 35.0,
+      "heightMax": 35.0
+    },
+    {
+      "id": "15fa251f-2d59-4a2d-92cf-2b263be62f1d",
+      "name": "강북구",
+      "type": "building_part",
+      "count": 0,
+      "height": {},
+      "geometry": {},
+      "rootSource": {},
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 0,
+      "holes": 0,
+      "vertices": 0,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "caafb9a5-eff5-441f-9fd4-45745f35e41c",
+      "name": "강서구",
+      "type": "building_part",
+      "count": 1,
+      "height": {
+        "missing": 1
+      },
+      "geometry": {
+        "Polygon": 1
+      },
+      "rootSource": {
+        "OpenStreetMap": 1
+      },
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 1,
+      "holes": 0,
+      "vertices": 5,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "7246abd6-c79c-4223-8a94-05fbcb3261f3",
+      "name": "관악구",
+      "type": "building_part",
+      "count": 20,
+      "height": {
+        "missing": 20
+      },
+      "geometry": {
+        "Polygon": 20
+      },
+      "rootSource": {
+        "OpenStreetMap": 20
+      },
+      "heightSource": {},
+      "numFloorsPresent": 16,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 20,
+      "holes": 0,
+      "vertices": 183,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "2c49a608-bcfb-41f3-95c5-cf19dc74f9d4",
+      "name": "광진구",
+      "type": "building_part",
+      "count": 118,
+      "height": {
+        "missing": 118
+      },
+      "geometry": {
+        "Polygon": 118
+      },
+      "rootSource": {
+        "OpenStreetMap": 118
+      },
+      "heightSource": {},
+      "numFloorsPresent": 95,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 118,
+      "holes": 0,
+      "vertices": 1102,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "f8a4838b-9d7d-4623-839f-6db642345b0a",
+      "name": "구로구",
+      "type": "building_part",
+      "count": 3,
+      "height": {
+        "missing": 3
+      },
+      "geometry": {
+        "Polygon": 3
+      },
+      "rootSource": {
+        "OpenStreetMap": 3
+      },
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 3,
+      "holes": 0,
+      "vertices": 42,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "9b911448-d25f-4453-a12a-596fe5e176dd",
+      "name": "금천구",
+      "type": "building_part",
+      "count": 8,
+      "height": {
+        "missing": 8
+      },
+      "geometry": {
+        "Polygon": 8
+      },
+      "rootSource": {
+        "OpenStreetMap": 8
+      },
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 8,
+      "holes": 0,
+      "vertices": 43,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "445f5fea-72a1-4543-8170-bb7f4ac43cc8",
+      "name": "노원구",
+      "type": "building_part",
+      "count": 3,
+      "height": {
+        "missing": 3
+      },
+      "geometry": {
+        "Polygon": 3
+      },
+      "rootSource": {
+        "OpenStreetMap": 3
+      },
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 3,
+      "holes": 0,
+      "vertices": 30,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "f1bb6d67-316d-4dfb-948a-fabaa535afcd",
+      "name": "도봉구",
+      "type": "building_part",
+      "count": 0,
+      "height": {},
+      "geometry": {},
+      "rootSource": {},
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 0,
+      "holes": 0,
+      "vertices": 0,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "f0178795-c548-4c9f-9b61-a3b3ce2c7cb7",
+      "name": "동대문구",
+      "type": "building_part",
+      "count": 21,
+      "height": {
+        "missing": 21
+      },
+      "geometry": {
+        "Polygon": 21
+      },
+      "rootSource": {
+        "OpenStreetMap": 21
+      },
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 21,
+      "holes": 1,
+      "vertices": 283,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "9b0107fb-0a00-488e-b683-305df891c12c",
+      "name": "동작구",
+      "type": "building_part",
+      "count": 0,
+      "height": {},
+      "geometry": {},
+      "rootSource": {},
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 0,
+      "holes": 0,
+      "vertices": 0,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "bcb3e6b5-b90e-4819-9c38-0cee6d99b6bd",
+      "name": "마포구",
+      "type": "building_part",
+      "count": 245,
+      "height": {
+        "missing": 218,
+        "source-reported-unverified": 27
+      },
+      "geometry": {
+        "Polygon": 244,
+        "MultiPolygon": 1
+      },
+      "rootSource": {
+        "OpenStreetMap": 245
+      },
+      "heightSource": {
+        "OpenStreetMap": 27
+      },
+      "numFloorsPresent": 212,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 246,
+      "holes": 0,
+      "vertices": 2086,
+      "heightMin": 7.0,
+      "heightMax": 123.0
+    },
+    {
+      "id": "5a7a9715-5216-49b7-b5ef-b45cf51f08df",
+      "name": "서대문구",
+      "type": "building_part",
+      "count": 8,
+      "height": {
+        "missing": 7,
+        "source-reported-unverified": 1
+      },
+      "geometry": {
+        "Polygon": 8
+      },
+      "rootSource": {
+        "OpenStreetMap": 8
+      },
+      "heightSource": {
+        "OpenStreetMap": 1
+      },
+      "numFloorsPresent": 8,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 8,
+      "holes": 0,
+      "vertices": 54,
+      "heightMin": 79.0,
+      "heightMax": 79.0
+    },
+    {
+      "id": "5056ad90-b154-46b1-a3b1-88140d162432",
+      "name": "서초구",
+      "type": "building_part",
+      "count": 76,
+      "height": {
+        "missing": 74,
+        "source-reported-unverified": 2
+      },
+      "geometry": {
+        "Polygon": 76
+      },
+      "rootSource": {
+        "OpenStreetMap": 76
+      },
+      "heightSource": {
+        "OpenStreetMap": 2
+      },
+      "numFloorsPresent": 72,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 76,
+      "holes": 1,
+      "vertices": 837,
+      "heightMin": 40.0,
+      "heightMax": 47.0
+    },
+    {
+      "id": "69a3b37d-611f-41ef-9797-73294297a165",
+      "name": "성동구",
+      "type": "building_part",
+      "count": 62,
+      "height": {
+        "missing": 45,
+        "source-reported-unverified": 17
+      },
+      "geometry": {
+        "Polygon": 62
+      },
+      "rootSource": {
+        "OpenStreetMap": 62
+      },
+      "heightSource": {
+        "OpenStreetMap": 17
+      },
+      "numFloorsPresent": 43,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 62,
+      "holes": 0,
+      "vertices": 672,
+      "heightMin": 8.1,
+      "heightMax": 42.0
+    },
+    {
+      "id": "106fd53f-00ec-4233-b97f-2fe5cf092d3b",
+      "name": "성북구",
+      "type": "building_part",
+      "count": 0,
+      "height": {},
+      "geometry": {},
+      "rootSource": {},
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 0,
+      "holes": 0,
+      "vertices": 0,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "7f8b7bd7-2924-49d0-9704-89659bcf6504",
+      "name": "송파구",
+      "type": "building_part",
+      "count": 74,
+      "height": {
+        "missing": 36,
+        "source-reported-unverified": 38
+      },
+      "geometry": {
+        "Polygon": 74
+      },
+      "rootSource": {
+        "OpenStreetMap": 74
+      },
+      "heightSource": {
+        "OpenStreetMap": 38
+      },
+      "numFloorsPresent": 37,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 74,
+      "holes": 0,
+      "vertices": 1884,
+      "heightMin": 2.0,
+      "heightMax": 554.5
+    },
+    {
+      "id": "5f65ac65-bc60-46c8-b9aa-3002cf9a5aa0",
+      "name": "양천구",
+      "type": "building_part",
+      "count": 55,
+      "height": {
+        "source-reported-unverified": 55
+      },
+      "geometry": {
+        "Polygon": 55
+      },
+      "rootSource": {
+        "OpenStreetMap": 55
+      },
+      "heightSource": {
+        "OpenStreetMap": 55
+      },
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 55,
+      "holes": 0,
+      "vertices": 633,
+      "heightMin": 4.0,
+      "heightMax": 46.0
+    },
+    {
+      "id": "08afc166-21c4-45c5-8763-3684d4a0286f",
+      "name": "영등포구",
+      "type": "building_part",
+      "count": 157,
+      "height": {
+        "source-reported-unverified": 117,
+        "missing": 40
+      },
+      "geometry": {
+        "Polygon": 157
+      },
+      "rootSource": {
+        "OpenStreetMap": 157
+      },
+      "heightSource": {
+        "OpenStreetMap": 117
+      },
+      "numFloorsPresent": 22,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 157,
+      "holes": 0,
+      "vertices": 1108,
+      "heightMin": 4.0,
+      "heightMax": 252.0
+    },
+    {
+      "id": "5a6610a0-e422-4af4-985e-401e44c1a4a4",
+      "name": "용산구",
+      "type": "building_part",
+      "count": 80,
+      "height": {
+        "source-reported-unverified": 71,
+        "missing": 9
+      },
+      "geometry": {
+        "Polygon": 80
+      },
+      "rootSource": {
+        "OpenStreetMap": 80
+      },
+      "heightSource": {
+        "OpenStreetMap": 71
+      },
+      "numFloorsPresent": 6,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 80,
+      "holes": 0,
+      "vertices": 813,
+      "heightMin": 0.7,
+      "heightMax": 236.7
+    },
+    {
+      "id": "cf1b9b1d-0160-4a4a-a85e-5f8daac0162d",
+      "name": "은평구",
+      "type": "building_part",
+      "count": 327,
+      "height": {
+        "missing": 327
+      },
+      "geometry": {
+        "Polygon": 327
+      },
+      "rootSource": {
+        "OpenStreetMap": 327
+      },
+      "heightSource": {},
+      "numFloorsPresent": 327,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 327,
+      "holes": 0,
+      "vertices": 2000,
+      "heightMin": null,
+      "heightMax": null
+    },
+    {
+      "id": "de7222b1-71d6-4afe-a30a-6cdd68253e01",
+      "name": "종로구",
+      "type": "building_part",
+      "count": 168,
+      "height": {
+        "missing": 75,
+        "source-reported-unverified": 93
+      },
+      "geometry": {
+        "Polygon": 165,
+        "MultiPolygon": 3
+      },
+      "rootSource": {
+        "OpenStreetMap": 168
+      },
+      "heightSource": {
+        "OpenStreetMap": 93
+      },
+      "numFloorsPresent": 24,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 179,
+      "holes": 0,
+      "vertices": 1492,
+      "heightMin": 2.0,
+      "heightMax": 133.0
+    },
+    {
+      "id": "11819d9a-7b7b-4d35-8475-870a838c2282",
+      "name": "중구",
+      "type": "building_part",
+      "count": 158,
+      "height": {
+        "missing": 103,
+        "source-reported-unverified": 55
+      },
+      "geometry": {
+        "Polygon": 154,
+        "MultiPolygon": 4
+      },
+      "rootSource": {
+        "OpenStreetMap": 158
+      },
+      "heightSource": {
+        "OpenStreetMap": 55
+      },
+      "numFloorsPresent": 17,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 232,
+      "holes": 1,
+      "vertices": 2529,
+      "heightMin": 0.18,
+      "heightMax": 156.0
+    },
+    {
+      "id": "823f64f9-26da-4ce3-a439-b659f546b701",
+      "name": "중랑구",
+      "type": "building_part",
+      "count": 2,
+      "height": {
+        "missing": 2
+      },
+      "geometry": {
+        "Polygon": 2
+      },
+      "rootSource": {
+        "OpenStreetMap": 2
+      },
+      "heightSource": {},
+      "numFloorsPresent": 0,
+      "hasParts": 0,
+      "boundaryCrossing": 0,
+      "invalidGeometry": 0,
+      "polygons": 2,
+      "holes": 0,
+      "vertices": 22,
+      "heightMin": null,
+      "heightMax": null
+    }
+  ],
+  "issues": {
+    "building": {
+      "outsideCityExcluded": 116427,
+      "duplicateIdsSkipped": 0
+    },
+    "building_part": {
+      "outsideCityExcluded": 1653,
+      "duplicateIdsSkipped": 0
+    },
+    "partsWithoutRetainedParent": [],
+    "hasPartsParentsWithoutRetainedParts": []
+  },
+  "totalCompressedBytes": 38909934,
+  "generationSeconds": 31.89
+}

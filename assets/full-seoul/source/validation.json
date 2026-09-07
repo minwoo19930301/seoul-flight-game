@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "checks": [
+    "Both source file SHA256s matched packaged provenance",
+    "All gzip payload SHA256s matched manifest",
+    "Every city-intersecting source feature is present exactly once by type and GERS ID",
+    "All source polygon ring coordinates, holes, multipolygons and original non-null properties round-trip exactly",
+    "Original heights and sources retained; null heights not filled",
+    "All 25 districts have retained building footprints"
+  ],
+  "types": {
+    "building": {
+      "checkedFeatures": 365456,
+      "duplicateInput": 0,
+      "exactGeometryAndNonNullPropertiesPreserved": true,
+      "vertices": 2188207,
+      "holes": 217,
+      "invalidSourceGeometriesPreservedAndFlagged": 0
+    },
+    "building_part": {
+      "checkedFeatures": 1684,
+      "duplicateInput": 0,
+      "exactGeometryAndNonNullPropertiesPreserved": true,
+      "vertices": 16932,
+      "holes": 3,
+      "invalidSourceGeometriesPreservedAndFlagged": 0
+    }
+  },
+  "passed": true,
+  "seconds": 23.05
+}

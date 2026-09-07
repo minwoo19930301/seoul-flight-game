@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "image": "seoul-raster-map.png",
+  "bbox": { "minLon": 126.92, "maxLon": 127.11, "minLat": 37.5, "maxLat": 37.59 },
+  "bboxBasis": "Retained raster generator scripts/build-osm-raster-map.py constants; not a new survey or acquisition.",
+  "width": 2214,
+  "height": 1323,
+  "sha256": "06503e60237455e7014db3383f732d5ee5e9fa7c3e0d65d5c2aca061d877e435",
+  "projection": "Web Mercator crop; x east, y south",
+  "attribution": "© OpenStreetMap contributors",
+  "sourceUrl": "https://www.openstreetmap.org/copyright",
+  "limitation": "Covers central Seoul only. Updating scene bounds requires replacing this image and metadata, not stretching the old crop. Acquisition time of the inherited image is unknown."
+}

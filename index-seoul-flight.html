@@ -4,13 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>SEOUL AIR TOUR VIEWER</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Orbitron:wght@500;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./seoul-flight.css?v=4" />
+    <link rel="stylesheet" href="./seoul-flight.css?v=5" />
   </head>
   <body>
     <main id="app">
@@ -22,7 +16,7 @@
         <div class="eyebrow">FIRST PERSON FLIGHT</div>
         <div class="title-row">
           <h1>SEOUL AIR TOUR</h1>
-          <p>서울 실제 도로, 한강, 주행 경로, 건물 풋프린트 데이터를 바탕으로 주요 랜드마크 상공을 비행하세요.</p>
+          <p>서울 25개 구 · 건물 36.5만 동 · 실제 윤곽 / 높이·외관 추정</p>
         </div>
       </header>
 
@@ -72,7 +66,13 @@
         </div>
         <p id="status-text">서울 상공 뷰를 준비 중입니다.</p>
         <p id="asset-status" aria-live="polite">실제 윤곽의 건물과 지형을 준비합니다.</p>
+        <div class="district-picker">
+          <label for="district-select">구역으로 이동</label>
+          <select id="district-select" aria-label="서울 25개 구"></select>
+          <button id="district-go" type="button" disabled>이동</button>
+        </div>
         <canvas id="mini-map" width="240" height="176" aria-label="서울 경로 미니맵"></canvas>
+        <p id="height-legend" class="source-legend">높이 출처 집계 중</p>
       </section>
 
       <section id="reticle" aria-hidden="true">
@@ -114,7 +114,7 @@
 
       <button id="pause-btn" type="button" disabled>일시정지</button>
 
-      <div id="map-credit">Map data</div>
+      <div id="map-credit">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM contributors</a> / Overture · Qian Shi 외 · USGS / Mapzen · <a href="./docs/full-seoul-data.md" target="_blank" rel="noopener noreferrer">자료·추정 한계</a></div>
 
       <section id="touch-controls" aria-label="터치 조작">
         <button type="button" class="touch-btn" data-control="pitchUp">기수 +</button>
@@ -131,15 +131,16 @@
         <div class="overlay-eyebrow">SEOUL AIR TOUR VIEWER</div>
         <h2>서울 상공 뷰를 시작합니다.</h2>
         <p>
-          서울 실제 도로, 한강, 주행 경로, 건물 풋프린트 데이터를 바탕으로 만든 1인칭 비행 뷰어입니다.
-          63빌딩, 경복궁, N서울타워, COEX, 롯데월드타워 방향을 차례대로 안내합니다.
+          강서부터 강동, 금천부터 도봉까지 37.0 × 30.4km 범위의 실제 지형과 서울 25개 구 건물 도형을 탐색합니다.
+          다섯 랜드마크 안내를 따라가거나 구역 선택으로 바로 이동하세요.
         </p>
         <div class="overlay-notes">
           <div>시작 후 화면을 클릭하면 마우스 보는 방향으로 비행합니다.</div>
-          <div>지면과 건물은 보기용이며 충돌 판정 없이 통과합니다.</div>
+          <div>건물은 통과할 수 있습니다. 원본 지형·표시 지형·해발 0m 중 높은 면 위로 18m 안전 고도를 유지합니다. 실제 항공 운항 자료가 아닙니다.</div>
           <div>미니맵의 번호 순서대로 비행하고, HUD의 목표 고도에 맞추세요.</div>
-          <div>거리·높이는 미터 기준입니다. 다섯 랜드마크는 참고 사진으로 재제작했으며, 일반 건물 높이·입면과 지형 고도는 측량값이 아닌 자료 기반 추정입니다.</div>
-          <div><a href="./docs/reconstruction.md" target="_blank" rel="noopener noreferrer">모델·높이·지형 출처와 한계</a></div>
+          <div>건물 365,456동 중 높이값은 26,626동(7.3%)입니다. 나머지는 층수×3.1m 또는 8m로 표시하며, 누락값을 실측으로 바꾸지 않습니다. 창문 패턴·평지붕은 설명용 표현입니다.</div>
+          <div>지형은 과거 위성 자료, 수면은 지도 도형입니다. 모든 건물의 현황·외관을 정확히 재현한 실사 모델은 아니며 도로선은 기존 도심 범위에 한정됩니다.</div>
+          <div><a href="./docs/full-seoul-data.md" target="_blank" rel="noopener noreferrer">전체 서울 자료·상세도·정확도 한계</a></div>
         </div>
         <button id="start-btn" type="button" disabled>서울 공역 준비 중…</button>
       </section>
@@ -153,6 +154,6 @@
       </section>
     </main>
 
-    <script type="module" src="./seoul-flight.mjs?v=8"></script>
+    <script type="module" src="./seoul-flight.mjs?v=9"></script>
   </body>
 </html>

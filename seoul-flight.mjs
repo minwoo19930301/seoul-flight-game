@@ -7,6 +7,10 @@ import { makeWaterGeometry } from "./water-geometry.mjs";
 import { CityStream } from "./city-stream.mjs";
 import { createTerrainGeometry } from "./terrain-geometry.mjs";
 import { projectWater } from "./water-model.mjs";
+import { validateSceneContract } from "./scene-contract.mjs";
+import {loadCompressedJson} from './compressed-assets.mjs';
+import {CityWorkerClient} from './city-worker-client.mjs';
+import {terrainLod,safeFlightFloor} from './terrain-lod.mjs';
 
 const dom = {
   root: document.getElementById("game-root"),
@@ -33,20 +37,20 @@ const dom = {
   horizonInner: document.getElementById("horizon-inner"),
   mapCredit: document.getElementById("map-credit"),
   miniMap: document.getElementById("mini-map"),
+  districtSelect: document.getElementById('district-select'),
+  districtGo: document.getElementById('district-go'),
+  heightLegend: document.getElementById('height-legend'),
   touchButtons: Array.from(document.querySelectorAll("[data-control]")),
 };
 
 const world = {
-  width: 3200,
-  depth: 2300,
-  ceiling: 1000,
-  boundaryPadding: 140,
+  width: 0, // Set only after validating the complete source projection.
+  depth: 0,
+  ceiling: 1600,
+  boundaryPadding: 50,
 };
 
-const riverWidth = 284;
 let riverPath = [];
-let hillDefs = [];
-let noBuildZones = [];
 let districtDefs = [];
 let landmarkDefs = [];
 let checkpointDefs = [];
@@ -86,7 +90,6 @@ const runtime = {
   waterData: null,
   boundaryBeacons: [],
   projectedMap: null,
-  rasterMapImage: null,
   miniMapBase: null,
   pointerLocked: false,
   lookRollVelocity: 0,
@@ -95,7 +98,11 @@ const runtime = {
   terrain: null,
   landmarkReferences: null,
   city: null,
+  cityManifest: null,
   lastCityUpdate: 0,
+  renderTerrain: null,
+  districts: null,
+  cityWorker: null,
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -110,18 +117,23 @@ try {
 
 async function init() {
   const mapData = await loadMapData();
-  [runtime.terrain,runtime.landmarkReferences,runtime.waterData]=await Promise.all([
-    loadJson("./assets/terrain/elevation.json"),loadJson("./assets/landmarks/references.json"),
-    loadJson("./assets/water/water.geojson"),
+  [runtime.terrain,runtime.landmarkReferences,runtime.waterData,runtime.cityManifest,runtime.districts]=await Promise.all([
+    loadCompressedJson("./assets/full-seoul/terrain/elevation.json.gz"),loadJson("./assets/landmarks/references.json"),
+    loadCompressedJson("./assets/full-seoul/water/water.geojson.gz"),
+    loadJson("./assets/full-seoul/city-manifest.json"),loadCompressedJson("./assets/full-seoul/districts.json.gz"),
   ]);
-  runtime.rasterMapImage = await loadRasterMapImage();
+  validateSceneContract({map:mapData,terrain:runtime.terrain,city:runtime.cityManifest,
+    districts:runtime.districts,references:runtime.landmarkReferences});
+  runtime.renderTerrain=terrainLod(runtime.terrain,window.matchMedia('(max-width: 760px)').matches?280:420);
   configureSeoulMap(mapData);
   buildMiniMapBase();
   setupThree();
   await buildWorld();
   bindEvents();
   resetFlight();
-  dom.mapCredit.textContent = `${mapData.attribution} · Terrain: USGS / Mapzen · 일반 건물 높이·외관 추정`;
+  dom.heightLegend.textContent='청회색: 높이값 있음 26,626동(7.3%, 실측 보장 아님) · 회갈색: 나머지 338,830동은 층수×3.1m 또는 8m 추정. 부분 형상은 본체 높이 추정도 사용.';
+  for(const district of districtDefs){const option=document.createElement('option');option.value=district.id;option.textContent=district.name;dom.districtSelect.appendChild(option);}
+  dom.districtGo.disabled=false;
   dom.startBtn.disabled = false;
   dom.startBtn.textContent = "둘러보기 시작";
   if (urlParams.get("autostart") === "1") {
@@ -151,7 +163,7 @@ function showFatalError(error) {
 }
 
 async function loadMapData() {
-  const response = await fetch("./assets/seoul-scene-data.json");
+  const response = await fetch("./assets/full-seoul/scene.json");
   if (!response.ok) {
     throw new Error(`Map data load failed (${response.status})`);
   }
@@ -160,29 +172,14 @@ async function loadMapData() {
 
 async function loadJson(url){const response=await fetch(url);if(!response.ok)throw new Error(`자료 로딩 실패: ${url} (${response.status})`);return response.json();}
 
-async function loadRasterMapImage() {
-  return new Promise((resolve) => {
-    const image = new Image();
-    image.decoding = "async";
-    image.onload = () => resolve(image);
-    image.onerror = () => {
-      console.warn("Raster map image unavailable. Falling back to vector texture.");
-      resolve(null);
-    };
-    image.src = "./assets/seoul-raster-map.png";
-  });
-}
 
 function configureSeoulMap(mapData) {
   const { project, width, depth } = localMetreProjection(mapData.bbox);
-  world.width = width + 1000;
-  world.depth = depth + 1000;
+  world.width = width;
+  world.depth = depth;
+  districtDefs=mapData.districts??[];
 
   runtime.projectedMap = {
-    rasterBounds: {
-      northWest: project(mapData.bbox.minLon, mapData.bbox.maxLat),
-      southEast: project(mapData.bbox.maxLon, mapData.bbox.minLat),
-    },
     attribution: mapData.attribution,
     waterPolygons: projectWater(runtime.waterData,project),
     waterLines: mapData.waterLines.map((points) => projectLine(points, project)),
@@ -192,7 +189,8 @@ function configureSeoulMap(mapData) {
       secondary: mapData.roads.secondary.map((points) => projectLine(points, project)),
     },
     route: projectLine(mapData.route.points, project),
-    buildings: mapData.buildings.map((building) => projectBuilding(building, project)).filter(Boolean),
+    buildings: [],
+    districtPolygons: runtime.districts?.features.map(f=>({id:f.id,polygons:projectWater({type:'FeatureCollection',features:[f]},project)}))??[],
   };
 
   riverPath = pickLongestLine(runtime.projectedMap.waterLines).map(([x, z]) => new THREE.Vector2(x, z));
@@ -224,7 +222,7 @@ function setupThree() {
     failIfMajorPerformanceCaveat: false,
     precision: "highp",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -233,9 +231,9 @@ function setupThree() {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf0a877);
-  scene.fog = new THREE.Fog(0xd9927e, 6000, 22000);
+  scene.fog = new THREE.Fog(0xd9927e, 9000, 40000);
 
-  const camera = new THREE.PerspectiveCamera(76, window.innerWidth / window.innerHeight, 0.5, 36000);
+  const camera = new THREE.PerspectiveCamera(76, window.innerWidth / window.innerHeight, 0.5, 60000);
   camera.position.set(0, 200, 0);
 
   const hemi = new THREE.HemisphereLight(0x7c6f9e, 0x2c2438, 1.5);
@@ -265,30 +263,27 @@ function setupThree() {
 }
 
 async function buildWorld() {
-  const scene = runtime.scene;
-
-  const groundTexture = createGroundTexture();
-  const terrainGeometry=createTerrainGeometry(runtime.terrain,world.width,world.depth);
-  const ground = new THREE.Mesh(
-    terrainGeometry,
-    new THREE.MeshStandardMaterial({
-      map: groundTexture,
-      roughness: 0.98,
-      metalness: 0.04,
-    }),
-  );
-  scene.add(ground);
-
-  const river = createRiverMesh();
-  scene.add(river);
-  runtime.riverMesh = river;
-
+  const scene=runtime.scene;
+  const geometry=createTerrainGeometry(runtime.renderTerrain,world.width,world.depth);
+  const colors=[],position=geometry.getAttribute('position');
+  const low=new THREE.Color(0x454c49),high=new THREE.Color(0xa69c87);
+  for(let i=0;i<position.count;i++){const color=low.clone().lerp(high,THREE.MathUtils.clamp(position.getY(i)/850,0,1));colors.push(color.r,color.g,color.b);}
+  geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  scene.add(new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.96,metalness:0})));
+  const river=createRiverMesh();scene.add(river);runtime.riverMesh=river;
+  // These are the retained central-Seoul road centrelines, not invented full-city streets.
+  const roadPositions=[];
+  for(const lines of Object.values(runtime.projectedMap.roads))for(const line of lines)for(let i=1;i<line.length;i++){
+    const a=line[i-1],b=line[i],steps=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/40));
+    for(let step=0;step<steps;step++)for(const t of [step/steps,(step+1)/steps]){
+      const x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;roadPositions.push(x,sampleLocalElevation(runtime.renderTerrain,x,z)+.8,z);
+    }
+  }
+  const roadGeometry=new THREE.BufferGeometry();roadGeometry.setAttribute('position',new THREE.Float32BufferAttribute(roadPositions,3));
+  scene.add(new THREE.LineSegments(roadGeometry,new THREE.LineBasicMaterial({color:0xb5aca0,transparent:true,opacity:.42})));
   createSky(scene);
-  // DEM surface replaces randomly offset cone mountains.
   await createLandmarks(scene);
   await createCityTiles(scene);
-  // Legacy bridge pylons and lengths were invented; source roads remain on the map.
-  // No invented perimeter skyscrapers: the skyline follows the source footprint set.
   createCheckpoints(scene);
   createClouds(scene);
 }
@@ -374,172 +369,23 @@ function createSky(scene) {
 }
 
 function buildMiniMapBase() {
-  const base = document.createElement("canvas");
-  base.width = dom.miniMap.width;
-  base.height = dom.miniMap.height;
-  const ctx = base.getContext("2d");
-  const map = runtime.projectedMap;
-
-  if (runtime.rasterMapImage) {
-    drawRasterMap(ctx, base);
-    ctx.fillStyle = "rgba(7, 14, 24, 0.16)";
-    ctx.fillRect(0, 0, base.width, base.height);
-  } else {
-    ctx.fillStyle = "#09131b";
-    ctx.fillRect(0, 0, base.width, base.height);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
-    for (let x = 0; x <= base.width; x += 32) {
-      ctx.fillRect(x, 0, 1, base.height);
-    }
-    for (let y = 0; y <= base.height; y += 32) {
-      ctx.fillRect(0, y, base.width, 1);
-    }
-
-    map.waterPolygons.forEach((polygon) => drawWaterPolygon(ctx, base, polygon, "rgba(48, 121, 212, 0.95)"));
-    map.buildings.forEach((building) => {
-      if (building.area < 280 && building.height < 28) {
-        return;
-      }
-      drawMiniMapPolygon(ctx, base, building.points, building.height >= 90 ? "rgba(187, 220, 255, 0.34)" : "rgba(226, 236, 242, 0.16)");
-    });
-    map.roads.primary.forEach((line) => drawMiniMapLine(ctx, base, line, 2.2, "rgba(255, 224, 157, 0.15)"));
-    map.roads.trunk.forEach((line) => drawMiniMapLine(ctx, base, line, 3, "rgba(255, 200, 120, 0.24)"));
+  const base=document.createElement('canvas');base.width=dom.miniMap.width;base.height=dom.miniMap.height;
+  const ctx=base.getContext('2d');ctx.fillStyle='#172729';ctx.fillRect(0,0,base.width,base.height);
+  for(const polygon of runtime.projectedMap.waterPolygons)drawWaterPolygon(ctx,base,polygon,'#427fa1');
+  for(const district of runtime.projectedMap.districtPolygons)for(const polygon of district.polygons){
+    for(const ring of polygon)drawMiniMapLine(ctx,base,ring,.65,'rgba(232,224,199,.62)');
   }
-  runtime.miniMapBase = base;
+  for(const line of runtime.projectedMap.roads.trunk)drawMiniMapLine(ctx,base,line,.7,'rgba(255,200,140,.45)');
+  runtime.miniMapBase=base;
 }
 
-function createGroundTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 3072;
-  canvas.height = 2048;
-  const ctx = canvas.getContext("2d");
-  const map = runtime.projectedMap;
-
-  if (runtime.rasterMapImage) {
-    ctx.save();
-    ctx.filter = "contrast(1.1) saturate(0.82) brightness(0.78)";
-    drawRasterMap(ctx, canvas);
-    ctx.restore();
-
-    // Dusk wash: multiply toward deep purple-mauve.
-    ctx.save();
-    ctx.globalCompositeOperation = "multiply";
-    ctx.fillStyle = "rgba(122, 106, 136, 0.55)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-
-    // Warm sun-facing tint patch (sun azimuth ~ -25deg -> biased toward left/upper of texture).
-    ctx.save();
-    ctx.globalCompositeOperation = "soft-light";
-    const sunTint = ctx.createRadialGradient(
-      canvas.width * 0.32, canvas.height * 0.28, 0,
-      canvas.width * 0.32, canvas.height * 0.28, canvas.width * 0.65,
-    );
-    sunTint.addColorStop(0, "rgba(201, 138, 106, 0.55)");
-    sunTint.addColorStop(1, "rgba(201, 138, 106, 0)");
-    ctx.fillStyle = sunTint;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-
-    const wash = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    wash.addColorStop(0, "rgba(18, 14, 30, 0.1)");
-    wash.addColorStop(0.5, "rgba(14, 10, 24, 0.18)");
-    wash.addColorStop(1, "rgba(16, 12, 26, 0.26)");
-    ctx.fillStyle = wash;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  } else {
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, "#1f3329");
-    gradient.addColorStop(0.42, "#16281f");
-    gradient.addColorStop(1, "#101c16");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.globalAlpha = 0.08;
-    for (let x = 0; x <= canvas.width; x += 96) {
-      ctx.fillStyle = x % 192 === 0 ? "#8db36f" : "#74935d";
-      ctx.fillRect(x, 0, 2, canvas.height);
-    }
-    for (let y = 0; y <= canvas.height; y += 96) {
-      ctx.fillStyle = y % 192 === 0 ? "#8db36f" : "#74935d";
-      ctx.fillRect(0, y, canvas.width, 2);
-    }
-    ctx.globalAlpha = 1;
-
-    ctx.save();
-    map.buildings.forEach((building) => {
-      const fill = building.height >= 120
-        ? "rgba(210, 230, 255, 0.18)"
-        : building.height >= 60
-          ? "rgba(176, 196, 214, 0.14)"
-          : "rgba(128, 146, 160, 0.12)";
-      drawPolygon(ctx, canvas, building.points, fill);
-    });
-    ctx.restore();
-
-    ctx.save();
-    ctx.shadowBlur = 34;
-    ctx.shadowColor = "rgba(58, 164, 255, 0.42)";
-    map.waterPolygons.forEach((polygon) => {
-      drawWaterPolygon(ctx, canvas, polygon, "rgba(38, 92, 174, 0.96)");
-    });
-    map.waterPolygons.forEach((polygon) => {
-      drawWaterPolygon(ctx, canvas, polygon, "rgba(114, 194, 255, 0.38)");
-    });
-    ctx.restore();
-
-    drawProjectedFeatureSet(ctx, canvas, map.roads.secondary, 5, "rgba(255, 226, 163, 0.1)");
-    drawProjectedFeatureSet(ctx, canvas, map.roads.primary, 9, "rgba(253, 228, 172, 0.18)");
-    drawProjectedFeatureSet(ctx, canvas, map.roads.trunk, 13, "rgba(255, 210, 138, 0.28)");
-  }
-
-  // Source raster already contains bridges; no metre-to-pixel decorative overlays.
-
-  if (!runtime.rasterMapImage) {
-    ctx.fillStyle = "rgba(255, 232, 208, 0.95)";
-    ctx.font = '700 64px "Orbitron", sans-serif';
-    ctx.fillText("SEOUL AIR TOUR", 86, 110);
-  }
-
-  ctx.save();
-  ctx.strokeStyle = "rgba(36, 20, 20, 0.55)";
-  ctx.lineWidth = 4;
-  ctx.fillStyle = "rgba(255, 232, 208, 0.92)";
-  ctx.font = '700 44px "IBM Plex Sans KR", sans-serif';
-  landmarkDefs.forEach((landmark) => {
-    const position = worldToTexture(landmark.x, landmark.z - 84, canvas);
-    ctx.textAlign = "center";
-    ctx.strokeText(landmark.label.toUpperCase(), position.x, position.y);
-    ctx.fillText(landmark.label.toUpperCase(), position.x, position.y);
-  });
-  ctx.restore();
-  const riverMid = riverPath[Math.floor(riverPath.length * 0.52)];
-  if (riverMid) {
-    ctx.save();
-    ctx.strokeStyle = "rgba(36, 20, 20, 0.55)";
-    ctx.lineWidth = 4;
-    const position = worldToTexture(riverMid.x, riverMid.y, canvas);
-    ctx.textAlign = "center";
-    ctx.strokeText("HAN RIVER", position.x, position.y);
-    ctx.fillStyle = "rgba(255, 224, 200, 0.95)";
-    ctx.fillText("HAN RIVER", position.x, position.y);
-    ctx.restore();
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.anisotropy = runtime.renderer.capabilities.getMaxAnisotropy();
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return texture;
-}
 
 function createRiverMesh() {
+  const grid=runtime.renderTerrain;
   const geometry=makeWaterGeometry(runtime.projectedMap.waterPolygons,{
-    minX:-runtime.terrain.projectedWidthM/2,maxX:runtime.terrain.projectedWidthM/2,
-    minZ:-runtime.terrain.projectedDepthM/2,maxZ:runtime.terrain.projectedDepthM/2,
-  },getTerrainHeight,{columns:runtime.terrain.width-1,rows:runtime.terrain.height-1});
-  return new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({
-    color:0x4a7588,roughness:.38,metalness:.15,side:THREE.DoubleSide,
-  }));
+    minX:-grid.projectedWidthM/2,maxX:grid.projectedWidthM/2,minZ:-grid.projectedDepthM/2,maxZ:grid.projectedDepthM/2,
+  },(x,z)=>sampleLocalElevation(grid,x,z),{columns:grid.width-1,rows:grid.height-1});
+  return new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color:0x4a7588,roughness:.38,metalness:.15,side:THREE.DoubleSide}));
 }
 
 
@@ -548,25 +394,51 @@ function createRiverMesh() {
 
 
 async function createCityTiles(scene){
-  const manifest=await loadJson('./assets/city/manifest.json');
-  const loader=new GLTFLoader();
-  runtime.city=new CityStream(manifest.tiles,{
-    load:async tile=>(await loader.loadAsync(`./assets/city/${tile.url}`)).scene,
-    attach:(object,tile)=>{object.position.fromArray(tile.origin);scene.add(object);},
-    dispose:object=>{
-      scene.remove(object);const geometries=new Set(),materials=new Set(),textures=new Set();
-      object.traverse(node=>{if(node.geometry)geometries.add(node.geometry);for(const material of (Array.isArray(node.material)?node.material:[node.material]))if(material){materials.add(material);for(const value of Object.values(material))if(value?.isTexture)textures.add(value);}});
-      for(const geometry of geometries)geometry.dispose();
-      for(const material of materials)material.dispose();
-      for(const texture of textures){texture.source?.data?.close?.();texture.dispose();}
+  const manifest=runtime.cityManifest;
+  const mobile=window.matchMedia('(max-width:760px)').matches;
+  const range=mobile?{near:1100,nearFade:[650,950],far:2800,farFade:[1800,2500]}:{near:1900,nearFade:[1300,1650],far:4300,farFade:[3200,3900]};
+  const texture=new THREE.TextureLoader().load('./scripts/generic-window-original.png');
+  texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.colorSpace=THREE.SRGBColorSpace;
+  texture.anisotropy=Math.min(4,runtime.renderer.capabilities.getMaxAnisotropy());
+  const materials={};
+  for(const lod of ['near','far']){
+    const material=new THREE.MeshStandardMaterial({map:texture,vertexColors:true,roughness:.86,metalness:.04});
+    const [begin,end]=range[lod+'Fade'];
+    material.onBeforeCompile=shader=>{
+      shader.uniforms.cityFade={value:new THREE.Vector2(begin,end)};
+      shader.vertexShader='varying vec3 cityWorld;\n'+shader.vertexShader;
+      shader.vertexShader=shader.vertexShader.replace('#include <worldpos_vertex>','#include <worldpos_vertex>\n cityWorld=(modelMatrix*vec4(transformed,1.0)).xyz;');
+      shader.fragmentShader='varying vec3 cityWorld; uniform vec2 cityFade;\n'+shader.fragmentShader;
+      shader.fragmentShader=shader.fragmentShader.replace('#include <alphatest_fragment>','#include <alphatest_fragment>\n float cityD=length(cityWorld.xz-cameraPosition.xz); float cityAlpha=1.0-smoothstep(cityFade.x,cityFade.y,cityD); if(cityAlpha<fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453)) discard;');
+    };
+    material.customProgramCacheKey=()=>lod+'-city-distance-fade';materials[lod]=material;
+  }
+  runtime.cityWorker=new CityWorkerClient(runtime.terrain);
+  const tiles=manifest.tiles.flatMap(tile=>['near','far'].map(lod=>({...tile,id:tile.id+'/'+lod,lod,loadRadius:range[lod],releaseRadius:range[lod]+650})));
+  runtime.city=new CityStream(tiles,{
+    concurrency:3,
+    load:async tile=>{
+      const result=await runtime.cityWorker.load(tile),group=new THREE.Group();
+      group.userData.stats=result.stats;
+      for(const attributes of result.groups){
+        if(!attributes.index.length)continue;
+        const geometry=new THREE.BufferGeometry();
+        for(const [key,size] of [['position',3],['normal',3],['uv',2],['color',3]])geometry.setAttribute(key,new THREE.BufferAttribute(attributes[key],size));
+        geometry.setIndex(new THREE.BufferAttribute(attributes.index,1));geometry.computeBoundingSphere();geometry.computeBoundingBox();
+        group.add(new THREE.Mesh(geometry,materials[tile.lod]));
+      }
+      return group;
     },
+    attach:(object,tile)=>{object.position.fromArray(tile.origin);scene.add(object);},
+    dispose:object=>{scene.remove(object);object.traverse(node=>node.geometry?.dispose());},
     onStatus:({ready,total,failed})=>{
-      const label=document.getElementById('asset-status');
-      label.textContent=failed?`건물 자료 ${failed}구역 로드 실패 · R로 재시도`:`주변 건물 ${ready} / ${total}구역 · 이동하면 다음 구역을 불러옵니다.`;
+      document.getElementById('asset-status').textContent=failed?'건물 '+failed+'구역 로드 실패 · R로 재시도':'주변 상세도 '+ready+' / '+total+' · 서울 25구 · 이동 중 불러오기';
     },
   });
-  const first=checkpointDefs[0];
-  await runtime.city.update({x:first.x-360,z:first.z+36});
+  const first=checkpointDefs[0];runtime.city.update({x:first.x-360,z:first.z+36});
+  // Only the nearest available tile gates first flight, never the whole city.
+  const firstEntries=[...runtime.city.entries.values()].slice(0,3);
+  if(firstEntries.length)await Promise.race(firstEntries.map(entry=>entry.promise));
 }
 
 
@@ -723,6 +595,8 @@ function bindEvents() {
     startGame();
     requestFlightPointerLock();
   });
+  dom.districtGo.addEventListener('click',()=>goToDistrict(dom.districtSelect.value));
+  window.addEventListener('pagehide', handlePageHide);
 
   runtime.renderer.domElement.addEventListener("click", () => {
     if (state.mode === "running") {
@@ -861,7 +735,7 @@ function resetFlight() {
 }
 
 function startGame() {
-  if (state.mode !== "intro" && state.mode !== "paused") {
+  if (!["intro","paused","complete"].includes(state.mode)) {
     return;
   }
 
@@ -889,6 +763,13 @@ function pauseFlight() {
   dom.resumeBtn.hidden = false;
   dom.restartBtn.textContent = "처음부터 다시";
   dom.messagePanel.classList.remove("hidden");
+}
+
+function handlePageHide(event) {
+  pauseFlight();
+  // A bfcache page keeps this same runtime on return. Do not terminate the
+  // worker it will still need when the user visits another district.
+  if (!event.persisted) runtime.cityWorker?.dispose();
 }
 
 function loop(now) {
@@ -927,14 +808,17 @@ function updateFlight(delta) {
   state.forward.set(0, 0, -1).applyEuler(euler).normalize();
   state.position.addScaledVector(state.forward, state.speed * delta);
 
-  const terrainHeight = getTerrainHeight(state.position.x, state.position.z);
-  const floor = terrainHeight + 18;
+  // Sample the final horizontal location. Clamping to the boundary after the
+  // height test could move the camera into a higher neighbouring terrain cell.
+  enforceBoundary(delta);
+
+  const floor = safeFlightFloor(runtime.terrain,runtime.renderTerrain,state.position.x,state.position.z);
 
   if (state.position.y < floor) {
     state.position.y = floor;
     state.pitch = Math.max(state.pitch, 0.05);
     state.roll = THREE.MathUtils.damp(state.roll, 0, 5.4, delta);
-    runtime.currentStatus = "저고도. 자동으로 지면 위로 복귀 중.";
+    runtime.currentStatus = "안전 고도 보정 · 원본 지형/표시 지형/해발 0m 중 높은 면의 18m 위";
   }
 
   if (state.position.y > world.ceiling) {
@@ -942,7 +826,6 @@ function updateFlight(delta) {
     state.pitch = Math.min(state.pitch, 0);
   }
 
-  enforceBoundary(delta);
   updateCamera(delta);
 }
 
@@ -1053,7 +936,7 @@ function updateHud() {
   dom.headingValue.textContent = String(Math.round(headingDegrees) % 360).padStart(3, "0");
   dom.headingCardinal.textContent = getCardinal(headingDegrees);
   dom.timerValue.textContent = formatTime(state.elapsedMs);
-  dom.targetName.textContent = current ? current.name : "둘러보기 완료";
+  dom.targetName.textContent = current ? current.name : "서울 자유 비행";
   dom.progressValue.textContent = `${Math.min(state.checkpointIndex, checkpointDefs.length)} / ${checkpointDefs.length}`;
   dom.targetAltitude.textContent = current ? formatMetres(current.y) : "—";
   dom.distanceValue.textContent = `${Math.round(distance)}m`;
@@ -1072,7 +955,8 @@ function finishRun() {
   dom.messageTag.textContent = "TOUR COMPLETE";
   dom.messageTitle.textContent = "서울의 다섯 랜드마크를 모두 둘러봤습니다.";
   dom.messageBody.textContent = `둘러본 곳 ${checkpointDefs.length}곳 · 비행 시간 ${formatTime(state.elapsedMs)}`;
-  dom.resumeBtn.hidden = true;
+  dom.resumeBtn.hidden = false;
+  dom.resumeBtn.textContent = '서울 전역 자유 비행';
   dom.restartBtn.textContent = "다시 둘러보기";
   dom.messagePanel.classList.remove("hidden");
   dom.restartBtn.focus({ preventScroll: true });
@@ -1095,6 +979,19 @@ function enforceBoundary(delta) {
   const deltaAngle = shortestAngle(state.yaw, desired);
   state.yaw += deltaAngle * Math.min(1, delta * 1.8);
   runtime.currentStatus = "서울 지도 경계 접근. 지도 안쪽으로 복귀 중.";
+}
+
+function goToDistrict(id) {
+  const district=districtDefs.find(item=>item.id===id);
+  if(!district||!runtime.scene)return;
+  clearInputs();document.exitPointerLock?.();runtime.pointerLocked=false;
+  const [x,z]=district.position;
+  state.position.set(THREE.MathUtils.clamp(x,-world.width/2+world.boundaryPadding,world.width/2-world.boundaryPadding),
+    Math.min(world.ceiling-80,safeFlightFloor(runtime.terrain,runtime.renderTerrain,x,z)+430),
+    THREE.MathUtils.clamp(z,-world.depth/2+world.boundaryPadding,world.depth/2-world.boundaryPadding));
+  state.yaw=yawToTarget(state.position,{x:0,z:0});state.pitch=-.16;state.roll=0;state.speed=74;
+  state.mode='paused';runtime.currentStatus=district.name+' 상공 · 이동 중 건물 자료를 불러옵니다.';
+  runtime.city?.update(state.position);updateCamera(0);startGame();
 }
 
 function getTerrainHeight(x, z) {
@@ -1152,16 +1049,6 @@ function worldToTexture(x, z, canvas) {
   };
 }
 
-function drawRasterMap(ctx, canvas) {
-  const bounds = runtime.projectedMap.rasterBounds;
-  const start = worldToTexture(bounds.northWest.x, bounds.northWest.z, canvas);
-  const end = worldToTexture(bounds.southEast.x, bounds.southEast.z, canvas);
-  // The raster covers the geographic bbox, not the padded simulation world.
-  // Use the same projection as buildings, roads and landmark positions.
-  ctx.fillStyle = "#303442";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(runtime.rasterMapImage, start.x, start.y, end.x - start.x, end.y - start.y);
-}
 
 function placeLabel(ctx, canvas, text, x, z, color = "rgba(225, 242, 251, 0.62)") {
   const position = worldToTexture(x, z, canvas);
@@ -1314,79 +1201,7 @@ function projectLine(points, project) {
   });
 }
 
-function projectBuilding(building, project) {
-  if (!Array.isArray(building.points) || building.points.length < 3) {
-    return null;
-  }
 
-  const points = [];
-  building.points.forEach(([lon, lat]) => {
-    const projected = project(lon, lat);
-    const next = [projected.x, projected.z];
-    const previous = points[points.length - 1];
-    if (!previous || horizontalDistance(previous[0], previous[1], next[0], next[1]) > 1) {
-      points.push(next);
-    }
-  });
-
-  if (points.length > 2) {
-    const first = points[0];
-    const last = points[points.length - 1];
-    if (horizontalDistance(first[0], first[1], last[0], last[1]) <= 1) {
-      points.pop();
-    }
-  }
-
-  if (points.length < 3) {
-    return null;
-  }
-
-  const signedArea = polygonSignedArea(points);
-  if (Math.abs(signedArea) < 10) {
-    return null;
-  }
-
-  const centroid = polygonCentroid(points, signedArea);
-  const footprintArea = Math.abs(signedArea);
-  let minX = Number.POSITIVE_INFINITY;
-  let maxX = Number.NEGATIVE_INFINITY;
-  let minZ = Number.POSITIVE_INFINITY;
-  let maxZ = Number.NEGATIVE_INFINITY;
-  let radius = 0;
-  points.forEach(([x, z]) => {
-    minX = Math.min(minX, x);
-    maxX = Math.max(maxX, x);
-    minZ = Math.min(minZ, z);
-    maxZ = Math.max(maxZ, z);
-    radius = Math.max(radius, horizontalDistance(x, z, centroid.x, centroid.z));
-  });
-
-  return {
-    ...building,
-    points,
-    height: normalizeBuildingHeight(building),
-    footprintArea,
-    footprintWidth: Math.max(4, maxX - minX),
-    footprintDepth: Math.max(4, maxZ - minZ),
-    footprintMinX: minX,
-    footprintMaxX: maxX,
-    footprintMinZ: minZ,
-    footprintMaxZ: maxZ,
-    x: centroid.x,
-    z: centroid.z,
-    radius: Math.max(radius, 10),
-  };
-}
-
-function normalizeBuildingHeight(building) {
-  const explicitHeight = Number(building.height);
-  if (Number.isFinite(explicitHeight) && explicitHeight > 0) {
-    return THREE.MathUtils.clamp(explicitHeight, 8, 320);
-  }
-
-  const footprintArea = Math.max(0, Number(building.area) || 0);
-  return THREE.MathUtils.clamp(10 + Math.sqrt(footprintArea) * 0.24, 8, 180);
-}
 
 function sampleRoutePoints(points, step = 1) {
   if (!points.length) {
@@ -1423,15 +1238,6 @@ function polylineLength(points) {
   return total;
 }
 
-function polygonSignedArea(points) {
-  let area = 0;
-  for (let index = 0; index < points.length; index += 1) {
-    const [x1, z1] = points[index];
-    const [x2, z2] = points[(index + 1) % points.length];
-    area += x1 * z2 - x2 * z1;
-  }
-  return area * 0.5;
-}
 
 function polygonBounds(points) {
   let minX = Number.POSITIVE_INFINITY;
@@ -1449,35 +1255,6 @@ function polygonBounds(points) {
   return { minX, maxX, minZ, maxZ };
 }
 
-function polygonCentroid(points, signedArea = polygonSignedArea(points)) {
-  if (Math.abs(signedArea) < 1e-5) {
-    const total = points.reduce((accumulator, [x, z]) => {
-      accumulator.x += x;
-      accumulator.z += z;
-      return accumulator;
-    }, { x: 0, z: 0 });
-    return {
-      x: total.x / points.length,
-      z: total.z / points.length,
-    };
-  }
-
-  let centroidX = 0;
-  let centroidZ = 0;
-  for (let index = 0; index < points.length; index += 1) {
-    const [x1, z1] = points[index];
-    const [x2, z2] = points[(index + 1) % points.length];
-    const cross = x1 * z2 - x2 * z1;
-    centroidX += (x1 + x2) * cross;
-    centroidZ += (z1 + z2) * cross;
-  }
-
-  const factor = 1 / (6 * signedArea);
-  return {
-    x: centroidX * factor,
-    z: centroidZ * factor,
-  };
-}
 
 function mercatorX(lon) {
   return THREE.MathUtils.degToRad(lon);

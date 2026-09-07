@@ -9,14 +9,17 @@ import {FlightInputs,updateAttitude,yawToTarget} from '../flight-model.mjs';
 import {localMetreProjection} from '../geographic-model.mjs';
 import {sampleLocalElevation} from '../terrain-model.mjs';
 import {projectWater} from '../water-model.mjs';
+import {terrainLod,safeFlightFloor} from '../terrain-lod.mjs';
 
 const source=fs.readFileSync(new URL('../seoul-flight.mjs',import.meta.url),'utf8');
 const json=path=>JSON.parse(fs.readFileSync(new URL(path,import.meta.url)));
-const terrain=json('../assets/terrain/elevation.json');
+const terrain=json('../assets/full-seoul/terrain/elevation.json');
 const references=json('../assets/landmarks/references.json');
-const water=json('../assets/water/water.geojson');
-const map=json('../assets/seoul-scene-data.json');
-const functions=['configureSeoulMap','projectLine','projectBuilding','polygonSignedArea','polygonCentroid','normalizeBuildingHeight','pickLongestLine','polylineLength','getTerrainHeight','horizontalDistance','updateFlight','updateCamera','enforceBoundary','shortestAngle','getRelativeBearing','getHeadingRadians','updateCheckpoints'];
+const water=json('../assets/full-seoul/water/water.geojson');
+const map=json('../assets/full-seoul/scene.json');
+const districts=json('../assets/full-seoul/source/districts.geojson');
+const renderTerrain=terrainLod(terrain,420);
+const functions=['configureSeoulMap','projectLine','pickLongestLine','polylineLength','getTerrainHeight','horizontalDistance','updateFlight','updateCamera','enforceBoundary','shortestAngle','getRelativeBearing','getHeadingRadians','updateCheckpoints','goToDistrict','handlePageHide'];
 const functionSource=functions.map(name=>{
   const match=source.match(new RegExp(`^function ${name}\\([^]*?^}`, 'm'));
   assert.ok(match,`source function ${name} must remain inspectable`);return match[0];
@@ -25,13 +28,14 @@ const functionSource=functions.map(name=>{
 function setup(){
   let now=0;
   const context=vm.createContext({
-    THREE,updateAttitude,yawToTarget,localMetreProjection,sampleLocalElevation,projectWater,
+    THREE,updateAttitude,yawToTarget,localMetreProjection,sampleLocalElevation,projectWater,safeFlightFloor,
     world:vm.runInNewContext(`(${source.match(/const world =\s*({[^;]+});/)[1]})`),
     state:{mode:'running',position:new THREE.Vector3(),forward:new THREE.Vector3(),yaw:0,pitch:0,roll:0,speed:68,checkpointIndex:0},
     input:new FlightInputs().state,
-    runtime:{terrain,landmarkReferences:references,waterData:water,lookRollVelocity:0,pointerLocked:false,camera:new THREE.PerspectiveCamera(76,1,.5,36000),cockpitLight:{intensity:.48},checkpointGroups:[]},
-    dom:{miniMap:{width:240}},riverPath:[],landmarkDefs:[],checkpointDefs:[],
+    runtime:{terrain,renderTerrain,districts,scene:{},landmarkReferences:references,waterData:water,lookRollVelocity:0,pointerLocked:false,camera:new THREE.PerspectiveCamera(76,1,.5,60000),cockpitLight:{intensity:.48},checkpointGroups:[]},
+    dom:{miniMap:{width:240}},riverPath:[],landmarkDefs:[],checkpointDefs:[],districtDefs:[],
     performance:{now:()=>now},window:{matchMedia:()=>({matches:false})},
+    document:{exitPointerLock:()=>{}},clearInputs:()=>{},startGame:()=>{context.state.mode='running';},pauseFlight:()=>{context.state.mode='paused';},
     updateCheckpointVisuals:()=>{},finishRun:()=>{context.state.mode='complete';},
   });
   vm.runInContext(functionSource,context);
@@ -75,8 +79,35 @@ test('actual flight clamps terrain, ceiling and all four boundary approaches',()
   }
   t.state.position.set(0,-500,0);t.state.pitch=-.4;t.updateFlight(1/60);
   assert.ok(t.state.position.y>=t.getTerrainHeight(t.state.position.x,t.state.position.z)+18-.001);
-  t.state.position.y=1500;t.state.pitch=.4;t.updateFlight(1/60);
+  t.state.position.y=2500;t.state.pitch=.4;t.updateFlight(1/60);
   assert.equal(t.state.position.y,t.world.ceiling);assert.ok(t.state.pitch<=0);
+});
+
+test('actual district action reaches every source destination without resetting the tour',()=>{
+  const t=setup();t.state.checkpointIndex=3;
+  for(const district of t.districtDefs){
+    t.goToDistrict(district.id);assert.equal(t.state.mode,'running');assert.equal(t.state.checkpointIndex,3);
+    assert.ok(Math.hypot(t.state.position.x-district.position[0],t.state.position.z-district.position[1])<1e-6);
+    assert.ok(t.state.position.y>=safeFlightFloor(terrain,renderTerrain,...district.position)+429.99);
+  }
+});
+
+test('boundary correction samples safe altitude at the final clamped coordinates',()=>{
+  const t=setup(),x=t.world.width/2-t.world.boundaryPadding,z=t.world.depth/2-t.world.boundaryPadding;
+  for(let i=0;i<=80;i++)for(const [px,pz] of [[x+10,(i/80*2-1)*z],[-x-10,(i/80*2-1)*z],[(i/80*2-1)*x,z+10],[(i/80*2-1)*x,-z-10]]){
+    t.state.position.set(px,-500,pz);t.updateFlight(1/60);
+    const p=t.state.position;assert.ok(p.y>=safeFlightFloor(terrain,renderTerrain,p.x,p.z)-1e-6);
+  }
+});
+
+test('bfcache pagehide preserves the usable worker but real navigation disposes it',()=>{
+  const t=setup();let disposed=0;
+  t.runtime.cityWorker={dispose:()=>disposed++};
+  t.handlePageHide({persisted:true});
+  assert.equal(t.state.mode,'paused');assert.equal(disposed,0);
+  t.handlePageHide({persisted:false});
+  assert.equal(disposed,1);
+  assert.match(source,/addEventListener\('pagehide', handlePageHide\)/);
 });
 
 test('minimap keeps its geographic intrinsic aspect at desktop and mobile CSS widths',()=>{

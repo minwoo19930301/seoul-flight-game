@@ -1,0 +1,154 @@
+{
+  "gridSha256": "80d5fd912de0942f2899b7f44aa08a772fb042d015b390003cb1a57c24a08460",
+  "sourceValuesModified": false,
+  "negativeSamples": 139,
+  "negativeSamplesInsideSeoul": 94,
+  "belowMinus20M": 10,
+  "belowMinus20MInsideSeoul": 9,
+  "minimumSample": {
+    "gridIndex": 211027,
+    "row": 256,
+    "col": 83,
+    "lon": 126.80672506172539,
+    "lat": 37.59823629866283,
+    "heightM": -137.37,
+    "insideSeoulBoundary": true,
+    "neighbourRangeM": [
+      -31.429,
+      136.635
+    ]
+  },
+  "suspiciousBelowMinus20Samples": [
+    {
+      "gridIndex": 145024,
+      "row": 176,
+      "col": 0,
+      "lon": 126.7644328,
+      "lat": 37.630515184745775,
+      "heightM": -31.313,
+      "insideSeoulBoundary": false,
+      "neighbourRangeM": [
+        -7.847,
+        6.189
+      ]
+    },
+    {
+      "gridIndex": 209377,
+      "row": 254,
+      "col": 81,
+      "lon": 126.80570597108141,
+      "lat": 37.59904344157377,
+      "heightM": -46.054,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -41.872,
+        94.586
+      ]
+    },
+    {
+      "gridIndex": 210201,
+      "row": 255,
+      "col": 81,
+      "lon": 126.80570597108141,
+      "lat": 37.5986398712128,
+      "heightM": -41.872,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -46.054,
+        94.586
+      ]
+    },
+    {
+      "gridIndex": 211027,
+      "row": 256,
+      "col": 83,
+      "lon": 126.80672506172539,
+      "lat": 37.59823629866283,
+      "heightM": -137.37,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -31.429,
+        136.635
+      ]
+    },
+    {
+      "gridIndex": 211028,
+      "row": 256,
+      "col": 84,
+      "lon": 126.80723460704738,
+      "lat": 37.59823629866283,
+      "heightM": -28.521,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -137.37,
+        136.635
+      ]
+    },
+    {
+      "gridIndex": 211851,
+      "row": 257,
+      "col": 83,
+      "lon": 126.80672506172539,
+      "lat": 37.597832723923865,
+      "heightM": -24.92,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -137.37,
+        17.025
+      ]
+    },
+    {
+      "gridIndex": 211852,
+      "row": 257,
+      "col": 84,
+      "lon": 126.80723460704738,
+      "lat": 37.597832723923865,
+      "heightM": -31.429,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -137.37,
+        14.651
+      ]
+    },
+    {
+      "gridIndex": 215975,
+      "row": 262,
+      "col": 87,
+      "lon": 126.80876324301336,
+      "lat": 37.59581481739445,
+      "heightM": -98.745,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -11.611,
+        29.642
+      ]
+    },
+    {
+      "gridIndex": 306584,
+      "row": 372,
+      "col": 56,
+      "lon": 126.79296733803159,
+      "lat": 37.551407030479325,
+      "heightM": -26.014,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -29.362,
+        0
+      ]
+    },
+    {
+      "gridIndex": 307408,
+      "row": 373,
+      "col": 56,
+      "lon": 126.79296733803159,
+      "lat": 37.55100320187253,
+      "heightM": -29.362,
+      "insideSeoulBoundary": true,
+      "neighbourRangeM": [
+        -26.014,
+        -2.103
+      ]
+    }
+  ],
+  "interpretation": "Large negative historical source values are possible urban/source void/resampling artifacts, not verified deep depressions. These values remain unchanged to preserve data provenance. A game-specific visual correction would require a separate explicitly labelled derived layer; this package does not silently clamp or fabricate heights."
+}
