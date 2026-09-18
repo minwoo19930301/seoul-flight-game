@@ -11,13 +11,56 @@ export function displayHeight(item){
 export function isFarFeature(item){return displayHeight(item).height>=24||item.areaM2>=500;}
 export function ringArea(ring){let sum=0;for(let i=0,j=ring.length-1;i<ring.length;j=i++)sum+=ring[j][0]*ring[i][1]-ring[i][0]*ring[j][1];return sum/2;}
 
-export function buildCityGeometry(tile,terrain,lod='near'){
+export function pointInRing(ring,x,z){
+  let inside=false;
+  for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+    const ax=ring[j][0],az=ring[j][1],bx=ring[i][0],bz=ring[i][1];
+    if((az>z)!==(bz>z)&&x<((bx-ax)*(z-az))/(bz-az)+ax)inside=!inside;
+  }
+  return inside;
+}
+
+export function localizeKeepouts(tile,keepouts){
+  const ox=tile.origin[0],oz=tile.origin[2];
+  return keepouts
+    .map(keepout=>({x:keepout.x-ox,z:keepout.z-oz,radius:keepout.radius}))
+    .filter(keepout=>Math.abs(keepout.x)<1400&&Math.abs(keepout.z)<1400);
+}
+
+export function cityItemHitsKeepout(item,keepouts,origin=[0,0,0]){
+  const ox=origin[0],oz=origin[2];
+  for(const keepout of keepouts){
+    const worldAnchor=Math.hypot(item.anchor[0]-keepout.x,item.anchor[1]-keepout.z);
+    const localAnchor=Math.hypot(item.anchor[0]+ox-keepout.x,item.anchor[1]+oz-keepout.z);
+    if(Math.min(worldAnchor,localAnchor)<=keepout.radius)return true;
+    const lx=keepout.x-ox,lz=keepout.z-oz;
+    for(const polygon of item.polygons){
+      const ring=polygon[0];
+      if(!ring?.length)continue;
+      if(pointInRing(ring,lx,lz))return true;
+      let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;
+      for(const [x,z] of ring){
+        if(Math.hypot(x-lx,z-lz)<=keepout.radius)return true;
+        if(x<minX)minX=x;if(x>maxX)maxX=x;
+        if(z<minZ)minZ=z;if(z>maxZ)maxZ=z;
+      }
+      const cx=Math.max(minX,Math.min(lx,maxX));
+      const cz=Math.max(minZ,Math.min(lz,maxZ));
+      if(Math.hypot(cx-lx,cz-lz)<=keepout.radius)return true;
+    }
+  }
+  return false;
+}
+
+export function buildCityGeometry(tile,terrain,lod='near',keepouts=[]){
   const groups=[{p:[],n:[],u:[],c:[],i:[]},{p:[],n:[],u:[],c:[],i:[]}];
-  const stats={features:0,source:0,estimated:0,holes:0,roofAreaError:0,skippedInvalidVolume:0,float32CollapsedTriangles:0,float32ReorientedTriangles:0};
+  const stats={features:0,source:0,estimated:0,holes:0,roofAreaError:0,skippedInvalidVolume:0,skippedKeepout:0,float32CollapsedTriangles:0,float32ReorientedTriangles:0};
+  const nearbyKeepouts=keepouts.filter(keepout=>Math.abs(keepout.x-tile.origin[0])<1400&&Math.abs(keepout.z-tile.origin[2])<1400);
   function vertex(g,x,y,z,nx,ny,nz,u,v,color){const id=g.p.length/3;g.p.push(x,y,z);g.n.push(nx,ny,nz);g.u.push(u,v);g.c.push(...color);return id;}
   for(const item of tile.items){
     if(lod==='far'&&!isFarFeature(item))continue;
     if(lod==='near'&&isFarFeature(item))continue;
+    if(nearbyKeepouts.length&&cityItemHitsKeepout(item,nearbyKeepouts,tile.origin)){stats.skippedKeepout++;continue;}
     const height=displayHeight(item),base=sampleLocalElevation(terrain,...item.anchor);
     const minHeight=Number.isFinite(item.minHeight)?Math.max(0,item.minHeight):Number.isFinite(item.minFloor)?Math.max(0,item.minFloor*3.1):0;
     if(minHeight>=height.height){stats.skippedInvalidVolume++;continue;}

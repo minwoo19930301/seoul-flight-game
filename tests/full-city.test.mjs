@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
 import {validateSceneContract} from '../scene-contract.mjs';
-import {displayHeight,isFarFeature,buildCityGeometry} from '../city-geometry.mjs';
+import {displayHeight,isFarFeature,buildCityGeometry,cityItemHitsKeepout} from '../city-geometry.mjs';
 import {localMetreProjection} from '../geographic-model.mjs';
 import {terrainLod,safeFlightFloor} from '../terrain-lod.mjs';
 import {sampleLocalElevation} from '../terrain-model.mjs';
@@ -48,6 +48,18 @@ test('closed outer contours, holes and rotated concavity survive both disjoint L
   assert.ok(far.stats.roofAreaError<1e-10);assert.equal(near.stats.estimated,1);assert.equal(far.stats.source,1);
 });
 
+test('landmark keepouts omit the generic box that occupies the same site',()=>{
+  const tile={origin:[100,0,200],items:[{id:'courtyard',polygons:[[[[0,0],[10,0],[10,10],[0,10],[0,0]]]],anchor:[5,5],height:30,areaM2:100},
+    {id:'neighbour',polygons:[[[[80,80],[90,80],[90,90],[80,90],[80,80]]]],anchor:[85,85],height:12,areaM2:100}]};
+  const flat={width:2,height:2,elevations:[20,20,20,20],projectedWidthM:100,projectedDepthM:100};
+  const cleared=buildCityGeometry(tile,flat,'far',[{x:105,z:205,radius:8}]);
+  const untouched=buildCityGeometry(tile,flat,'near',[{x:105,z:205,radius:8}]);
+  assert.equal(cleared.stats.skippedKeepout,1);assert.equal(cleared.stats.features,0);
+  assert.equal(untouched.stats.features,1);assert.equal(untouched.stats.skippedKeepout,0);
+  assert.equal(cityItemHitsKeepout(tile.items[0],[{x:105,z:205,radius:1}],tile.origin),true);
+  assert.equal(cityItemHitsKeepout(tile.items[1],[{x:105,z:205,radius:1}],tile.origin),false);
+});
+
 test('visual terrain LOD is bounded while source samples and safety floor remain intact',()=>{
   const desktop=terrainLod(terrain,420),mobile=terrainLod(terrain,280);
   assert.ok((desktop.width-1)*(desktop.height-1)*2<300000);assert.ok((mobile.width-1)*(mobile.height-1)*2<135000);
@@ -65,5 +77,5 @@ test('startup payload is below 2.5MB before runtime libraries, landmarks and nea
   assert.deepEqual(JSON.parse(gunzipSync(read('assets/full-seoul/terrain/elevation.json.gz'))),terrain);
   const source=read('seoul-flight.mjs').toString(),init=source.slice(source.indexOf('async function init()'),source.indexOf('function showFatalError'));
   assert.doesNotMatch(init,/seoul-scene-data|raster|district-data/);
-  assert.match(source,/new CityWorkerClient\(runtime.terrain\)/);assert.match(source,/concurrency:3/);
+  assert.match(source,/new CityWorkerClient\(runtime.terrain/);assert.match(source,/concurrency:3/);
 });

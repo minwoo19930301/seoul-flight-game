@@ -7,7 +7,7 @@ import {execFileSync} from 'node:child_process';
 const root=fileURLToPath(new URL('../',import.meta.url)),out=path.join(root,'dist');
 const modules=fs.readdirSync(root).filter(name=>name.endsWith('.mjs'));
 for(const file of modules)execFileSync(process.execPath,['--check',path.join(root,file)]);
-const files=['index.html','index-seoul-flight.html','seoul-flight.css','README.md',...modules,'vendor','assets/landmarks','assets/full-seoul','scripts/generic-window-original.png','docs'];
+const files=['index.html','index-seoul-flight.html','seoul-flight.css','README.md',...modules,'vendor','assets/landmarks','assets/full-seoul','landmarks','scripts/generic-window-original.png','scripts/landmark-registry.mjs','docs'];
 if(fs.existsSync(path.join(root,'LICENSE')))files.push('LICENSE');
 fs.mkdirSync(out,{recursive:true});
 for(const name of files){const destination=path.join(out,name);fs.mkdirSync(path.dirname(destination),{recursive:true});fs.cpSync(path.join(root,name),destination,{recursive:true});}

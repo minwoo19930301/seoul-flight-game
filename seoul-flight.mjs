@@ -3,6 +3,9 @@ import { controlByCode, FlightInputs, formatMetres, updateAttitude, yawToTarget 
 import { localMetreProjection } from "./geographic-model.mjs";
 import { sampleLocalElevation } from "./terrain-model.mjs";
 import { GLTFLoader } from "./vendor/loaders/GLTFLoader.js";
+import { extraLandmarks } from "./landmarks/index.mjs";
+import { mergeGroupByMaterial } from "./landmarks/_helpers.mjs";
+import { LANDMARKS as landmarkRegistry } from "./scripts/landmark-registry.mjs";
 import { makeWaterGeometry } from "./water-geometry.mjs";
 import { CityStream } from "./city-stream.mjs";
 import { createTerrainGeometry } from "./terrain-geometry.mjs";
@@ -53,6 +56,7 @@ const world = {
 let riverPath = [];
 let districtDefs = [];
 let landmarkDefs = [];
+let extraLandmarkDefs = [];
 let checkpointDefs = [];
 let bridgeDefs = [];
 
@@ -139,6 +143,11 @@ async function init() {
   if (urlParams.get("autostart") === "1") {
     startGame();
   }
+  const look=urlParams.get("look");
+  if(look){
+    const site=[...landmarkDefs,...extraLandmarkDefs].find(item=>item.id===look);
+    if(site)goToLandmarkSite(site);
+  }
   updateHud();
   runtime.frameId = requestAnimationFrame(loop);
 }
@@ -205,6 +214,14 @@ function configureSeoulMap(mapData) {
     yaw:THREE.MathUtils.degToRad(reference.yawDegFromEast||0),osmWayId:reference.osmWayId,
     ...project(reference.coordinate.lon,reference.coordinate.lat),
   }));
+  extraLandmarkDefs=extraLandmarks.map(module=>{
+    const registry=landmarkRegistry.find(entry=>entry.id===module.id);
+    return {
+      id:module.id,label:module.name,height:module.height,module,
+      colliderRadius:registry?.colliderRadius??module.colliderRadius??40,
+      ...project(registry?.lon??module.lon,registry?.lat??module.lat),
+    };
+  });
   checkpointDefs=landmarkDefs.map(landmark=>({
     name:landmark.label,x:landmark.x,z:landmark.z,
     y:getTerrainHeight(landmark.x,landmark.z)+landmark.height+75,
@@ -413,7 +430,10 @@ async function createCityTiles(scene){
     };
     material.customProgramCacheKey=()=>lod+'-city-distance-fade';materials[lod]=material;
   }
-  runtime.cityWorker=new CityWorkerClient(runtime.terrain);
+  runtime.cityWorker=new CityWorkerClient(runtime.terrain,{keepouts:[
+    ...landmarkDefs.map(site=>({x:site.x,z:site.z,radius:Math.max(site.colliderRadius||40,36)+24})),
+    ...extraLandmarkDefs.map(site=>({x:site.x,z:site.z,radius:Math.max(site.colliderRadius||40,36)+24})),
+  ]});
   const tiles=manifest.tiles.flatMap(tile=>['near','far'].map(lod=>({...tile,id:tile.id+'/'+lod,lod,loadRadius:range[lod],releaseRadius:range[lod]+650})));
   runtime.city=new CityStream(tiles,{
     concurrency:3,
@@ -460,6 +480,23 @@ async function createLandmarks(scene) {
     label.position.set(landmark.x, terrainHeight + landmark.height + 32, landmark.z);
     scene.add(label);
   }));
+
+  extraLandmarkDefs.forEach((landmark) => {
+    const terrainHeight = getTerrainHeight(landmark.x, landmark.z);
+    let group;
+    try {
+      group = mergeGroupByMaterial(landmark.module.create());
+    } catch (error) {
+      console.error(`Landmark ${landmark.id} failed to build`, error);
+      return;
+    }
+    group.position.set(landmark.x, terrainHeight, landmark.z);
+    scene.add(group);
+
+    const label = createLabelSprite(landmark.label, "#d7c4a4");
+    label.position.set(landmark.x, terrainHeight + landmark.height + 32, landmark.z);
+    scene.add(label);
+  });
 }
 
 
@@ -994,6 +1031,20 @@ function goToDistrict(id) {
   runtime.city?.update(state.position);updateCamera(0);startGame();
 }
 
+function goToLandmarkSite(site){
+  if(!site||!runtime.scene)return;
+  clearInputs();document.exitPointerLock?.();runtime.pointerLocked=false;
+  const offset=Math.max(160,site.height*1.15);
+  const x=site.x-offset,z=site.z+offset*0.85;
+  state.position.set(
+    THREE.MathUtils.clamp(x,-world.width/2+world.boundaryPadding,world.width/2-world.boundaryPadding),
+    Math.min(world.ceiling-80,getTerrainHeight(site.x,site.z)+Math.max(48,site.height*0.32)+36),
+    THREE.MathUtils.clamp(z,-world.depth/2+world.boundaryPadding,world.depth/2-world.boundaryPadding));
+  state.yaw=yawToTarget(state.position,site);state.pitch=-.14;state.roll=0;state.speed=36;
+  state.mode='paused';runtime.currentStatus=site.label;
+  runtime.city?.update(state.position);updateCamera(0);startGame();
+}
+
 function getTerrainHeight(x, z) {
   return sampleLocalElevation(runtime.terrain,x,z);
 }
@@ -1167,6 +1218,13 @@ function drawMiniMap() {
     ctx.stroke();
     ctx.restore();
   }
+  extraLandmarkDefs.forEach((landmark) => {
+    const point = worldToTexture(landmark.x, landmark.z, dom.miniMap);
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 2.2, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(232, 212, 168, 0.72)";
+    ctx.fill();
+  });
   checkpointDefs.forEach((checkpoint, index) => {
     const point = worldToTexture(checkpoint.x, checkpoint.z, dom.miniMap);
     ctx.beginPath();

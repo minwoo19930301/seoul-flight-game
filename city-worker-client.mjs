@@ -1,7 +1,7 @@
 // Worker keeps gzip/JSON parsing, hole triangulation and extrusion off the UI thread.
 export class CityWorkerClient{
-  constructor(terrain,{WorkerClass=globalThis.Worker,timeoutMs=60000}={}){
-    this.terrain=terrain;this.WorkerClass=WorkerClass;this.timeoutMs=timeoutMs;this.pending=new Map();this.sequence=0;this.disposed=false;this.initialize();
+  constructor(terrain,{WorkerClass=globalThis.Worker,timeoutMs=60000,keepouts=[]}={}){
+    this.terrain=terrain;this.WorkerClass=WorkerClass;this.timeoutMs=timeoutMs;this.keepouts=keepouts;this.pending=new Map();this.sequence=0;this.disposed=false;this.initialize();
   }
   initialize(){
     const worker=new this.WorkerClass(new URL('./city-worker.mjs',import.meta.url),{type:'module'});
@@ -13,7 +13,7 @@ export class CityWorkerClient{
       clearTimeout(p.timer);this.pending.delete(data.id);data.error?p.reject(Error(data.error)):p.resolve(data.result??data.ready);
     };
     worker.onerror=event=>this.failWorker(Error(event.message||'건물 작업자 오류'),worker);
-    this.ready=this.request({type:'init',terrain:this.terrain});
+    this.ready=this.request({type:'init',terrain:this.terrain,keepouts:this.keepouts});
     // No nearby tile is required to exist; init failure must not become an
     // unhandled rejection while the first consumer is still outside the radius.
     void this.ready.catch(()=>{});
