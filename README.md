@@ -1,6 +1,6 @@
 # Seoul Air Tour Viewer
 
-[![OPEN TOUR](https://img.shields.io/badge/OPEN%20TOUR-GitHub%20Pages-4caf50?style=for-the-badge&logo=githubpages&logoColor=white)](https://minwoo19930301.github.io/seoul-flight-game/) [![SOURCE CODE](https://img.shields.io/badge/SOURCE%20CODE-minwoo19930301-e7322d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/minwoo19930301/seoul-flight-game)
+[![OPEN TOUR](https://img.shields.io/badge/OPEN%20TOUR-GitHub%20Pages-4caf50?style=for-the-badge&logo=githubpages&logoColor=white)](https://flam-ing.github.io/seoul-flight-game/) [![SOURCE CODE](https://img.shields.io/badge/SOURCE%20CODE-flam--ing-e7322d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/flam-ing/seoul-flight-game)
 
 
 서울 25개 구의 공개 건물 윤곽을 거리별로 불러오는 비행 지도입니다. **전체 행정구역 자료를 연결했지만, 서울 전체의 실측·실사 복원을 완료한 것은 아닙니다.** 공개 데모에 이 변경이 배포됐다는 뜻도 아닙니다.
@@ -67,4 +67,4 @@ npm run build
 - `scripts/prepare-full-seoul.py`: 보존 원본만으로 재현 가능한 오프라인 생성기.
 - `docs/reconstruction.md`: 이전 중심 구역 모델의 역사적 참고 자료.
 
-공개 사이트: [GitHub Pages](https://minwoo19930301.github.io/seoul-flight-game/) · [최신 PR](https://github.com/minwoo19930301/seoul-flight-game/pulls)
+공개 사이트: [GitHub Pages](https://flam-ing.github.io/seoul-flight-game/) · [최신 PR](https://github.com/flam-ing/seoul-flight-game/pulls)
